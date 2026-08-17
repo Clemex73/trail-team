@@ -6,18 +6,11 @@ export default function HomePage() {
     <main className="home-page">
       {/* HERO */}
       <section className="home-hero">
-        <div className="home-hero-image">
-          <Image
-            src="/aiguilles-arves2.png"
-            alt=""
-            fill
-            priority
-            sizes="100vw"
-          />
-        </div>
-
         <div className="home-hero-overlay" />
+
         <div className="home-hero-light" />
+
+        <div className="home-topography" />
 
         <div className="home-hero-content">
           {/* Texte */}
@@ -35,7 +28,6 @@ export default function HomePage() {
             <h1 className="home-title">
               PLUS HAUT.
               <br />
-
               <span>ENSEMBLE.</span>
             </h1>
 
@@ -66,14 +58,16 @@ export default function HomePage() {
           <div className="home-hero-logo-area">
             <div className="home-logo-glow" />
 
-            <div className="home-hero-logo">
-              <Image
-                src="/logo-maurienne2.png"
-                alt="Logo Maurienne Trail Team"
-                fill
-                priority
-                sizes="400px"
-              />
+            <div className="home-logo-circle">
+              <div className="home-hero-logo">
+                <Image
+                  src="/logo-maurienne.png"
+                  alt="Logo Maurienne Trail Team"
+                  fill
+                  priority
+                  sizes="400px"
+                />
+              </div>
             </div>
           </div>
         </div>
@@ -164,7 +158,11 @@ function HeroBadge({
 }: {
   children: React.ReactNode;
 }) {
-  return <span className="hero-badge">{children}</span>;
+  return (
+    <span className="hero-badge">
+      {children}
+    </span>
+  );
 }
 
 function HomeCard({

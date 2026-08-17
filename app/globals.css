@@ -449,16 +449,17 @@ label {
 /* ======================================================
    HOME HERO
 ====================================================== */
+/* ======================================================
+   HOME HERO
+====================================================== */
 
 .home-page {
   width: 100%;
-
   overflow: hidden;
 }
 
 .home-hero {
   position: relative;
-
   min-height: 760px;
 
   display: flex;
@@ -469,70 +470,125 @@ label {
   background:
     linear-gradient(
       90deg,
-      #1d0b42,
+      #1d0b42 0%,
       #4c1d95 28%,
       #7c3aed 52%,
       #4c1d95 75%,
-      #1d0b42
+      #1d0b42 100%
     );
 }
 
-.home-hero-image {
-  position: absolute;
-
-  inset: 0;
-}
-
-.home-hero-image img {
-  object-fit: cover;
-
-  object-position: center;
-
-  opacity: 0.27;
-
-  filter:
-    grayscale(100%)
-    contrast(120%)
-    brightness(90%);
-}
+/* Voile principal */
 
 .home-hero-overlay {
   position: absolute;
-
   inset: 0;
 
   background:
     linear-gradient(
       90deg,
-      rgba(20, 6, 50, 0.94),
-      rgba(54, 20, 110, 0.72) 35%,
-      rgba(91, 33, 182, 0.55) 52%,
-      rgba(54, 20, 110, 0.72) 72%,
-      rgba(20, 6, 50, 0.94)
+      rgba(20, 6, 50, 0.75) 0%,
+      rgba(54, 20, 110, 0.48) 35%,
+      rgba(124, 58, 237, 0.18) 52%,
+      rgba(54, 20, 110, 0.48) 72%,
+      rgba(20, 6, 50, 0.75) 100%
     );
 }
+
+/* Lumière centrale */
 
 .home-hero-light {
   position: absolute;
 
-  width: 850px;
-  height: 850px;
+  width: 900px;
+  height: 650px;
 
-  top: -300px;
+  top: -220px;
   left: 50%;
 
   transform: translateX(-50%);
 
   border-radius: 50%;
 
-  background: rgba(167, 139, 250, 0.14);
+  background:
+    rgba(196, 181, 253, 0.16);
 
-  filter: blur(100px);
+  filter: blur(110px);
+
+  pointer-events: none;
 }
+
+/* ======================================================
+   COURBES TOPOGRAPHIQUES
+====================================================== */
+
+.home-topography {
+  position: absolute;
+  inset: 0;
+
+  pointer-events: none;
+
+  opacity: 0.3;
+
+  background-image:
+    repeating-radial-gradient(
+      ellipse at 8% 45%,
+      transparent 0px,
+      transparent 30px,
+      rgba(255, 255, 255, 0.15) 31px,
+      transparent 32px,
+      transparent 61px
+    ),
+    repeating-radial-gradient(
+      ellipse at 93% 38%,
+      transparent 0px,
+      transparent 38px,
+      rgba(255, 255, 255, 0.12) 39px,
+      transparent 40px,
+      transparent 78px
+    );
+}
+
+.home-topography::before {
+  content: "";
+
+  position: absolute;
+  inset: 0;
+
+  background:
+    radial-gradient(
+      ellipse at 20% 82%,
+      transparent 0px,
+      transparent 78px,
+      rgba(255, 255, 255, 0.08) 79px,
+      transparent 80px,
+      transparent 125px,
+      rgba(255, 255, 255, 0.07) 126px,
+      transparent 127px,
+      transparent 172px,
+      rgba(255, 255, 255, 0.05) 173px,
+      transparent 174px
+    ),
+    radial-gradient(
+      ellipse at 78% 16%,
+      transparent 0px,
+      transparent 95px,
+      rgba(255, 255, 255, 0.07) 96px,
+      transparent 97px,
+      transparent 150px,
+      rgba(255, 255, 255, 0.05) 151px,
+      transparent 152px
+    );
+
+  pointer-events: none;
+}
+
+/* ======================================================
+   CONTENU HERO
+====================================================== */
 
 .home-hero-content {
   width: 100%;
-
   max-width: 1280px;
 
   margin: 0 auto;
@@ -540,7 +596,6 @@ label {
   padding: 90px 32px;
 
   position: relative;
-
   z-index: 2;
 
   display: grid;
@@ -565,11 +620,14 @@ label {
 .hero-badge {
   padding: 7px 11px;
 
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  border:
+    1px solid rgba(255, 255, 255, 0.22);
 
-  background: rgba(255, 255, 255, 0.07);
+  background:
+    rgba(255, 255, 255, 0.07);
 
-  color: rgba(255, 255, 255, 0.8);
+  color:
+    rgba(255, 255, 255, 0.82);
 
   border-radius: 999px;
 
@@ -583,7 +641,7 @@ label {
 }
 
 .home-eyebrow {
-  color: #c4b5fd;
+  color: #d8b4fe;
 
   font-size: 0.8rem;
 
@@ -599,7 +657,8 @@ label {
 .home-title {
   color: white;
 
-  font-size: clamp(3.4rem, 7vw, 6.8rem);
+  font-size:
+    clamp(3.4rem, 7vw, 6.8rem);
 
   line-height: 0.9;
 
@@ -609,11 +668,12 @@ label {
 
   margin: 0;
 
-  text-shadow: 0 10px 40px rgba(0, 0, 0, 0.28);
+  text-shadow:
+    0 10px 40px rgba(0, 0, 0, 0.28);
 }
 
 .home-title span {
-  color: #c4b5fd;
+  color: #d8b4fe;
 }
 
 .home-hero-text {
@@ -621,12 +681,17 @@ label {
 
   max-width: 650px;
 
-  color: rgba(255, 255, 255, 0.76);
+  color:
+    rgba(255, 255, 255, 0.76);
 
   font-size: 1.15rem;
 
   line-height: 1.75;
 }
+
+/* ======================================================
+   BOUTONS HERO
+====================================================== */
 
 .home-hero-buttons {
   display: flex;
@@ -651,7 +716,8 @@ label {
 
   color: #4c1d95;
 
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18);
+  box-shadow:
+    0 10px 30px rgba(0, 0, 0, 0.18);
 }
 
 .home-button-primary:hover {
@@ -663,9 +729,11 @@ label {
 .home-button-secondary {
   color: white;
 
-  border: 1px solid rgba(255, 255, 255, 0.32);
+  border:
+    1px solid rgba(255, 255, 255, 0.32);
 
-  background: rgba(255, 255, 255, 0.08);
+  background:
+    rgba(255, 255, 255, 0.08);
 
   backdrop-filter: blur(12px);
 }
@@ -673,61 +741,98 @@ label {
 .home-button-secondary:hover {
   color: white;
 
-  background: rgba(255, 255, 255, 0.14);
+  background:
+    rgba(255, 255, 255, 0.14);
 }
+
+/* ======================================================
+   LOGO HERO
+====================================================== */
 
 .home-hero-logo-area {
   display: flex;
 
   justify-content: center;
-
   align-items: center;
 
   position: relative;
 }
 
+/* Halo */
+
 .home-logo-glow {
   position: absolute;
 
-  width: 430px;
-  height: 430px;
+  width: 470px;
+  height: 470px;
 
   border-radius: 50%;
 
-  background: rgba(139, 92, 246, 0.15);
+  background:
+    rgba(216, 180, 254, 0.18);
 
-  filter: blur(50px);
+  filter: blur(55px);
+
+  pointer-events: none;
 }
+
+/* Rond violet très clair */
+
+.home-logo-circle {
+  width: 410px;
+  height: 410px;
+
+  max-width: 80vw;
+  max-height: 80vw;
+
+  border-radius: 50%;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  position: relative;
+
+  background:
+    linear-gradient(
+      145deg,
+      rgba(237, 233, 254, 0.98),
+      rgba(216, 180, 254, 0.92)
+    );
+
+  border:
+    1px solid rgba(255, 255, 255, 0.8);
+
+  box-shadow:
+    0 30px 90px rgba(20, 6, 50, 0.28),
+    0 0 0 8px rgba(255, 255, 255, 0.05),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+
+/* Logo */
 
 .home-hero-logo {
   position: relative;
 
-  width: 390px;
+  width: 350px;
 
-  max-width: 80vw;
+  max-width: 70vw;
 
   aspect-ratio: 1;
 
   border-radius: 50%;
-
-  padding: 18px;
-
-  background: rgba(255, 255, 255, 0.08);
-
-  border: 1px solid rgba(255, 255, 255, 0.18);
-
-  box-shadow:
-    0 30px 80px rgba(0, 0, 0, 0.25),
-    inset 0 1px 0 rgba(255, 255, 255, 0.15);
-
-  backdrop-filter: blur(8px);
 }
 
 .home-hero-logo img {
   object-fit: contain;
 
-  padding: 20px;
+  padding: 15px;
 }
+
+/* ======================================================
+   FADE BAS
+====================================================== */
 
 .home-hero-bottom-fade {
   position: absolute;
@@ -737,6 +842,8 @@ label {
   right: 0;
 
   height: 130px;
+
+  pointer-events: none;
 
   background:
     linear-gradient(
