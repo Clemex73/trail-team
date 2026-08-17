@@ -4,13 +4,15 @@
   --background: #f8f7fc;
   --foreground: #17131f;
 
-  --purple-primary: #6d28d9;
-  --purple-dark: #4c1d95;
+  --purple-primary: #5b21b6;
+  --purple-dark: #3b1378;
+  --purple-deep: #24104f;
   --purple-light: #8b5cf6;
   --purple-soft: #ede9fe;
+  --purple-lavender: #d8b4fe;
 
   --white: #ffffff;
-  --border: #e7e3ee;
+  --border: #ddd8e3;
   --muted: #6b6573;
 }
 
@@ -47,7 +49,8 @@ img {
 
 h1,
 h2,
-h3 {
+h3,
+p {
   margin-top: 0;
 }
 
@@ -62,6 +65,10 @@ h2 {
   font-weight: 700;
 }
 
+h3 {
+  font-weight: 800;
+}
+
 /* ======================================================
    LIENS
 ====================================================== */
@@ -71,9 +78,10 @@ a {
   text-decoration: none;
   transition:
     color 0.2s ease,
+    background 0.2s ease,
     opacity 0.2s ease,
     transform 0.2s ease,
-    background 0.2s ease;
+    box-shadow 0.2s ease;
 }
 
 /* ======================================================
@@ -82,13 +90,14 @@ a {
 
 button {
   border: none;
-  border-radius: 10px;
+  border-radius: 8px;
   padding: 11px 18px;
   background: var(--purple-primary);
   color: white;
   font-size: 0.95rem;
-  font-weight: 600;
+  font-weight: 700;
   cursor: pointer;
+
   transition:
     background 0.2s ease,
     transform 0.2s ease,
@@ -98,7 +107,7 @@ button {
 button:hover {
   background: var(--purple-dark);
   transform: translateY(-1px);
-  box-shadow: 0 6px 18px rgba(109, 40, 217, 0.2);
+  box-shadow: 0 6px 18px rgba(91, 33, 182, 0.18);
 }
 
 button:active {
@@ -108,8 +117,8 @@ button:active {
 button:disabled {
   opacity: 0.5;
   cursor: not-allowed;
-  transform: none;
   box-shadow: none;
+  transform: none;
 }
 
 /* ======================================================
@@ -121,12 +130,13 @@ select,
 textarea {
   width: 100%;
   border: 1px solid var(--border);
-  border-radius: 10px;
+  border-radius: 8px;
   padding: 11px 12px;
   background: white;
   color: var(--foreground);
   font-size: 1rem;
   outline: none;
+
   transition:
     border-color 0.2s ease,
     box-shadow 0.2s ease;
@@ -136,13 +146,13 @@ input:focus,
 select:focus,
 textarea:focus {
   border-color: var(--purple-light);
-  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.15);
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.12);
 }
 
 label {
   display: inline-block;
   margin-bottom: 6px;
-  font-weight: 600;
+  font-weight: 700;
   color: #332d3b;
 }
 
@@ -160,9 +170,9 @@ label {
 .card {
   background: var(--white);
   border: 1px solid var(--border);
-  border-radius: 16px;
+  border-radius: 14px;
   padding: 24px;
-  box-shadow: 0 4px 20px rgba(40, 30, 55, 0.05);
+  box-shadow: 0 6px 24px rgba(40, 30, 55, 0.05);
 }
 
 .text-muted {
@@ -174,10 +184,13 @@ label {
   align-items: center;
   padding: 6px 10px;
   border-radius: 999px;
+
   background: var(--purple-soft);
   color: var(--purple-dark);
-  font-size: 0.85rem;
-  font-weight: 700;
+
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
 }
 
 /* ======================================================
@@ -199,7 +212,7 @@ label {
       #24104f 100%
     );
 
-  box-shadow: 0 8px 30px rgba(53, 24, 110, 0.22);
+  box-shadow: 0 6px 26px rgba(53, 24, 110, 0.18);
 }
 
 .navbar-mountain-image {
@@ -280,12 +293,11 @@ label {
 .navbar-brand {
   display: flex;
   align-items: center;
-
   gap: 18px;
 
-  color: white;
-
   min-width: 0;
+
+  color: white;
 }
 
 .navbar-logo {
@@ -295,7 +307,6 @@ label {
   flex-shrink: 0;
 
   border-radius: 50%;
-
   padding: 5px;
 
   background: rgba(255, 255, 255, 0.97);
@@ -318,13 +329,11 @@ label {
 
 .navbar-brand-text {
   border-left: 1px solid rgba(255, 255, 255, 0.24);
-
   padding-left: 18px;
 }
 
 .navbar-title {
   font-size: 1.48rem;
-
   line-height: 1;
 
   font-weight: 900;
@@ -340,7 +349,6 @@ label {
   margin-top: 10px;
 
   font-size: 0.7rem;
-
   line-height: 1;
 
   font-weight: 700;
@@ -375,7 +383,6 @@ label {
 
 .navbar-link:hover {
   color: white;
-
   background: rgba(255, 255, 255, 0.08);
 }
 
@@ -404,7 +411,6 @@ label {
 
 .navbar-action:hover {
   color: white;
-
   background: rgba(255, 255, 255, 0.15);
 }
 
@@ -424,7 +430,6 @@ label {
 
 .navbar-register:hover {
   color: #24104f;
-
   transform: translateY(-1px);
 }
 
@@ -447,10 +452,7 @@ label {
 }
 
 /* ======================================================
-   HOME HERO
-====================================================== */
-/* ======================================================
-   HOME HERO
+   EDITORIAL HOME
 ====================================================== */
 
 .home-page {
@@ -458,549 +460,490 @@ label {
   overflow: hidden;
 }
 
-.home-hero {
-  position: relative;
-  min-height: 760px;
-
-  display: flex;
-  align-items: center;
-
-  overflow: hidden;
-
+.editorial-hero {
   background:
     linear-gradient(
-      90deg,
-      #1d0b42 0%,
-      #4c1d95 28%,
-      #7c3aed 52%,
-      #4c1d95 75%,
-      #1d0b42 100%
-    );
-}
-
-/* Voile principal */
-
-.home-hero-overlay {
-  position: absolute;
-  inset: 0;
-
-  background:
-    linear-gradient(
-      90deg,
-      rgba(20, 6, 50, 0.75) 0%,
-      rgba(54, 20, 110, 0.48) 35%,
-      rgba(124, 58, 237, 0.18) 52%,
-      rgba(54, 20, 110, 0.48) 72%,
-      rgba(20, 6, 50, 0.75) 100%
-    );
-}
-
-/* Lumière centrale */
-
-.home-hero-light {
-  position: absolute;
-
-  width: 900px;
-  height: 650px;
-
-  top: -220px;
-  left: 50%;
-
-  transform: translateX(-50%);
-
-  border-radius: 50%;
-
-  background:
-    rgba(196, 181, 253, 0.16);
-
-  filter: blur(110px);
-
-  pointer-events: none;
-}
-
-/* ======================================================
-   COURBES TOPOGRAPHIQUES
-====================================================== */
-
-.home-topography {
-  position: absolute;
-  inset: 0;
-
-  pointer-events: none;
-
-  opacity: 0.3;
-
-  background-image:
-    repeating-radial-gradient(
-      ellipse at 8% 45%,
-      transparent 0px,
-      transparent 30px,
-      rgba(255, 255, 255, 0.15) 31px,
-      transparent 32px,
-      transparent 61px
-    ),
-    repeating-radial-gradient(
-      ellipse at 93% 38%,
-      transparent 0px,
-      transparent 38px,
-      rgba(255, 255, 255, 0.12) 39px,
-      transparent 40px,
-      transparent 78px
-    );
-}
-
-.home-topography::before {
-  content: "";
-
-  position: absolute;
-  inset: 0;
-
-  background:
-    radial-gradient(
-      ellipse at 20% 82%,
-      transparent 0px,
-      transparent 78px,
-      rgba(255, 255, 255, 0.08) 79px,
-      transparent 80px,
-      transparent 125px,
-      rgba(255, 255, 255, 0.07) 126px,
-      transparent 127px,
-      transparent 172px,
-      rgba(255, 255, 255, 0.05) 173px,
-      transparent 174px
-    ),
-    radial-gradient(
-      ellipse at 78% 16%,
-      transparent 0px,
-      transparent 95px,
-      rgba(255, 255, 255, 0.07) 96px,
-      transparent 97px,
-      transparent 150px,
-      rgba(255, 255, 255, 0.05) 151px,
-      transparent 152px
+      180deg,
+      #ffffff 0%,
+      #faf9fc 100%
     );
 
-  pointer-events: none;
+  border-bottom: 1px solid #e8e4ed;
 }
 
-/* ======================================================
-   CONTENU HERO
-====================================================== */
-
-.home-hero-content {
-  width: 100%;
-  max-width: 1280px;
+.editorial-hero-inner {
+  max-width: 1450px;
+  min-height: 600px;
 
   margin: 0 auto;
 
-  padding: 90px 32px;
-
-  position: relative;
-  z-index: 2;
+  padding: 60px 36px;
 
   display: grid;
 
-  grid-template-columns: 1.15fr 0.85fr;
+  grid-template-columns:
+    240px
+    1px
+    1.25fr
+    0.95fr;
 
   align-items: center;
 
-  gap: 60px;
-}
-
-.home-hero-badges {
-  display: flex;
-
-  gap: 10px;
-
-  flex-wrap: wrap;
-
-  margin-bottom: 24px;
-}
-
-.hero-badge {
-  padding: 7px 11px;
-
-  border:
-    1px solid rgba(255, 255, 255, 0.22);
-
-  background:
-    rgba(255, 255, 255, 0.07);
-
-  color:
-    rgba(255, 255, 255, 0.82);
-
-  border-radius: 999px;
-
-  font-size: 0.68rem;
-
-  font-weight: 800;
-
-  letter-spacing: 0.12em;
-
-  backdrop-filter: blur(8px);
-}
-
-.home-eyebrow {
-  color: #d8b4fe;
-
-  font-size: 0.8rem;
-
-  font-weight: 800;
-
-  letter-spacing: 0.32em;
-
-  text-transform: uppercase;
-
-  margin-bottom: 18px;
-}
-
-.home-title {
-  color: white;
-
-  font-size:
-    clamp(3.4rem, 7vw, 6.8rem);
-
-  line-height: 0.9;
-
-  letter-spacing: -0.055em;
-
-  font-weight: 950;
-
-  margin: 0;
-
-  text-shadow:
-    0 10px 40px rgba(0, 0, 0, 0.28);
-}
-
-.home-title span {
-  color: #d8b4fe;
-}
-
-.home-hero-text {
-  margin-top: 30px;
-
-  max-width: 650px;
-
-  color:
-    rgba(255, 255, 255, 0.76);
-
-  font-size: 1.15rem;
-
-  line-height: 1.75;
-}
-
-/* ======================================================
-   BOUTONS HERO
-====================================================== */
-
-.home-hero-buttons {
-  display: flex;
-
-  gap: 14px;
-
-  flex-wrap: wrap;
-
-  margin-top: 36px;
-}
-
-.home-button {
-  padding: 15px 24px;
-
-  border-radius: 13px;
-
-  font-weight: 800;
-}
-
-.home-button-primary {
-  background: white;
-
-  color: #4c1d95;
-
-  box-shadow:
-    0 10px 30px rgba(0, 0, 0, 0.18);
-}
-
-.home-button-primary:hover {
-  color: #24104f;
-
-  transform: translateY(-2px);
-}
-
-.home-button-secondary {
-  color: white;
-
-  border:
-    1px solid rgba(255, 255, 255, 0.32);
-
-  background:
-    rgba(255, 255, 255, 0.08);
-
-  backdrop-filter: blur(12px);
-}
-
-.home-button-secondary:hover {
-  color: white;
-
-  background:
-    rgba(255, 255, 255, 0.14);
+  gap: 42px;
 }
 
 /* ======================================================
    LOGO HERO
 ====================================================== */
 
-.home-hero-logo-area {
+.editorial-logo-column {
   display: flex;
-
-  justify-content: center;
-  align-items: center;
-
-  position: relative;
-}
-
-/* Halo */
-
-.home-logo-glow {
-  position: absolute;
-
-  width: 470px;
-  height: 470px;
-
-  border-radius: 50%;
-
-  background:
-    rgba(216, 180, 254, 0.18);
-
-  filter: blur(55px);
-
-  pointer-events: none;
-}
-
-/* Rond violet très clair */
-
-.home-logo-circle {
-  width: 410px;
-  height: 410px;
-
-  max-width: 80vw;
-  max-height: 80vw;
-
-  border-radius: 50%;
-
-  display: flex;
-
   align-items: center;
   justify-content: center;
-
-  position: relative;
-
-  background:
-    linear-gradient(
-      145deg,
-      rgba(237, 233, 254, 0.98),
-      rgba(216, 180, 254, 0.92)
-    );
-
-  border:
-    1px solid rgba(255, 255, 255, 0.8);
-
-  box-shadow:
-    0 30px 90px rgba(20, 6, 50, 0.28),
-    0 0 0 8px rgba(255, 255, 255, 0.05),
-    inset 0 1px 0 rgba(255, 255, 255, 0.9);
 }
 
-/* Logo */
-
-.home-hero-logo {
-  position: relative;
-
-  width: 350px;
-
-  max-width: 70vw;
-
-  aspect-ratio: 1;
-
-  border-radius: 50%;
-}
-
-.home-hero-logo img {
-  object-fit: contain;
-
-  padding: 15px;
+.editorial-logo {
+  width: 220px;
+  height: auto;
 }
 
 /* ======================================================
-   FADE BAS
+   DIVIDER HERO
 ====================================================== */
 
-.home-hero-bottom-fade {
-  position: absolute;
-
-  bottom: 0;
-  left: 0;
-  right: 0;
-
-  height: 130px;
-
-  pointer-events: none;
+.editorial-divider {
+  width: 1px;
+  height: 360px;
 
   background:
     linear-gradient(
       to bottom,
       transparent,
-      rgba(248, 247, 252, 1)
+      #bbb4c5 15%,
+      #bbb4c5 85%,
+      transparent
     );
 }
 
 /* ======================================================
-   HOME INTRO
+   TITRE HERO
 ====================================================== */
 
-.home-intro {
-  padding-top: 70px;
-
-  padding-bottom: 70px;
+.editorial-main {
+  position: relative;
+  z-index: 2;
 }
 
-.home-intro-heading {
-  max-width: 850px;
+.editorial-kicker {
+  color: #5b21b6;
 
-  margin-bottom: 44px;
+  font-size: 0.76rem;
+
+  font-weight: 900;
+
+  letter-spacing: 0.28em;
+
+  margin-bottom: 10px;
 }
 
-.home-intro-heading h2 {
-  font-size: clamp(2rem, 4vw, 3.2rem);
+.editorial-title {
+  margin: 0;
 
-  line-height: 1.05;
+  color: #3b1378;
 
-  margin-top: 18px;
+  font-size: clamp(3.6rem, 7vw, 7.2rem);
 
-  margin-bottom: 18px;
+  font-weight: 950;
 
-  color: #24104f;
+  line-height: 0.78;
+
+  letter-spacing: -0.045em;
 }
 
-.home-intro-heading p {
-  font-size: 1.1rem;
+.editorial-title span {
+  display: block;
 
-  line-height: 1.75;
+  color: #17131f;
 
-  max-width: 720px;
+  font-size: 0.56em;
+
+  letter-spacing: 0.02em;
+
+  margin-top: 22px;
 }
 
 /* ======================================================
-   HOME CARDS
+   SEPARATEUR HERO
 ====================================================== */
 
-.home-cards {
-  display: grid;
+.editorial-line {
+  display: flex;
+  align-items: center;
 
-  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
 
-  gap: 20px;
+  width: 330px;
+
+  margin: 30px 0 16px;
 }
 
-.home-card {
-  position: relative;
+.editorial-line > span {
+  height: 2px;
+  flex: 1;
 
-  min-height: 280px;
+  background: #5b21b6;
+}
 
-  padding: 28px;
+.editorial-mini-mountain {
+  color: #5b21b6;
 
-  border-radius: 20px;
+  font-size: 0.8rem;
+
+  letter-spacing: -0.2em;
+}
+
+.editorial-subtitle {
+  color: #4c1d95;
+
+  font-size: 0.95rem;
+
+  font-weight: 800;
+
+  font-style: italic;
+
+  letter-spacing: 0.05em;
+}
+
+/* ======================================================
+   FEATURES
+====================================================== */
+
+.editorial-features {
+  display: grid;
+
+  grid-template-columns:
+    repeat(4, minmax(120px, 1fr));
+
+  gap: 22px;
+
+  margin-top: 34px;
+}
+
+.editorial-feature {
+  display: flex;
+  align-items: center;
+
+  gap: 10px;
+}
+
+.editorial-feature-icon {
+  width: 46px;
+  height: 46px;
+
+  flex-shrink: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border: 1px solid #d9d2e4;
+
+  border-radius: 50%;
+
+  color: #4c1d95;
 
   background: white;
 
-  border: 1px solid #e7e3ee;
-
-  box-shadow: 0 12px 35px rgba(40, 20, 75, 0.06);
-
-  overflow: hidden;
-
-  transition:
-    transform 0.2s ease,
-    box-shadow 0.2s ease;
+  font-size: 1.15rem;
 }
 
-.home-card:hover {
-  transform: translateY(-5px);
+.editorial-feature strong {
+  display: block;
 
-  box-shadow: 0 18px 45px rgba(40, 20, 75, 0.12);
+  color: #24104f;
+
+  font-size: 0.72rem;
+
+  letter-spacing: 0.08em;
 }
 
-.home-card-line {
+.editorial-feature span {
+  display: block;
+
+  margin-top: 3px;
+
+  color: #756f7d;
+
+  font-size: 0.7rem;
+}
+
+/* ======================================================
+   BOUTONS HERO
+====================================================== */
+
+.editorial-buttons {
+  display: flex;
+
+  gap: 12px;
+
+  margin-top: 34px;
+}
+
+.editorial-button-primary,
+.editorial-button-secondary {
+  padding: 13px 19px;
+
+  border-radius: 4px;
+
+  font-weight: 800;
+
+  font-size: 0.87rem;
+
+  letter-spacing: 0.02em;
+}
+
+.editorial-button-primary {
+  background: #4c1d95;
+
+  color: white;
+
+  box-shadow: 0 8px 20px rgba(76, 29, 149, 0.16);
+}
+
+.editorial-button-primary:hover {
+  color: white;
+
+  background: #321063;
+
+  transform: translateY(-1px);
+}
+
+.editorial-button-secondary {
+  color: #4c1d95;
+
+  border: 1px solid #4c1d95;
+
+  background: transparent;
+}
+
+.editorial-button-secondary:hover {
+  color: white;
+
+  background: #4c1d95;
+}
+
+/* ======================================================
+   MONTAGNE HERO
+====================================================== */
+
+.editorial-mountain-column {
+  position: relative;
+
+  min-height: 420px;
+}
+
+.editorial-mountain-image {
+  object-fit: contain;
+
+  object-position: center;
+
+  filter:
+    grayscale(100%)
+    sepia(12%)
+    hue-rotate(225deg)
+    saturate(160%);
+
+  opacity: 0.28;
+}
+
+.editorial-mountain-fade {
   position: absolute;
 
-  top: 0;
-  left: 0;
-
-  width: 100%;
-
-  height: 4px;
+  inset: 0;
 
   background:
     linear-gradient(
       90deg,
-      #24104f,
-      #6d28d9,
-      #a78bfa
+      white 0%,
+      transparent 28%,
+      transparent 80%,
+      white 100%
     );
 }
 
-.home-card-number {
-  color: #ddd6fe;
+.editorial-mountain-text {
+  position: absolute;
 
-  font-size: 3.4rem;
+  right: 0;
+  bottom: 30px;
 
-  line-height: 1;
+  text-align: right;
+
+  color: #4c1d95;
+
+  font-style: italic;
+
+  font-weight: 800;
+
+  font-size: 0.78rem;
+
+  line-height: 1.5;
+
+  letter-spacing: 0.04em;
+}
+
+.editorial-mountain-text span,
+.editorial-mountain-text strong {
+  display: block;
+}
+
+/* ======================================================
+   SECTION IDENTITE
+====================================================== */
+
+.editorial-section {
+  padding-top: 90px;
+  padding-bottom: 90px;
+}
+
+.editorial-section-heading p {
+  margin: 0 0 12px;
+
+  color: #5b21b6;
+
+  font-size: 0.75rem;
+
+  font-weight: 900;
+
+  letter-spacing: 0.27em;
+}
+
+.editorial-section-heading h2 {
+  margin: 0;
+
+  color: #24104f;
+
+  font-size: clamp(2.7rem, 5vw, 5rem);
+
+  line-height: 0.95;
 
   font-weight: 950;
 
-  margin-bottom: 28px;
+  letter-spacing: -0.04em;
 }
 
-.home-card h3 {
-  font-size: 1.45rem;
+.editorial-heading-line {
+  width: 100px;
+  height: 3px;
 
-  margin-bottom: 10px;
+  margin-top: 24px;
+
+  background: #5b21b6;
+}
+
+/* ======================================================
+   CARTES EDITORIALES
+====================================================== */
+
+.editorial-cards {
+  display: grid;
+
+  grid-template-columns:
+    repeat(3, 1fr);
+
+  margin-top: 55px;
+
+  border-top: 1px solid #ddd8e3;
+  border-bottom: 1px solid #ddd8e3;
+}
+
+.editorial-card {
+  padding: 34px 34px 38px;
+
+  border-right: 1px solid #ddd8e3;
+
+  background: white;
+
+  transition:
+    background 0.2s ease,
+    transform 0.2s ease;
+}
+
+.editorial-card:hover {
+  background: #faf8ff;
+}
+
+.editorial-card:last-child {
+  border-right: none;
+}
+
+.editorial-card-top span {
+  display: inline-block;
+
+  background: #4c1d95;
+
+  color: white;
+
+  padding: 6px 12px;
+
+  font-size: 0.7rem;
+
+  font-weight: 900;
+
+  letter-spacing: 0.08em;
+}
+
+.editorial-card h3 {
+  margin: 22px 0 12px;
 
   color: #24104f;
+
+  font-size: 1.4rem;
+
+  letter-spacing: 0.03em;
 }
 
-.home-card p {
+.editorial-card p {
+  color: #6b6573;
+
   line-height: 1.65;
-
-  margin-bottom: 25px;
 }
 
-.home-card a {
-  color: #6d28d9;
+.editorial-card a {
+  display: inline-block;
+
+  margin-top: 18px;
+
+  color: #4c1d95;
 
   font-weight: 800;
 }
 
+.editorial-card a:hover {
+  color: #24104f;
+}
+
 /* ======================================================
-   MOUNTAIN SECTION
+   TERRITOIRE
 ====================================================== */
 
-.mountain-section {
+.editorial-territory {
   position: relative;
 
-  max-width: 1200px;
-
-  min-height: 320px;
-
-  margin: 20px auto 90px;
-
-  border-radius: 26px;
+  min-height: 380px;
 
   overflow: hidden;
 
-  box-shadow: 0 20px 55px rgba(45, 20, 85, 0.14);
+  background: #24104f;
 }
 
-.mountain-section-image {
+.editorial-territory-image {
+  position: absolute;
+
+  inset: 0;
+}
+
+.editorial-territory-image img {
   object-fit: cover;
 
   object-position: center;
@@ -1008,7 +951,7 @@ label {
   filter: grayscale(100%);
 }
 
-.mountain-section-overlay {
+.editorial-territory-overlay {
   position: absolute;
 
   inset: 0;
@@ -1016,56 +959,54 @@ label {
   background:
     linear-gradient(
       90deg,
-      rgba(30, 10, 67, 0.96),
-      rgba(76, 29, 149, 0.72),
-      rgba(76, 29, 149, 0.28)
+      rgba(36, 16, 79, 0.97),
+      rgba(76, 29, 149, 0.8),
+      rgba(76, 29, 149, 0.25)
     );
 }
 
-.mountain-section-content {
+.editorial-territory-content {
   position: relative;
 
   z-index: 2;
 
-  min-height: 320px;
+  max-width: 1200px;
+
+  min-height: 380px;
+
+  margin: 0 auto;
+
+  padding: 70px 24px;
 
   display: flex;
-
   flex-direction: column;
-
   justify-content: center;
-
-  padding: 50px;
-
-  max-width: 650px;
 }
 
-.mountain-eyebrow {
-  color: #c4b5fd;
-
-  font-weight: 800;
+.editorial-territory-content p {
+  color: #d8b4fe;
 
   font-size: 0.75rem;
 
-  letter-spacing: 0.28em;
+  font-weight: 900;
 
-  text-transform: uppercase;
+  letter-spacing: 0.3em;
 }
 
-.mountain-section-content h2 {
+.editorial-territory-content h2 {
+  margin: 10px 0;
+
   color: white;
 
-  font-size: clamp(2rem, 4vw, 3.4rem);
+  font-size: clamp(2.8rem, 6vw, 5.5rem);
 
-  line-height: 1;
+  line-height: 0.9;
 
-  margin: 12px 0 18px;
+  letter-spacing: -0.04em;
 }
 
-.mountain-section-content p:last-child {
-  color: rgba(255, 255, 255, 0.76);
-
-  line-height: 1.7;
+.editorial-territory-content span {
+  color: rgba(255, 255, 255, 0.75);
 
   font-size: 1.05rem;
 }
@@ -1074,10 +1015,9 @@ label {
    TABLETTE
 ====================================================== */
 
-@media (max-width: 1024px) {
+@media (max-width: 1100px) {
   .navbar-inner {
     gap: 20px;
-
     padding-left: 20px;
     padding-right: 20px;
   }
@@ -1088,32 +1028,37 @@ label {
 
   .navbar-subtitle {
     font-size: 0.58rem;
-
     letter-spacing: 0.18em;
   }
 
-  .navbar-link {
-    padding-left: 10px;
-    padding-right: 10px;
-  }
-
-  .home-hero-content {
-    grid-template-columns: 1fr 0.7fr;
+  .editorial-hero-inner {
+    grid-template-columns:
+      180px
+      1px
+      1fr;
 
     gap: 30px;
   }
 
-  .home-hero-logo {
-    width: 310px;
+  .editorial-mountain-column {
+    grid-column: 1 / -1;
+
+    min-height: 280px;
+
+    margin-top: 10px;
   }
 
-  .home-logo-glow {
-    width: 340px;
-    height: 340px;
+  .editorial-logo {
+    width: 170px;
   }
 
-  .home-cards {
-    grid-template-columns: repeat(2, 1fr);
+  .editorial-divider {
+    height: 300px;
+  }
+
+  .editorial-features {
+    grid-template-columns:
+      repeat(2, 1fr);
   }
 }
 
@@ -1148,7 +1093,6 @@ label {
 
   .navbar-brand {
     gap: 12px;
-
     width: 100%;
   }
 
@@ -1159,13 +1103,11 @@ label {
 
   .navbar-brand-text {
     padding-left: 12px;
-
     min-width: 0;
   }
 
   .navbar-title {
     font-size: 1rem;
-
     white-space: normal;
   }
 
@@ -1193,7 +1135,6 @@ label {
   .navbar-action,
   .navbar-register {
     font-size: 0.84rem;
-
     padding: 9px 10px;
   }
 
@@ -1207,138 +1148,174 @@ label {
   }
 
   /* =========================
-     HERO MOBILE
+     HERO EDITORIAL MOBILE
   ========================= */
 
-  .home-hero {
-    min-height: auto;
-  }
-
-  .home-hero-content {
+  .editorial-hero-inner {
     grid-template-columns: 1fr;
+
+    padding: 45px 20px;
 
     text-align: center;
 
-    padding: 65px 18px 100px;
-
-    gap: 35px;
+    gap: 26px;
   }
 
-  .home-hero-badges {
-    justify-content: center;
+  .editorial-logo-column {
+    order: 1;
   }
 
-  .home-eyebrow {
-    font-size: 0.68rem;
-
-    letter-spacing: 0.22em;
+  .editorial-logo {
+    width: 150px;
   }
 
-  .home-title {
-    font-size: clamp(3rem, 16vw, 5rem);
-
-    line-height: 0.92;
+  .editorial-divider {
+    display: none;
   }
 
-  .home-hero-text {
-    font-size: 1rem;
+  .editorial-main {
+    order: 2;
+  }
 
-    line-height: 1.65;
+  .editorial-kicker {
+    font-size: 0.66rem;
+    letter-spacing: 0.2em;
+  }
+
+  .editorial-title {
+    font-size: clamp(3.2rem, 18vw, 5rem);
+    line-height: 0.82;
+  }
+
+  .editorial-title span {
+    margin-top: 16px;
+  }
+
+  .editorial-line {
+    width: 220px;
 
     margin-left: auto;
-
     margin-right: auto;
   }
 
-  .home-hero-buttons {
-    justify-content: center;
+  .editorial-subtitle {
+    font-size: 0.78rem;
   }
 
-  .home-button {
+  .editorial-features {
+    grid-template-columns:
+      repeat(2, 1fr);
+
+    text-align: left;
+
+    gap: 18px;
+  }
+
+  .editorial-feature {
+    align-items: flex-start;
+  }
+
+  .editorial-feature-icon {
+    width: 42px;
+    height: 42px;
+  }
+
+  .editorial-buttons {
+    flex-direction: column;
+  }
+
+  .editorial-button-primary,
+  .editorial-button-secondary {
     width: 100%;
+    text-align: center;
+  }
+
+  .editorial-mountain-column {
+    order: 3;
+
+    min-height: 240px;
+
+    margin-top: 5px;
+  }
+
+  .editorial-mountain-text {
+    left: 0;
+    right: 0;
+    bottom: 10px;
 
     text-align: center;
   }
 
-  .home-hero-logo {
-    width: 230px;
+  /* =========================
+     SECTION MOBILE
+  ========================= */
 
-    max-width: 70vw;
+  .editorial-section {
+    padding-top: 60px;
+    padding-bottom: 60px;
   }
 
-  .home-logo-glow {
-    width: 260px;
-    height: 260px;
+  .editorial-section-heading {
+    text-align: center;
   }
 
-  .home-hero-image img {
-    object-position: center;
+  .editorial-section-heading h2 {
+    font-size: clamp(2.3rem, 12vw, 3.5rem);
+  }
+
+  .editorial-heading-line {
+    margin-left: auto;
+    margin-right: auto;
   }
 
   /* =========================
-     INTRO MOBILE
+     CARTES MOBILE
   ========================= */
 
-  .home-intro {
-    padding-top: 45px;
-  }
-
-  .home-intro-heading h2 {
-    font-size: 2rem;
-  }
-
-  .home-intro-heading p {
-    font-size: 1rem;
-  }
-
-  /* =========================
-     CARDS MOBILE
-  ========================= */
-
-  .home-cards {
+  .editorial-cards {
     grid-template-columns: 1fr;
   }
 
-  .home-card {
-    min-height: auto;
+  .editorial-card {
+    border-right: none;
+
+    border-bottom: 1px solid #ddd8e3;
+  }
+
+  .editorial-card:last-child {
+    border-bottom: none;
   }
 
   /* =========================
-     MOUNTAIN MOBILE
+     TERRITOIRE MOBILE
   ========================= */
 
-  .mountain-section {
-    margin: 10px 16px 55px;
-
-    min-height: 390px;
-
-    border-radius: 20px;
+  .editorial-territory {
+    min-height: 360px;
   }
 
-  .mountain-section-content {
-    min-height: 390px;
+  .editorial-territory-content {
+    min-height: 360px;
 
-    padding: 30px 22px;
+    padding: 50px 18px;
 
-    justify-content: flex-end;
+    text-align: center;
+
+    align-items: center;
   }
 
-  .mountain-section-overlay {
+  .editorial-territory-content h2 {
+    font-size: clamp(2.5rem, 13vw, 4rem);
+  }
+
+  .editorial-territory-overlay {
     background:
       linear-gradient(
         to top,
-        rgba(30, 10, 67, 0.98),
-        rgba(76, 29, 149, 0.7),
-        rgba(76, 29, 149, 0.18)
+        rgba(36, 16, 79, 0.98),
+        rgba(76, 29, 149, 0.68),
+        rgba(76, 29, 149, 0.25)
       );
-  }
-
-  .mountain-section-content h2 {
-    font-size: 2rem;
-  }
-
-  .mountain-section-content p:last-child {
-    font-size: 0.95rem;
   }
 }
 
@@ -1349,13 +1326,11 @@ label {
 @media (max-width: 430px) {
   .navbar-inner {
     padding-left: 12px;
-
     padding-right: 12px;
   }
 
   .navbar-logo {
     width: 48px;
-
     height: 48px;
   }
 
@@ -1365,7 +1340,6 @@ label {
 
   .navbar-subtitle {
     font-size: 0.46rem;
-
     letter-spacing: 0.12em;
   }
 
@@ -1377,33 +1351,39 @@ label {
   .navbar-action,
   .navbar-register {
     font-size: 0.76rem;
-
     padding: 8px 7px;
   }
 
-  .home-hero-content {
-    padding-left: 15px;
-
-    padding-right: 15px;
+  .editorial-hero-inner {
+    padding: 38px 14px;
   }
 
-  .home-title {
-    font-size: clamp(2.7rem, 15vw, 4rem);
+  .editorial-logo {
+    width: 130px;
   }
 
-  .home-hero-logo {
-    width: 200px;
+  .editorial-title {
+    font-size: clamp(2.8rem, 17vw, 4.2rem);
   }
 
-  .hero-badge {
-    font-size: 0.6rem;
-
-    padding: 6px 9px;
+  .editorial-features {
+    gap: 14px;
   }
 
-  .mountain-section {
-    margin-left: 12px;
+  .editorial-feature-icon {
+    width: 38px;
+    height: 38px;
+  }
 
-    margin-right: 12px;
+  .editorial-feature strong {
+    font-size: 0.64rem;
+  }
+
+  .editorial-feature span {
+    font-size: 0.62rem;
+  }
+
+  .editorial-card {
+    padding: 28px 22px 32px;
   }
 }

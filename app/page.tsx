@@ -5,195 +5,222 @@ export default function HomePage() {
   return (
     <main className="home-page">
       {/* HERO */}
-      <section className="home-hero">
-        <div className="home-hero-overlay" />
+      <section className="editorial-hero">
+        <div className="editorial-hero-inner">
+          {/* Logo */}
+          <div className="editorial-logo-column">
+            <Image
+              src="/logo-maurienne.png"
+              alt="Maurienne Trail Team"
+              width={260}
+              height={260}
+              priority
+              className="editorial-logo"
+            />
+          </div>
 
-        <div className="home-hero-light" />
+          <div className="editorial-divider" />
 
-        <div className="home-topography" />
-
-        <div className="home-hero-content">
-          {/* Texte */}
-          <div className="home-hero-left">
-            <div className="home-hero-badges">
-              <HeroBadge>TRAIL</HeroBadge>
-              <HeroBadge>MAURIENNE</HeroBadge>
-              <HeroBadge>MONTAGNE</HeroBadge>
-            </div>
-
-            <p className="home-eyebrow">
-              Maurienne Trail Team
+          {/* Contenu principal */}
+          <div className="editorial-main">
+            <p className="editorial-kicker">
+              MAURIENNE TRAIL TEAM
             </p>
 
-            <h1 className="home-title">
-              PLUS HAUT.
-              <br />
-              <span>ENSEMBLE.</span>
+            <h1 className="editorial-title">
+              MAURIENNE
+              <span>TRAIL TEAM</span>
             </h1>
 
-            <p className="home-hero-text">
-              Une équipe réunie par les sentiers, les sommets et le goût de
-              l&apos;effort. Du kilomètre vertical à l&apos;ultra-trail, nous
-              partageons la même passion : avancer en montagne.
+            <div className="editorial-line">
+              <span />
+              <div className="editorial-mini-mountain">
+                ▲▲▲
+              </div>
+              <span />
+            </div>
+
+            <p className="editorial-subtitle">
+              COURIR PLUS HAUT · COURIR ENSEMBLE
             </p>
 
-            <div className="home-hero-buttons">
+            <div className="editorial-features">
+              <Feature
+                icon="△"
+                title="MONTAGNE"
+                text="Notre terrain de jeu"
+              />
+
+              <Feature
+                icon="↗"
+                title="PERFORMANCE"
+                text="Progresser ensemble"
+              />
+
+              <Feature
+                icon="◌"
+                title="ENDURANCE"
+                text="Du trail à l'ultra"
+              />
+
+              <Feature
+                icon="✦"
+                title="ESPRIT TEAM"
+                text="Partager l'aventure"
+              />
+            </div>
+
+            <div className="editorial-buttons">
               <Link
                 href="/equipe"
-                className="home-button home-button-primary"
+                className="editorial-button-primary"
               >
-                Découvrir l&apos;équipe →
+                Découvrir l&apos;équipe
               </Link>
 
               <Link
                 href="/register"
-                className="home-button home-button-secondary"
+                className="editorial-button-secondary"
               >
                 Rejoindre le team
               </Link>
             </div>
           </div>
 
-          {/* Logo */}
-          <div className="home-hero-logo-area">
-            <div className="home-logo-glow" />
+          {/* Montagne */}
+          <div className="editorial-mountain-column">
+            <Image
+              src="/aiguilles-arves2.png"
+              alt="Aiguilles d'Arves"
+              fill
+              priority
+              sizes="(max-width: 768px) 100vw, 40vw"
+              className="editorial-mountain-image"
+            />
 
-            <div className="home-logo-circle">
-              <div className="home-hero-logo">
-                <Image
-                  src="/logo-maurienne.png"
-                  alt="Logo Maurienne Trail Team"
-                  fill
-                  priority
-                  sizes="400px"
-                />
-              </div>
+            <div className="editorial-mountain-fade" />
+
+            <div className="editorial-mountain-text">
+              <span>BORN IN THE MOUNTAINS</span>
+              <strong>BUILT FOR THE TRAIL</strong>
             </div>
           </div>
         </div>
-
-        <div className="home-hero-bottom-fade" />
       </section>
 
-      {/* INTRO */}
-      <section className="page-container home-intro">
-        <div className="home-intro-heading">
-          <span className="purple-badge">
-            L&apos;ESPRIT DU TEAM
-          </span>
+      {/* IDENTITÉ */}
+      <section className="page-container editorial-section">
+        <div className="editorial-section-heading">
+          <p>NOTRE IDENTITÉ</p>
 
           <h2>
-            La montagne comme terrain de jeu.
-          </h2>
-
-          <p className="text-muted">
-            En Maurienne, chaque sortie commence au fond de la vallée et peut
-            finir bien plus haut. Le team rassemble des coureurs qui veulent
-            progresser, partager et vivre pleinement le trail.
-          </p>
-        </div>
-
-        <div className="home-cards">
-          <HomeCard
-            number="01"
-            title="Le Team"
-            text="Découvrez les membres de Maurienne Trail Team et leurs profils."
-            href="/equipe"
-            action="Voir l'équipe"
-          />
-
-          <HomeCard
-            number="02"
-            title="UTMB Index"
-            text="Suivez les UTMB Index des coureurs du team, mis à jour automatiquement."
-            href="/equipe"
-            action="Voir les index"
-          />
-
-          <HomeCard
-            number="03"
-            title="Les défis"
-            text="Courses, objectifs, kilomètres et dénivelé : les prochains défis du team arrivent bientôt."
-            href="/equipe"
-            action="Découvrir"
-          />
-        </div>
-      </section>
-
-      {/* MONTAGNE */}
-      <section className="mountain-section">
-        <Image
-          src="/aiguilles-arves2.png"
-          alt="Aiguilles d'Arves"
-          fill
-          sizes="1200px"
-          className="mountain-section-image"
-        />
-
-        <div className="mountain-section-overlay" />
-
-        <div className="mountain-section-content">
-          <p className="mountain-eyebrow">
-            Notre territoire
-          </p>
-
-          <h2>
-            Les Aiguilles d&apos;Arves.
+            Une équipe née
             <br />
-            Notre horizon.
+            au cœur de la Maurienne.
           </h2>
 
-          <p>
-            Un décor exigeant et spectaculaire qui incarne parfaitement notre
-            façon de courir : libre, engagée et profondément montagnarde.
-          </p>
+          <div className="editorial-heading-line" />
+        </div>
+
+        <div className="editorial-cards">
+          <EditorialCard
+            number="01"
+            title="LE TEAM"
+            text="Découvrez les coureurs du Maurienne Trail Team, leurs profils et leurs objectifs."
+            href="/equipe"
+          />
+
+          <EditorialCard
+            number="02"
+            title="UTMB INDEX"
+            text="Suivez les performances et les différents UTMB Index des membres de l'équipe."
+            href="/equipe"
+          />
+
+          <EditorialCard
+            number="03"
+            title="NOS DÉFIS"
+            text="Courses, kilomètres, dénivelé et aventures : les prochains objectifs du team."
+            href="/equipe"
+          />
+        </div>
+      </section>
+
+      {/* TERRITOIRE */}
+      <section className="editorial-territory">
+        <div className="editorial-territory-image">
+          <Image
+            src="/aiguilles-arves2.png"
+            alt="Aiguilles d'Arves"
+            fill
+            sizes="100vw"
+          />
+        </div>
+
+        <div className="editorial-territory-overlay" />
+
+        <div className="editorial-territory-content">
+          <p>NOTRE TERRITOIRE</p>
+
+          <h2>
+            LES AIGUILLES D&apos;ARVES
+          </h2>
+
+          <span>
+            Un terrain exigeant, vertical et spectaculaire.
+          </span>
         </div>
       </section>
     </main>
   );
 }
 
-function HeroBadge({
-  children,
+function Feature({
+  icon,
+  title,
+  text,
 }: {
-  children: React.ReactNode;
+  icon: string;
+  title: string;
+  text: string;
 }) {
   return (
-    <span className="hero-badge">
-      {children}
-    </span>
+    <div className="editorial-feature">
+      <div className="editorial-feature-icon">
+        {icon}
+      </div>
+
+      <div>
+        <strong>{title}</strong>
+        <span>{text}</span>
+      </div>
+    </div>
   );
 }
 
-function HomeCard({
+function EditorialCard({
   number,
   title,
   text,
   href,
-  action,
 }: {
   number: string;
   title: string;
   text: string;
   href: string;
-  action: string;
 }) {
   return (
-    <article className="home-card">
-      <div className="home-card-line" />
-
-      <div className="home-card-number">
-        {number}
+    <article className="editorial-card">
+      <div className="editorial-card-top">
+        <span>{number}</span>
       </div>
 
       <h3>{title}</h3>
 
-      <p className="text-muted">
-        {text}
-      </p>
+      <p>{text}</p>
 
       <Link href={href}>
-        {action} →
+        Découvrir →
       </Link>
     </article>
   );
