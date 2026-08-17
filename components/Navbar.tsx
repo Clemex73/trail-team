@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useEffect, useState } from "react";
 import { createClient } from "@/utils/supabase/client";
 
@@ -41,7 +42,7 @@ export default function Navbar() {
         style={{
           maxWidth: "1200px",
           margin: "0 auto",
-          padding: "18px 24px",
+          padding: "12px 24px",
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
@@ -51,13 +52,44 @@ export default function Navbar() {
         <Link
           href="/"
           style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "12px",
             color: "white",
-            fontSize: "1.3rem",
+            fontSize: "1.15rem",
             fontWeight: 800,
             letterSpacing: "-0.02em",
           }}
         >
-          TRAIL TEAM
+          <div
+            style={{
+              width: "62px",
+              height: "62px",
+              borderRadius: "50%",
+              overflow: "hidden",
+              background: "white",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              flexShrink: 0,
+              boxShadow: "0 3px 12px rgba(0,0,0,0.15)",
+            }}
+          >
+            <Image
+              src="/logo-maurienne.png"
+              alt="Logo Maurienne Trail Team"
+              width={62}
+              height={62}
+              priority
+              style={{
+                width: "100%",
+                height: "100%",
+                objectFit: "contain",
+              }}
+            />
+          </div>
+
+          <span>MAURIENNE TRAIL TEAM</span>
         </Link>
 
         <nav
