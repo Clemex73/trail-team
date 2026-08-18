@@ -17,6 +17,16 @@ type Race = {
   distance: number;
   elevation: number;
   race_date: string;
+  location: string | null;
+  image_url: string | null;
+};
+
+type RaceOption = {
+  id: string;
+  race_id: string;
+  name: string | null;
+  distance: number;
+  elevation: number;
 };
 
 type Training = {
@@ -31,6 +41,7 @@ type Training = {
 type RaceAttendance = {
   id: string;
   race_id: string;
+  race_option_id: string | null;
   user_id: string;
   status: "participant" | "support";
 };
@@ -65,6 +76,7 @@ export default function HomePage() {
 
   const [profiles, setProfiles] = useState<Profile[]>([]);
   const [races, setRaces] = useState<Race[]>([]);
+  const [raceOptions, setRaceOptions] = useState<RaceOption[]>([]);
   const [trainings, setTrainings] = useState<Training[]>([]);
 
   const [raceAttendance, setRaceAttendance] =
@@ -113,6 +125,14 @@ export default function HomePage() {
           ascending: true,
         });
 
+    const { data: raceOptionsData } =
+      await supabase
+        .from("race_options")
+        .select("*")
+        .order("distance", {
+          ascending: true,
+        });
+
     const { data: trainingsData } =
       await supabase
         .from("trainings")
@@ -155,6 +175,10 @@ export default function HomePage() {
 
     setRaces(
       (racesData ?? []) as Race[]
+    );
+
+    setRaceOptions(
+      (raceOptionsData ?? []) as RaceOption[]
     );
 
     setTrainings(
@@ -239,6 +263,15 @@ export default function HomePage() {
 
   const nextTraining =
     upcomingTrainings[0] ?? null;
+
+  function getRaceOptions(
+    raceId: string
+  ) {
+    return raceOptions.filter(
+      (option) =>
+        option.race_id === raceId
+    );
+  }
 
   function raceParticipants(
     raceId: string
@@ -339,6 +372,7 @@ export default function HomePage() {
 
   return (
     <main className="home-dashboard">
+
       {/* ==================================================
           HERO
       ================================================== */}
@@ -410,7 +444,9 @@ export default function HomePage() {
               {profiles.length}
             </strong>
 
-            <span>MEMBRES</span>
+            <span>
+              MEMBRES
+            </span>
           </div>
 
           <div>
@@ -419,7 +455,7 @@ export default function HomePage() {
             </strong>
 
             <span>
-              COURSES À VENIR
+              ÉVÉNEMENTS À VENIR
             </span>
           </div>
 
@@ -438,7 +474,9 @@ export default function HomePage() {
               {comments.length}
             </strong>
 
-            <span>MESSAGES</span>
+            <span>
+              MESSAGES
+            </span>
           </div>
         </div>
       </section>
@@ -459,68 +497,116 @@ export default function HomePage() {
         </div>
 
         <div className="home-next-grid">
+
+          {/* ==============================
+              PROCHAINE COURSE
+          ============================== */}
+
           {nextRace ? (
             <Link
               href={`/courses/course/${nextRace.id}`}
-              className="home-event-card home-race-card"
+              className="home-event-card home-race-card home-race-card-with-image"
             >
-              <div className="home-event-top">
-                <span>
-                  PROCHAINE COURSE
-                </span>
+              <div className="home-race-card-main">
 
-                <strong>
-                  {new Date(
-                    `${nextRace.race_date}T12:00:00`
-                  ).toLocaleDateString(
-                    "fr-FR",
+                <div className="home-event-top">
+                  <span>
+                    PROCHAINE COURSE
+                  </span>
+
+                  <strong>
+                    {new Date(
+                      `${nextRace.race_date}T12:00:00`
+                    ).toLocaleDateString(
+                      "fr-FR",
+                      {
+                        day: "2-digit",
+                        month: "short",
+                      }
+                    )}
+                  </strong>
+                </div>
+
+                <div className="home-race-body">
+                  {nextRace.image_url && (
+                    <div className="home-race-image">
+                      <img
+                        src={nextRace.image_url}
+                        alt={`Logo ${nextRace.name}`}
+                      />
+                    </div>
+                  )}
+
+                  <div className="home-race-info">
+                    <h3>
+                      {nextRace.name}
+                    </h3>
+
+                    {nextRace.location && (
+                      <p className="home-race-location">
+                        📍 {nextRace.location}
+                      </p>
+                    )}
+
+                    <div className="home-race-formats">
+                      <strong>
+                        {
+                          getRaceOptions(
+                            nextRace.id
+                          ).length
+                        }
+                      </strong>
+
+                      <span>
+                        FORMAT
+                        {getRaceOptions(
+                          nextRace.id
+                        ).length !== 1
+                          ? "S"
+                          : ""}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="home-event-footer home-race-footer">
+                  <span>
+                    🏃{" "}
                     {
-                      day: "2-digit",
-                      month: "short",
-                    }
-                  )}
-                </strong>
-              </div>
-
-              <h3>
-                {nextRace.name}
-              </h3>
-
-              <div className="home-event-details">
-                <span>
-                  {nextRace.distance} KM
-                </span>
-
-                <span>
-                  {nextRace.elevation} M+
-                </span>
-              </div>
-
-              <div className="home-event-footer">
-                <span>
-                  🏃{" "}
-                  {
-                    raceParticipants(
+                      raceParticipants(
+                        nextRace.id
+                      ).length
+                    }{" "}
+                    participant
+                    {raceParticipants(
                       nextRace.id
-                    ).length
-                  }
-                </span>
+                    ).length !== 1
+                      ? "s"
+                      : ""}
+                  </span>
 
-                <span>
-                  📣{" "}
-                  {
-                    raceSupporters(
+                  <span>
+                    📣{" "}
+                    {
+                      raceSupporters(
+                        nextRace.id
+                      ).length
+                    }{" "}
+                    supporter
+                    {raceSupporters(
                       nextRace.id
-                    ).length
-                  }
-                </span>
+                    ).length !== 1
+                      ? "s"
+                      : ""}
+                  </span>
 
-                <span>
-                  💬{" "}
-                  {raceCommentCount(
-                    nextRace.id
-                  )}
-                </span>
+                  <span>
+                    💬{" "}
+                    {raceCommentCount(
+                      nextRace.id
+                    )}
+                  </span>
+                </div>
               </div>
             </Link>
           ) : (
@@ -538,6 +624,10 @@ export default function HomePage() {
               </Link>
             </div>
           )}
+
+          {/* ==============================
+              PROCHAINE SORTIE
+          ============================== */}
 
           {nextTraining ? (
             <Link
@@ -765,8 +855,7 @@ export default function HomePage() {
             <p>
               Récit de course,
               entraînement, aventure ou
-              moment du team : à vous
-              d&apos;écrire la suite.
+              moment du team.
             </p>
 
             {userId && (
@@ -789,10 +878,11 @@ export default function HomePage() {
                     {article.image_urls?.[0] ? (
                       <img
                         src={
-                          article
-                            .image_urls[0]
+                          article.image_urls[0]
                         }
-                        alt={article.title}
+                        alt={
+                          article.title
+                        }
                       />
                     ) : (
                       <div className="home-article-placeholder">
