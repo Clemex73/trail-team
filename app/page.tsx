@@ -1,7 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { createClient } from "@/utils/supabase/client";
 
 type Profile = {
@@ -74,10 +79,17 @@ type Article = {
 export default function HomePage() {
   const supabase = createClient();
 
-  const [profiles, setProfiles] = useState<Profile[]>([]);
-  const [races, setRaces] = useState<Race[]>([]);
-  const [raceOptions, setRaceOptions] = useState<RaceOption[]>([]);
-  const [trainings, setTrainings] = useState<Training[]>([]);
+  const [profiles, setProfiles] =
+    useState<Profile[]>([]);
+
+  const [races, setRaces] =
+    useState<Race[]>([]);
+
+  const [raceOptions, setRaceOptions] =
+    useState<RaceOption[]>([]);
+
+  const [trainings, setTrainings] =
+    useState<Training[]>([]);
 
   const [raceAttendance, setRaceAttendance] =
     useState<RaceAttendance[]>([]);
@@ -96,6 +108,9 @@ export default function HomePage() {
 
   const [loading, setLoading] =
     useState(true);
+
+  const racesCarouselRef =
+    useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     loadHome();
@@ -209,10 +224,11 @@ export default function HomePage() {
   function getProfileName(
     profileId: string
   ) {
-    const profile = profiles.find(
-      (item) =>
-        item.id === profileId
-    );
+    const profile =
+      profiles.find(
+        (item) =>
+          item.id === profileId
+      );
 
     if (!profile) {
       return "Membre";
@@ -260,6 +276,9 @@ export default function HomePage() {
 
   const nextRace =
     upcomingRaces[0] ?? null;
+
+  const nextRaces =
+    upcomingRaces.slice(1, 6);
 
   const nextTraining =
     upcomingTrainings[0] ?? null;
@@ -326,15 +345,19 @@ export default function HomePage() {
     comment: EventComment
   ) {
     if (comment.race_id) {
-      const race = races.find(
-        (item) =>
-          item.id === comment.race_id
-      );
+      const race =
+        races.find(
+          (item) =>
+            item.id ===
+            comment.race_id
+        );
 
       return {
         name:
           race?.name ?? "Course",
-        href: `/courses/course/${comment.race_id}`,
+
+        href:
+          `/courses/course/${comment.race_id}`,
       };
     }
 
@@ -350,7 +373,9 @@ export default function HomePage() {
         name:
           training?.title ??
           "Entraînement",
-        href: `/courses/training/${comment.training_id}`,
+
+        href:
+          `/courses/training/${comment.training_id}`,
       };
     }
 
@@ -358,6 +383,33 @@ export default function HomePage() {
       name: "Événement",
       href: "/courses",
     };
+  }
+
+  function scrollRaceCarousel(
+    direction: "left" | "right"
+  ) {
+    const carousel =
+      racesCarouselRef.current;
+
+    if (!carousel) {
+      return;
+    }
+
+    const amount =
+      Math.min(
+        carousel.clientWidth *
+          0.85,
+        430
+      );
+
+    carousel.scrollBy({
+      left:
+        direction === "right"
+          ? amount
+          : -amount,
+
+      behavior: "smooth",
+    });
   }
 
   if (loading) {
@@ -387,7 +439,9 @@ export default function HomePage() {
             <h1>
               PLUS HAUT.
               <br />
-              <span>ENSEMBLE.</span>
+              <span>
+                ENSEMBLE.
+              </span>
             </h1>
 
             <p>
@@ -461,7 +515,9 @@ export default function HomePage() {
 
           <div>
             <strong>
-              {upcomingTrainings.length}
+              {
+                upcomingTrainings.length
+              }
             </strong>
 
             <span>
@@ -531,7 +587,9 @@ export default function HomePage() {
                   {nextRace.image_url && (
                     <div className="home-race-image">
                       <img
-                        src={nextRace.image_url}
+                        src={
+                          nextRace.image_url
+                        }
                         alt={`Logo ${nextRace.name}`}
                       />
                     </div>
@@ -544,7 +602,8 @@ export default function HomePage() {
 
                     {nextRace.location && (
                       <p className="home-race-location">
-                        📍 {nextRace.location}
+                        📍{" "}
+                        {nextRace.location}
                       </p>
                     )}
 
@@ -659,7 +718,9 @@ export default function HomePage() {
               <div className="home-event-details">
                 <span>
                   📍{" "}
-                  {nextTraining.location}
+                  {
+                    nextTraining.location
+                  }
                 </span>
 
                 <span>
@@ -711,6 +772,220 @@ export default function HomePage() {
             </div>
           )}
         </div>
+
+        {/* ==================================================
+            CARROUSEL COURSES SUIVANTES
+        ================================================== */}
+
+        {nextRaces.length > 0 && (
+          <div className="home-races-carousel-section">
+
+            <div className="home-races-carousel-heading">
+              <div>
+                <span>
+                  ENSUITE
+                </span>
+
+                <h3>
+                  Les prochains objectifs
+                </h3>
+              </div>
+
+              <div className="home-races-carousel-controls">
+                <button
+                  type="button"
+                  aria-label="Voir les courses précédentes"
+                  onClick={() =>
+                    scrollRaceCarousel(
+                      "left"
+                    )
+                  }
+                >
+                  ←
+                </button>
+
+                <button
+                  type="button"
+                  aria-label="Voir les courses suivantes"
+                  onClick={() =>
+                    scrollRaceCarousel(
+                      "right"
+                    )
+                  }
+                >
+                  →
+                </button>
+              </div>
+            </div>
+
+            <div
+              ref={
+                racesCarouselRef
+              }
+              className="home-races-carousel"
+            >
+              {nextRaces.map(
+                (race) => {
+                  const options =
+                    getRaceOptions(
+                      race.id
+                    );
+
+                  const participants =
+                    raceParticipants(
+                      race.id
+                    ).length;
+
+                  const supporters =
+                    raceSupporters(
+                      race.id
+                    ).length;
+
+                  const commentCount =
+                    raceCommentCount(
+                      race.id
+                    );
+
+                  return (
+                    <Link
+                      key={race.id}
+                      href={`/courses/course/${race.id}`}
+                      className="home-carousel-race-card"
+                    >
+                      <div className="home-carousel-race-visual">
+                        {race.image_url ? (
+                          <img
+                            src={
+                              race.image_url
+                            }
+                            alt={`Logo ${race.name}`}
+                          />
+                        ) : (
+                          <div className="home-carousel-race-placeholder">
+                            MTT
+                          </div>
+                        )}
+
+                        <div className="home-carousel-race-date">
+                          <strong>
+                            {new Date(
+                              `${race.race_date}T12:00:00`
+                            ).toLocaleDateString(
+                              "fr-FR",
+                              {
+                                day:
+                                  "2-digit",
+                              }
+                            )}
+                          </strong>
+
+                          <span>
+                            {new Date(
+                              `${race.race_date}T12:00:00`
+                            )
+                              .toLocaleDateString(
+                                "fr-FR",
+                                {
+                                  month:
+                                    "short",
+                                }
+                              )
+                              .toUpperCase()}
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="home-carousel-race-body">
+                        <span className="home-carousel-race-label">
+                          COURSE
+                        </span>
+
+                        <h4>
+                          {race.name}
+                        </h4>
+
+                        {race.location && (
+                          <p>
+                            📍{" "}
+                            {race.location}
+                          </p>
+                        )}
+
+                        <div className="home-carousel-race-format-count">
+                          {
+                            options.length
+                          }{" "}
+                          format
+                          {options.length !==
+                          1
+                            ? "s"
+                            : ""}
+                        </div>
+
+                        {options.length >
+                          0 && (
+                          <div className="home-carousel-race-options">
+                            {options
+                              .slice(
+                                0,
+                                3
+                              )
+                              .map(
+                                (
+                                  option
+                                ) => (
+                                  <span
+                                    key={
+                                      option.id
+                                    }
+                                  >
+                                    {
+                                      option.distance
+                                    }{" "}
+                                    km
+                                  </span>
+                                )
+                              )}
+
+                            {options.length >
+                              3 && (
+                              <span>
+                                +
+                                {options.length -
+                                  3}
+                              </span>
+                            )}
+                          </div>
+                        )}
+
+                        <div className="home-carousel-race-stats">
+                          <span>
+                            🏃{" "}
+                            {participants}
+                          </span>
+
+                          <span>
+                            📣{" "}
+                            {supporters}
+                          </span>
+
+                          <span>
+                            💬{" "}
+                            {commentCount}
+                          </span>
+                        </div>
+                      </div>
+                    </Link>
+                  );
+                }
+              )}
+            </div>
+
+            <div className="home-carousel-hint">
+              Glisse horizontalement pour voir les autres courses →
+            </div>
+          </div>
+        )}
       </section>
 
       {/* ==================================================
@@ -739,61 +1014,77 @@ export default function HomePage() {
 
               {comments
                 .slice(0, 5)
-                .map((comment) => {
-                  const target =
-                    getCommentTarget(
-                      comment
-                    );
+                .map(
+                  (comment) => {
+                    const target =
+                      getCommentTarget(
+                        comment
+                      );
 
-                  return (
-                    <Link
-                      href={target.href}
-                      key={comment.id}
-                      className="home-activity-item"
-                    >
-                      <div className="home-activity-avatar">
-                        {getProfileName(
-                          comment.user_id
-                        )
-                          .charAt(0)
-                          .toUpperCase()}
-                      </div>
-
-                      <div>
-                        <div className="home-activity-meta">
-                          <strong>
-                            {getProfileName(
-                              comment.user_id
-                            )}
-                          </strong>
-
-                          <span>
-                            sur{" "}
-                            {target.name}
-                          </span>
+                    return (
+                      <Link
+                        href={
+                          target.href
+                        }
+                        key={
+                          comment.id
+                        }
+                        className="home-activity-item"
+                      >
+                        <div className="home-activity-avatar">
+                          {getProfileName(
+                            comment.user_id
+                          )
+                            .charAt(
+                              0
+                            )
+                            .toUpperCase()}
                         </div>
 
-                        <p>
-                          {comment.message}
-                        </p>
+                        <div>
+                          <div className="home-activity-meta">
+                            <strong>
+                              {getProfileName(
+                                comment.user_id
+                              )}
+                            </strong>
 
-                        <small>
-                          {new Date(
-                            comment.created_at
-                          ).toLocaleString(
-                            "fr-FR",
+                            <span>
+                              sur{" "}
+                              {
+                                target.name
+                              }
+                            </span>
+                          </div>
+
+                          <p>
                             {
-                              day: "2-digit",
-                              month: "short",
-                              hour: "2-digit",
-                              minute: "2-digit",
+                              comment.message
                             }
-                          )}
-                        </small>
-                      </div>
-                    </Link>
-                  );
-                })}
+                          </p>
+
+                          <small>
+                            {new Date(
+                              comment.created_at
+                            ).toLocaleString(
+                              "fr-FR",
+                              {
+                                day:
+                                  "2-digit",
+                                month:
+                                  "short",
+                                hour:
+                                  "2-digit",
+                                minute:
+                                  "2-digit",
+                              }
+                            )}
+                          </small>
+                        </div>
+                      </Link>
+                    );
+                  }
+                )}
             </div>
 
             <div className="home-team-quote">
@@ -868,64 +1159,71 @@ export default function HomePage() {
           <div className="home-articles-grid">
             {articles
               .slice(0, 6)
-              .map((article) => (
-                <Link
-                  key={article.id}
-                  href={`/articles/${article.id}`}
-                  className="home-article-card"
-                >
-                  <div className="home-article-image">
-                    {article.image_urls?.[0] ? (
-                      <img
-                        src={
-                          article.image_urls[0]
-                        }
-                        alt={
-                          article.title
-                        }
-                      />
-                    ) : (
-                      <div className="home-article-placeholder">
-                        MTT
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="home-article-content">
-                    <span>
-                      {new Date(
-                        article.created_at
-                      ).toLocaleDateString(
-                        "fr-FR",
-                        {
-                          day: "2-digit",
-                          month: "long",
-                          year: "numeric",
-                        }
-                      )}
-                    </span>
-
-                    <h3>
-                      {article.title}
-                    </h3>
-
-                    <p>
-                      {article.excerpt ||
-                        article.content.slice(
-                          0,
-                          150
-                        )}
-                    </p>
-
-                    <div className="home-article-author">
-                      PAR{" "}
-                      {getProfileName(
-                        article.author_id
+              .map(
+                (article) => (
+                  <Link
+                    key={
+                      article.id
+                    }
+                    href={`/articles/${article.id}`}
+                    className="home-article-card"
+                  >
+                    <div className="home-article-image">
+                      {article.image_urls?.[0] ? (
+                        <img
+                          src={
+                            article.image_urls[0]
+                          }
+                          alt={
+                            article.title
+                          }
+                        />
+                      ) : (
+                        <div className="home-article-placeholder">
+                          MTT
+                        </div>
                       )}
                     </div>
-                  </div>
-                </Link>
-              ))}
+
+                    <div className="home-article-content">
+                      <span>
+                        {new Date(
+                          article.created_at
+                        ).toLocaleDateString(
+                          "fr-FR",
+                          {
+                            day:
+                              "2-digit",
+                            month:
+                              "long",
+                            year:
+                              "numeric",
+                          }
+                        )}
+                      </span>
+
+                      <h3>
+                        {article.title}
+                      </h3>
+
+                      <p>
+                        {article.excerpt ||
+                          article.content.slice(
+                            0,
+                            150
+                          )}
+                      </p>
+
+                      <div className="home-article-author">
+                        PAR{" "}
+                        {getProfileName(
+                          article.author_id
+                        )}
+                      </div>
+                    </div>
+                  </Link>
+                )
+              )}
           </div>
         )}
       </section>
