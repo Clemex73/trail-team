@@ -1387,3 +1387,1035 @@ label {
     padding: 28px 22px 32px;
   }
 }
+
+/* ======================================================
+   COURSES
+====================================================== */
+
+.courses-page {
+  min-height: 100vh;
+  background: #faf9fc;
+}
+
+.courses-hero {
+  background:
+    linear-gradient(
+      115deg,
+      #ffffff 0%,
+      #faf8ff 55%,
+      #f2edfb 100%
+    );
+
+  border-bottom: 1px solid #ded8e7;
+}
+
+.courses-hero-inner {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+
+  padding: 70px 24px;
+}
+
+.courses-hero-inner > p:first-child {
+  margin: 0 0 14px;
+
+  color: #5b21b6;
+
+  font-size: 0.75rem;
+  font-weight: 900;
+
+  letter-spacing: 0.3em;
+}
+
+.courses-hero h1 {
+  margin: 0;
+
+  font-size: clamp(3rem, 7vw, 6.5rem);
+
+  line-height: 0.85;
+
+  font-weight: 950;
+
+  letter-spacing: -0.05em;
+
+  color: #17131f;
+}
+
+.courses-hero h1 span {
+  color: #4c1d95;
+}
+
+.courses-title-line {
+  width: 120px;
+  height: 4px;
+
+  margin: 28px 0;
+
+  background: #4c1d95;
+}
+
+.courses-description {
+  max-width: 620px;
+
+  color: #6b6573;
+
+  line-height: 1.7;
+
+  font-size: 1.05rem;
+}
+
+/* ======================================================
+   CREATION COURSE
+====================================================== */
+
+.race-create {
+  background: white;
+
+  border: 1px solid #ddd8e3;
+
+  padding: 32px;
+
+  box-shadow: 0 12px 35px rgba(40, 20, 75, 0.05);
+}
+
+.race-create-heading {
+  margin-bottom: 28px;
+}
+
+.race-create-heading > span {
+  color: #5b21b6;
+
+  font-size: 0.7rem;
+
+  font-weight: 900;
+
+  letter-spacing: 0.25em;
+}
+
+.race-create-heading h2 {
+  margin: 10px 0 5px;
+
+  color: #24104f;
+
+  font-size: 2rem;
+}
+
+.race-create-heading p {
+  margin: 0;
+
+  color: #6b6573;
+}
+
+.race-form {
+  display: grid;
+
+  grid-template-columns:
+    2fr
+    0.8fr
+    0.8fr
+    1fr
+    auto;
+
+  align-items: end;
+
+  gap: 14px;
+}
+
+.race-input-unit {
+  position: relative;
+}
+
+.race-input-unit input {
+  padding-right: 45px;
+}
+
+.race-input-unit span {
+  position: absolute;
+
+  right: 12px;
+  top: 50%;
+
+  transform: translateY(-50%);
+
+  color: #8a8292;
+
+  font-size: 0.72rem;
+
+  font-weight: 800;
+}
+
+.race-submit {
+  min-height: 45px;
+
+  white-space: nowrap;
+}
+
+/* ======================================================
+   SECTIONS
+====================================================== */
+
+.courses-section-title {
+  display: flex;
+
+  align-items: flex-end;
+  justify-content: space-between;
+
+  gap: 30px;
+
+  margin-bottom: 28px;
+}
+
+.courses-section-title span {
+  color: #5b21b6;
+
+  font-size: 0.7rem;
+
+  font-weight: 900;
+
+  letter-spacing: 0.25em;
+}
+
+.courses-section-title h2 {
+  margin: 8px 0 0;
+
+  color: #24104f;
+
+  font-size: clamp(2rem, 4vw, 3rem);
+}
+
+/* ======================================================
+   CALENDAR
+====================================================== */
+
+.calendar-controls {
+  display: flex;
+  align-items: center;
+
+  gap: 15px;
+
+  text-transform: capitalize;
+}
+
+.calendar-controls button {
+  width: 38px;
+  height: 38px;
+
+  padding: 0;
+
+  border-radius: 50%;
+}
+
+.race-calendar {
+  display: grid;
+
+  grid-template-columns: repeat(7, 1fr);
+
+  border-top: 1px solid #ded8e7;
+  border-left: 1px solid #ded8e7;
+
+  background: white;
+}
+
+.calendar-weekday {
+  padding: 13px 8px;
+
+  border-right: 1px solid #ded8e7;
+  border-bottom: 1px solid #ded8e7;
+
+  color: #6b6573;
+
+  font-size: 0.68rem;
+
+  font-weight: 900;
+
+  letter-spacing: 0.08em;
+
+  text-align: center;
+}
+
+.calendar-day {
+  position: relative;
+
+  min-height: 130px;
+
+  padding: 10px;
+
+  border-right: 1px solid #ded8e7;
+  border-bottom: 1px solid #ded8e7;
+
+  background: white;
+}
+
+.calendar-empty {
+  background: #faf9fc;
+}
+
+.calendar-number {
+  display: inline-flex;
+
+  width: 26px;
+  height: 26px;
+
+  justify-content: center;
+  align-items: center;
+
+  color: #6b6573;
+
+  font-size: 0.78rem;
+
+  font-weight: 700;
+}
+
+.calendar-day-race .calendar-number {
+  border-radius: 50%;
+
+  background: #4c1d95;
+
+  color: white;
+}
+
+.calendar-race {
+  margin-top: 8px;
+
+  padding: 8px;
+
+  border-left: 3px solid #6d28d9;
+
+  background: #f4f0fb;
+}
+
+.calendar-race strong {
+  display: block;
+
+  color: #24104f;
+
+  font-size: 0.72rem;
+}
+
+.calendar-race > span {
+  display: block;
+
+  margin-top: 3px;
+
+  color: #746d7c;
+
+  font-size: 0.64rem;
+}
+
+.calendar-race-status {
+  display: flex;
+
+  gap: 5px;
+
+  margin-top: 7px;
+
+  color: #4c1d95;
+
+  font-size: 0.68rem;
+
+  font-weight: 800;
+}
+
+/* ======================================================
+   LISTE COURSES
+====================================================== */
+
+.race-list {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 18px;
+}
+
+.race-card {
+  display: grid;
+
+  grid-template-columns:
+    95px
+    1.1fr
+    1.5fr
+    auto;
+
+  align-items: stretch;
+
+  background: white;
+
+  border: 1px solid #ded8e7;
+
+  box-shadow:
+    0 8px 28px rgba(40, 20, 75, 0.04);
+}
+
+.race-card-date {
+  display: flex;
+
+  flex-direction: column;
+
+  justify-content: center;
+  align-items: center;
+
+  background: #24104f;
+
+  color: white;
+}
+
+.race-card-date strong {
+  font-size: 2rem;
+
+  line-height: 1;
+}
+
+.race-card-date span {
+  margin-top: 5px;
+
+  color: #d8b4fe;
+
+  font-size: 0.7rem;
+
+  font-weight: 900;
+
+  letter-spacing: 0.1em;
+}
+
+.race-card-main {
+  padding: 24px;
+
+  border-right: 1px solid #ece8ef;
+}
+
+.race-card-label {
+  margin: 0 0 6px;
+
+  color: #5b21b6;
+
+  font-size: 0.65rem;
+
+  font-weight: 900;
+
+  letter-spacing: 0.2em;
+}
+
+.race-card-main h3 {
+  margin: 0 0 18px;
+
+  color: #24104f;
+
+  font-size: 1.5rem;
+}
+
+.race-stats {
+  display: flex;
+
+  gap: 30px;
+}
+
+.race-stats span {
+  display: block;
+
+  color: #8a8292;
+
+  font-size: 0.6rem;
+
+  font-weight: 900;
+
+  letter-spacing: 0.1em;
+}
+
+.race-stats strong {
+  display: block;
+
+  margin-top: 3px;
+
+  color: #24104f;
+}
+
+.race-people {
+  display: grid;
+
+  grid-template-columns: 1fr 1fr;
+
+  gap: 20px;
+
+  padding: 24px;
+}
+
+.race-people-title {
+  display: block;
+
+  margin-bottom: 10px;
+
+  color: #4c1d95;
+
+  font-size: 0.65rem;
+
+  font-weight: 900;
+
+  letter-spacing: 0.1em;
+}
+
+.race-names {
+  display: flex;
+
+  flex-wrap: wrap;
+
+  gap: 6px;
+}
+
+.race-person {
+  padding: 5px 8px;
+
+  border-radius: 999px;
+
+  font-size: 0.72rem;
+
+  font-weight: 700;
+}
+
+.race-person.participant {
+  color: #4c1d95;
+
+  background: #ede9fe;
+}
+
+.race-person.supporter {
+  color: #6b4d00;
+
+  background: #fff5cc;
+}
+
+.race-empty {
+  color: #aaa3af;
+
+  font-size: 0.72rem;
+}
+
+.race-actions {
+  min-width: 175px;
+
+  padding: 18px;
+
+  display: flex;
+
+  flex-direction: column;
+
+  justify-content: center;
+
+  gap: 8px;
+
+  border-left: 1px solid #ece8ef;
+}
+
+.race-choice {
+  background: white;
+
+  color: #4c1d95;
+
+  border: 1px solid #d9d2e4;
+
+  box-shadow: none;
+}
+
+.race-choice:hover {
+  color: white;
+
+  background: #4c1d95;
+}
+
+.race-choice-active {
+  color: white;
+
+  background: #4c1d95;
+
+  border-color: #4c1d95;
+}
+
+.race-remove {
+  background: transparent;
+
+  color: #8d8495;
+
+  box-shadow: none;
+}
+
+.race-remove:hover {
+  background: #f5f2f7;
+
+  color: #24104f;
+
+  box-shadow: none;
+}
+
+.no-races,
+.race-login-message {
+  padding: 30px;
+
+  color: #6b6573;
+
+  border: 1px dashed #d9d2e4;
+
+  background: #faf9fc;
+}
+
+/* ======================================================
+   COURSES MOBILE
+====================================================== */
+
+@media (max-width: 900px) {
+  .race-form {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .race-form-name {
+    grid-column: 1 / -1;
+  }
+
+  .race-submit {
+    grid-column: 1 / -1;
+  }
+
+  .race-card {
+    grid-template-columns: 75px 1fr;
+  }
+
+  .race-people {
+    grid-column: 1 / -1;
+
+    border-top: 1px solid #ece8ef;
+  }
+
+  .race-actions {
+    grid-column: 1 / -1;
+
+    min-width: 0;
+
+    flex-direction: row;
+
+    border-left: none;
+    border-top: 1px solid #ece8ef;
+  }
+}
+
+@media (max-width: 768px) {
+  .courses-hero-inner {
+    padding: 50px 18px;
+  }
+
+  .courses-hero h1 {
+    font-size: clamp(3rem, 17vw, 4.5rem);
+  }
+
+  .courses-section-title {
+    align-items: flex-start;
+
+    flex-direction: column;
+  }
+
+  .race-create {
+    padding: 22px;
+  }
+
+  .race-form {
+    grid-template-columns: 1fr;
+  }
+
+  .race-form-name,
+  .race-submit {
+    grid-column: auto;
+  }
+
+  .race-calendar {
+    min-width: 780px;
+  }
+
+  .courses-calendar-section {
+    overflow-x: auto;
+  }
+
+  .calendar-controls {
+    width: 100%;
+
+    justify-content: space-between;
+  }
+
+  .race-card {
+    grid-template-columns: 65px 1fr;
+  }
+
+  .race-card-main {
+    border-right: none;
+  }
+
+  .race-people {
+    grid-template-columns: 1fr;
+
+    padding: 20px;
+  }
+
+  .race-actions {
+    flex-direction: column;
+  }
+}
+
+/* ======================================================
+   EDITION / SUPPRESSION COURSE
+====================================================== */
+
+.race-owner-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 20px;
+}
+
+.race-owner-actions button {
+  padding: 8px 12px;
+  font-size: 0.75rem;
+}
+
+.race-delete-button {
+  background: white;
+  color: #b42318;
+  border: 1px solid #e6b8b3;
+  box-shadow: none;
+}
+
+.race-delete-button:hover {
+  background: #fff1f0;
+  color: #8f1d14;
+  box-shadow: none;
+}
+
+.race-edit-form {
+  margin-top: 12px;
+}
+
+.race-edit-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.race-edit-form label {
+  font-size: 0.7rem;
+}
+
+.race-edit-form input {
+  padding: 8px 10px;
+  font-size: 0.85rem;
+}
+
+.race-edit-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.race-edit-actions button {
+  padding: 8px 12px;
+  font-size: 0.75rem;
+}
+
+.race-edit-cancel {
+  background: white;
+  color: #6b6573;
+  border: 1px solid #ddd8e3;
+  box-shadow: none;
+}
+
+.race-edit-cancel:hover {
+  background: #f6f4f8;
+  color: #24104f;
+  box-shadow: none;
+}
+
+@media (max-width: 768px) {
+  .race-edit-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .race-owner-actions {
+    flex-direction: column;
+  }
+}
+
+/* ======================================================
+   AJOUT SORTIE / ENTRAINEMENT
+====================================================== */
+
+.training-create {
+  background: #f4f4f6;
+  border: 1px solid #dedee3;
+  padding: 32px;
+  box-shadow: 0 10px 30px rgba(40, 40, 50, 0.04);
+}
+
+.training-create-heading {
+  margin-bottom: 28px;
+}
+
+.training-create-heading > span {
+  color: #6b7280;
+  font-size: 0.7rem;
+  font-weight: 900;
+  letter-spacing: 0.25em;
+}
+
+.training-create-heading h2 {
+  margin: 10px 0 5px;
+  color: #27272a;
+  font-size: 2rem;
+}
+
+.training-create-heading p {
+  margin: 0;
+  color: #71717a;
+}
+
+.training-form {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr 0.7fr 1fr;
+  gap: 14px;
+  align-items: end;
+}
+
+.training-form-comment {
+  grid-column: 1 / -1;
+}
+
+.training-form-comment textarea {
+  resize: vertical;
+}
+
+.training-submit {
+  grid-column: 1 / -1;
+  justify-self: start;
+  background: #6b7280;
+}
+
+.training-submit:hover {
+  background: #4b5563;
+}
+
+@media (max-width: 768px) {
+  .training-create {
+    padding: 22px;
+  }
+
+  .training-form {
+    grid-template-columns: 1fr;
+  }
+
+  .training-form-comment,
+  .training-submit {
+    grid-column: auto;
+  }
+
+  .training-submit {
+    width: 100%;
+  }
+}
+
+/* ======================================================
+   CALENDRIER - SORTIES
+====================================================== */
+
+.calendar-training {
+  margin-top: 8px;
+  padding: 8px;
+
+  border-left: 3px solid #9ca3af;
+  background: #f1f1f4;
+
+  border-radius: 4px;
+}
+
+.calendar-training strong {
+  display: block;
+
+  color: #27272a;
+
+  font-size: 0.72rem;
+}
+
+.calendar-training span {
+  display: block;
+
+  margin-top: 3px;
+
+  color: #71717a;
+
+  font-size: 0.64rem;
+}
+
+/* ======================================================
+   LISTE SORTIES / ENTRAINEMENTS
+====================================================== */
+
+.training-list-section {
+  padding-top: 55px;
+  padding-bottom: 80px;
+}
+
+.training-list {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.training-card {
+  display: grid;
+
+  grid-template-columns: 95px 1fr;
+
+  background: #f4f4f5;
+
+  border: 1px solid #dedee3;
+
+  box-shadow:
+    0 8px 24px rgba(40, 40, 50, 0.04);
+
+  overflow: hidden;
+}
+
+.training-card-date {
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
+  justify-content: center;
+
+  background: #d4d4d8;
+
+  color: #27272a;
+}
+
+.training-card-date strong {
+  font-size: 2rem;
+  line-height: 1;
+}
+
+.training-card-date span {
+  margin-top: 5px;
+
+  color: #52525b;
+
+  font-size: 0.7rem;
+
+  font-weight: 900;
+
+  letter-spacing: 0.1em;
+}
+
+.training-card-main {
+  padding: 24px;
+}
+
+.training-card-label {
+  margin: 0 0 6px;
+
+  color: #71717a;
+
+  font-size: 0.65rem;
+
+  font-weight: 900;
+
+  letter-spacing: 0.18em;
+}
+
+.training-card-main h3 {
+  margin: 0 0 18px;
+
+  color: #27272a;
+
+  font-size: 1.5rem;
+}
+
+.training-info-grid {
+  display: flex;
+
+  gap: 30px;
+
+  flex-wrap: wrap;
+}
+
+.training-info-grid span {
+  display: block;
+
+  color: #8a8a92;
+
+  font-size: 0.6rem;
+
+  font-weight: 900;
+
+  letter-spacing: 0.1em;
+}
+
+.training-info-grid strong {
+  display: block;
+
+  margin-top: 3px;
+
+  color: #27272a;
+}
+
+.training-comment {
+  margin: 20px 0 0;
+
+  padding-top: 16px;
+
+  border-top: 1px solid #d4d4d8;
+
+  color: #52525b;
+
+  line-height: 1.65;
+}
+
+/* ======================================================
+   MOBILE SORTIES
+====================================================== */
+
+@media (max-width: 768px) {
+  .training-card {
+    grid-template-columns: 65px 1fr;
+  }
+
+  .training-card-main {
+    padding: 18px;
+  }
+
+  .training-info-grid {
+    flex-direction: column;
+    gap: 12px;
+  }
+}
+
+/* ======================================================
+   PARTICIPATION SORTIES
+====================================================== */
+
+.training-participants {
+  margin-top: 22px;
+  padding-top: 18px;
+  border-top: 1px solid #d4d4d8;
+}
+
+.training-participants .race-names {
+  margin-top: 10px;
+}
+
+.training-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 18px;
+}
+
+.calendar-training-status {
+  margin-top: 5px;
+  color: #52525b;
+  font-size: 0.65rem;
+  font-weight: 800;
+}

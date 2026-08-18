@@ -78,6 +78,7 @@ export default function Navbar() {
         <nav className="navbar-nav">
           <NavLink href="/">Accueil</NavLink>
           <NavLink href="/equipe">Équipe</NavLink>
+          <NavLink href="/courses">Courses</NavLink>
 
           {isConnected ? (
             <>
