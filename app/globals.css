@@ -4113,3 +4113,357 @@ label {
     justify-content: flex-start;
   }
 }
+
+/* ==========================================================
+   IMAGE / LOGO COURSE
+========================================================== */
+
+.race-form-with-image {
+  align-items: end;
+}
+
+.race-image-upload-zone {
+  grid-column: 1 / -1;
+
+  padding: 20px;
+
+  background: #f7f5fa;
+
+  border: 1px dashed #d5cbe1;
+}
+
+.race-image-upload-zone > label {
+  display: block;
+
+  margin-bottom: 10px;
+
+  color: #5f23ae;
+
+  font-size: 0.66rem;
+  font-weight: 1000;
+
+  letter-spacing: 0.13em;
+}
+
+.race-image-upload-row {
+  display: flex;
+
+  align-items: center;
+
+  gap: 15px;
+
+  flex-wrap: wrap;
+}
+
+.race-image-upload-row > span {
+  color: #8b8393;
+
+  font-size: 0.72rem;
+}
+
+.race-image-upload-button {
+  display: inline-flex !important;
+
+  align-items: center;
+  justify-content: center;
+
+  min-height: 42px;
+
+  margin: 0 !important;
+
+  padding: 0 15px;
+
+  cursor: pointer;
+
+  background: #6521c4;
+
+  border-radius: 6px;
+
+  color: white !important;
+
+  font-size: 0.72rem !important;
+  font-weight: 900 !important;
+
+  letter-spacing: 0 !important;
+}
+
+.race-image-upload-button input {
+  display: none;
+}
+
+.race-image-preview {
+  position: relative;
+
+  width: 150px;
+  height: 150px;
+
+  margin-top: 18px;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  overflow: hidden;
+
+  background: white;
+
+  border: 1px solid #ddd6e4;
+
+  border-radius: 12px;
+}
+
+.race-image-preview img {
+  width: 100%;
+  height: 100%;
+
+  padding: 8px;
+
+  object-fit: contain;
+}
+
+.race-image-preview button {
+  position: absolute;
+
+  top: 6px;
+  right: 6px;
+
+  width: 30px;
+  height: 30px;
+
+  padding: 0;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 50%;
+
+  background: rgba(
+    30,
+    15,
+    45,
+    0.85
+  );
+
+  color: white;
+
+  box-shadow: none;
+}
+
+/* ==========================================================
+   CARTE COURSE AVEC LOGO
+========================================================== */
+
+.race-card-heading-with-logo {
+  display: flex;
+
+  align-items: center;
+
+  gap: 22px;
+}
+
+.race-card-logo {
+  flex: 0 0 105px;
+
+  width: 105px;
+  height: 105px;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  overflow: hidden;
+
+  background: white;
+
+  border: 1px solid #e1dce6;
+
+  border-radius: 16px;
+
+  box-shadow:
+    0 8px 20px
+    rgba(38, 20, 65, 0.06);
+}
+
+.race-card-logo img {
+  width: 100%;
+  height: 100%;
+
+  padding: 8px;
+
+  object-fit: contain;
+}
+
+/* ==========================================================
+   MODIFICATION IMAGE
+========================================================== */
+
+.race-edit-image {
+  margin-top: 18px;
+
+  padding: 18px;
+
+  background: #f7f5fa;
+
+  border: 1px solid #e1dce7;
+}
+
+.race-edit-image > label:first-child {
+  display: block;
+
+  margin-bottom: 12px;
+}
+
+.race-edit-image-preview {
+  width: 120px;
+  height: 120px;
+
+  margin-bottom: 12px;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  overflow: hidden;
+
+  background: white;
+
+  border: 1px solid #ddd6e4;
+
+  border-radius: 12px;
+}
+
+.race-edit-image-preview img {
+  width: 100%;
+  height: 100%;
+
+  padding: 8px;
+
+  object-fit: contain;
+}
+
+/* ==========================================================
+   PAGE DETAIL COURSE
+========================================================== */
+
+.race-detail-with-logo {
+  display: grid;
+
+  grid-template-columns:
+    minmax(170px, 250px)
+    1fr;
+
+  gap: 40px;
+
+  align-items: center;
+}
+
+.race-detail-logo {
+  width: 100%;
+
+  aspect-ratio: 1;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  overflow: hidden;
+
+  background: white;
+
+  border: 1px solid #e2dce8;
+
+  border-radius: 20px;
+
+  box-shadow:
+    0 15px 35px
+    rgba(39, 20, 65, 0.08);
+}
+
+.race-detail-logo img {
+  width: 100%;
+  height: 100%;
+
+  padding: 15px;
+
+  object-fit: contain;
+}
+
+.race-detail-content {
+  min-width: 0;
+}
+
+.race-detail-content > span {
+  display: block;
+
+  margin-bottom: 10px;
+
+  color: #6d28d9;
+
+  font-size: 0.68rem;
+  font-weight: 900;
+
+  letter-spacing: 0.2em;
+}
+
+.race-detail-content h1 {
+  margin: 0;
+
+  color: #27272a;
+
+  font-size:
+    clamp(
+      2.2rem,
+      5vw,
+      4.5rem
+    );
+
+  line-height: 0.95;
+}
+
+/* ==========================================================
+   MOBILE
+========================================================== */
+
+@media (max-width: 768px) {
+  .race-card-heading-with-logo {
+    align-items: flex-start;
+
+    flex-direction: column;
+  }
+
+  .race-card-logo {
+    width: 90px;
+    height: 90px;
+
+    flex-basis: 90px;
+  }
+
+  .race-detail-with-logo {
+    grid-template-columns: 1fr;
+
+    gap: 25px;
+  }
+
+  .race-detail-logo {
+    width: 150px;
+    height: 150px;
+
+    aspect-ratio: auto;
+  }
+
+  .race-image-upload-zone {
+    grid-column: auto;
+  }
+
+  .race-image-upload-row {
+    align-items: flex-start;
+
+    flex-direction: column;
+  }
+}

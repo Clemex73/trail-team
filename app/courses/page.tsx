@@ -11,6 +11,7 @@ type Race = {
   elevation: number;
   race_date: string;
   created_by: string | null;
+  image_url: string | null;
 };
 
 type Attendance = {
@@ -67,7 +68,6 @@ export default function CoursesPage() {
   const [comments, setComments] = useState<EventComment[]>([]);
 
   const [userId, setUserId] = useState<string | null>(null);
-
   const [loading, setLoading] = useState(true);
 
   /* ======================================================
@@ -78,6 +78,10 @@ export default function CoursesPage() {
   const [distance, setDistance] = useState("");
   const [elevation, setElevation] = useState("");
   const [raceDate, setRaceDate] = useState("");
+
+  const [raceImage, setRaceImage] = useState<File | null>(null);
+  const [raceImagePreview, setRaceImagePreview] =
+    useState<string | null>(null);
 
   const [saving, setSaving] = useState(false);
 
@@ -105,6 +109,12 @@ export default function CoursesPage() {
   const [editDistance, setEditDistance] = useState("");
   const [editElevation, setEditElevation] = useState("");
   const [editDate, setEditDate] = useState("");
+
+  const [editRaceImage, setEditRaceImage] =
+    useState<File | null>(null);
+
+  const [editRaceImagePreview, setEditRaceImagePreview] =
+    useState<string | null>(null);
 
   /* ======================================================
      EDITION SORTIE
@@ -182,18 +192,9 @@ export default function CoursesPage() {
       .select("*");
 
     setRaces((racesData ?? []) as Race[]);
-
-    setAttendance(
-      (attendanceData ?? []) as Attendance[]
-    );
-
-    setProfiles(
-      (profilesData ?? []) as Profile[]
-    );
-
-    setTrainings(
-      (trainingsData ?? []) as Training[]
-    );
+    setAttendance((attendanceData ?? []) as Attendance[]);
+    setProfiles((profilesData ?? []) as Profile[]);
+    setTrainings((trainingsData ?? []) as Training[]);
 
     setTrainingAttendance(
       (trainingAttendanceData ?? []) as TrainingAttendance[]
@@ -207,59 +208,270 @@ export default function CoursesPage() {
   }
 
   /* ======================================================
-     AJOUT COURSE
+     IMAGES COURSE
   ====================================================== */
 
-  async function addRace(event: React.FormEvent) {
-    event.preventDefault();
+  function handleRaceImage(
+    event: React.ChangeEvent<HTMLInputElement>
+  ) {
+    const file = event.target.files?.[0];
 
-    if (!userId) {
-      alert("Tu dois être connecté pour ajouter une course.");
+    if (!file) {
       return;
     }
 
-    if (!name || !distance || !elevation || !raceDate) {
-      alert("Merci de remplir tous les champs.");
+    if (!file.type.startsWith("image/")) {
+      alert("Merci de sélectionner une image.");
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      alert("L'image ne doit pas dépasser 5 Mo.");
+      return;
+    }
+
+    setRaceImage(file);
+
+    if (raceImagePreview) {
+      URL.revokeObjectURL(raceImagePreview);
+    }
+
+    setRaceImagePreview(
+      URL.createObjectURL(file)
+    );
+  }
+
+  function removeRaceImageSelection() {
+    if (raceImagePreview) {
+      URL.revokeObjectURL(raceImagePreview);
+    }
+
+    setRaceImage(null);
+    setRaceImagePreview(null);
+  }
+
+  function handleEditRaceImage(
+    event: React.ChangeEvent<HTMLInputElement>
+  ) {
+    const file = event.target.files?.[0];
+
+    if (!file) {
+      return;
+    }
+
+    if (!file.type.startsWith("image/")) {
+      alert("Merci de sélectionner une image.");
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      alert("L'image ne doit pas dépasser 5 Mo.");
+      return;
+    }
+
+    setEditRaceImage(file);
+
+    if (
+      editRaceImagePreview &&
+      editRaceImagePreview.startsWith("blob:")
+    ) {
+      URL.revokeObjectURL(
+        editRaceImagePreview
+      );
+    }
+
+    setEditRaceImagePreview(
+      URL.createObjectURL(file)
+    );
+  }
+
+  async function uploadRaceImage(
+    file: File
+  ) {
+    if (!userId) {
+      throw new Error(
+        "Utilisateur non connecté."
+      );
+    }
+
+    const extension =
+      file.name.split(".").pop() ?? "jpg";
+
+    const filePath =
+      `${userId}/${crypto.randomUUID()}.${extension}`;
+
+    const { error } =
+      await supabase.storage
+        .from("race-images")
+        .upload(
+          filePath,
+          file,
+          {
+            cacheControl: "3600",
+            upsert: false,
+          }
+        );
+
+    if (error) {
+      throw error;
+    }
+
+    const {
+      data: publicUrlData,
+    } = supabase.storage
+      .from("race-images")
+      .getPublicUrl(filePath);
+
+    return publicUrlData.publicUrl;
+  }
+
+  async function deleteRaceImageFromStorage(
+    imageUrl: string | null
+  ) {
+    if (!imageUrl) {
+      return;
+    }
+
+    try {
+      const marker =
+        "/storage/v1/object/public/race-images/";
+
+      const index =
+        imageUrl.indexOf(marker);
+
+      if (index === -1) {
+        return;
+      }
+
+      const filePath =
+        decodeURIComponent(
+          imageUrl.slice(
+            index + marker.length
+          )
+        );
+
+      const { error } =
+        await supabase.storage
+          .from("race-images")
+          .remove([filePath]);
+
+      if (error) {
+        console.error(
+          "Erreur suppression image :",
+          error
+        );
+      }
+    } catch (error) {
+      console.error(
+        "Impossible de supprimer l'image :",
+        error
+      );
+    }
+  }
+
+  /* ======================================================
+     AJOUT COURSE
+  ====================================================== */
+
+  async function addRace(
+    event: React.FormEvent
+  ) {
+    event.preventDefault();
+
+    if (!userId) {
+      alert(
+        "Tu dois être connecté pour ajouter une course."
+      );
+      return;
+    }
+
+    if (
+      !name.trim() ||
+      !distance ||
+      !elevation ||
+      !raceDate
+    ) {
+      alert(
+        "Merci de remplir tous les champs."
+      );
       return;
     }
 
     setSaving(true);
 
-    const { error } = await supabase
-      .from("races")
-      .insert({
-        name: name.trim(),
-        distance: Number(distance),
-        elevation: Number(elevation),
-        race_date: raceDate,
-        created_by: userId,
-      });
+    try {
+      let imageUrl: string | null =
+        null;
 
-    setSaving(false);
+      if (raceImage) {
+        imageUrl =
+          await uploadRaceImage(
+            raceImage
+          );
+      }
 
-    if (error) {
-      console.error(error);
-      alert(`Erreur : ${error.message}`);
-      return;
+      const { error } =
+        await supabase
+          .from("races")
+          .insert({
+            name: name.trim(),
+            distance:
+              Number(distance),
+            elevation:
+              Number(elevation),
+            race_date: raceDate,
+            created_by: userId,
+            image_url: imageUrl,
+          });
+
+      if (error) {
+        if (imageUrl) {
+          await deleteRaceImageFromStorage(
+            imageUrl
+          );
+        }
+
+        throw error;
+      }
+
+      setName("");
+      setDistance("");
+      setElevation("");
+      setRaceDate("");
+
+      removeRaceImageSelection();
+
+      await loadEverything();
+    } catch (error: any) {
+      console.error(
+        "Erreur ajout course :",
+        error
+      );
+
+      alert(
+        `Erreur : ${
+          error?.message ??
+          "Impossible d'ajouter la course."
+        }`
+      );
+    } finally {
+      setSaving(false);
     }
-
-    setName("");
-    setDistance("");
-    setElevation("");
-    setRaceDate("");
-
-    await loadEverything();
   }
 
   /* ======================================================
      AJOUT SORTIE
   ====================================================== */
 
-  async function addTraining(event: React.FormEvent) {
+  async function addTraining(
+    event: React.FormEvent
+  ) {
     event.preventDefault();
 
     if (!userId) {
-      alert("Tu dois être connecté pour ajouter une sortie.");
+      alert(
+        "Tu dois être connecté pour ajouter une sortie."
+      );
       return;
     }
 
@@ -267,32 +479,48 @@ export default function CoursesPage() {
       !trainingTitle.trim() ||
       !trainingLocation.trim() ||
       !trainingDuration ||
-      !trainingDate ||
-      !trainingLevel
+      !trainingDate
     ) {
-      alert("Merci de remplir tous les champs.");
+      alert(
+        "Merci de remplir tous les champs."
+      );
       return;
     }
 
     setSavingTraining(true);
 
-    const { error } = await supabase
-      .from("trainings")
-      .insert({
-        title: trainingTitle.trim(),
-        location: trainingLocation.trim(),
-        duration_minutes: Number(trainingDuration),
-        training_date: trainingDate,
-        comment: trainingComment.trim() || null,
-        expected_level: trainingLevel,
-        created_by: userId,
-      });
+    const { error } =
+      await supabase
+        .from("trainings")
+        .insert({
+          title:
+            trainingTitle.trim(),
+
+          location:
+            trainingLocation.trim(),
+
+          duration_minutes:
+            Number(
+              trainingDuration
+            ),
+
+          training_date:
+            trainingDate,
+
+          comment:
+            trainingComment.trim() ||
+            null,
+
+          expected_level:
+            trainingLevel,
+
+          created_by: userId,
+        });
 
     setSavingTraining(false);
 
     if (error) {
-      console.error(error);
-      alert(`Erreur : ${error.message}`);
+      alert(error.message);
       return;
     }
 
@@ -312,25 +540,31 @@ export default function CoursesPage() {
 
   async function chooseStatus(
     raceId: string,
-    status: "participant" | "support"
+    status:
+      | "participant"
+      | "support"
   ) {
     if (!userId) {
-      alert("Tu dois être connecté.");
+      alert(
+        "Tu dois être connecté."
+      );
       return;
     }
 
-    const { error } = await supabase
-      .from("race_attendance")
-      .upsert(
-        {
-          race_id: raceId,
-          user_id: userId,
-          status,
-        },
-        {
-          onConflict: "race_id,user_id",
-        }
-      );
+    const { error } =
+      await supabase
+        .from("race_attendance")
+        .upsert(
+          {
+            race_id: raceId,
+            user_id: userId,
+            status,
+          },
+          {
+            onConflict:
+              "race_id,user_id",
+          }
+        );
 
     if (error) {
       alert(error.message);
@@ -340,7 +574,9 @@ export default function CoursesPage() {
     await loadEverything();
   }
 
-  async function removeStatus(raceId: string) {
+  async function removeStatus(
+    raceId: string
+  ) {
     if (!userId) return;
 
     await supabase
@@ -356,18 +592,24 @@ export default function CoursesPage() {
      PARTICIPATION SORTIE
   ====================================================== */
 
-  async function joinTraining(trainingId: string) {
+  async function joinTraining(
+    trainingId: string
+  ) {
     if (!userId) {
-      alert("Tu dois être connecté.");
+      alert(
+        "Tu dois être connecté."
+      );
       return;
     }
 
-    const { error } = await supabase
-      .from("training_attendance")
-      .insert({
-        training_id: trainingId,
-        user_id: userId,
-      });
+    const { error } =
+      await supabase
+        .from("training_attendance")
+        .insert({
+          training_id:
+            trainingId,
+          user_id: userId,
+        });
 
     if (error) {
       alert(error.message);
@@ -377,95 +619,247 @@ export default function CoursesPage() {
     await loadEverything();
   }
 
-  async function leaveTraining(trainingId: string) {
+  async function leaveTraining(
+    trainingId: string
+  ) {
     if (!userId) return;
 
     await supabase
       .from("training_attendance")
       .delete()
-      .eq("training_id", trainingId)
+      .eq(
+        "training_id",
+        trainingId
+      )
       .eq("user_id", userId);
 
     await loadEverything();
   }
 
   /* ======================================================
-     MODIFIER COURSE
+     EDITION COURSE
   ====================================================== */
 
-  function startEditRace(race: Race) {
+  function startEditRace(
+    race: Race
+  ) {
     setEditingRaceId(race.id);
+
     setEditName(race.name);
-    setEditDistance(String(race.distance));
-    setEditElevation(String(race.elevation));
-    setEditDate(race.race_date);
+    setEditDistance(
+      String(race.distance)
+    );
+    setEditElevation(
+      String(race.elevation)
+    );
+    setEditDate(
+      race.race_date
+    );
+
+    setEditRaceImage(null);
+
+    setEditRaceImagePreview(
+      race.image_url
+    );
   }
 
   function cancelEditRace() {
     setEditingRaceId(null);
+
+    if (
+      editRaceImagePreview &&
+      editRaceImagePreview.startsWith(
+        "blob:"
+      )
+    ) {
+      URL.revokeObjectURL(
+        editRaceImagePreview
+      );
+    }
+
+    setEditRaceImage(null);
+    setEditRaceImagePreview(null);
   }
 
-  async function updateRace(raceId: string) {
+  async function updateRace(
+    raceId: string
+  ) {
     if (!userId) return;
 
-    const { error } = await supabase
-      .from("races")
-      .update({
-        name: editName.trim(),
-        distance: Number(editDistance),
-        elevation: Number(editElevation),
-        race_date: editDate,
-      })
-      .eq("id", raceId)
-      .eq("created_by", userId);
+    if (
+      !editName.trim() ||
+      !editDistance ||
+      !editElevation ||
+      !editDate
+    ) {
+      alert(
+        "Merci de remplir tous les champs."
+      );
+      return;
+    }
+
+    const existingRace =
+      races.find(
+        (race) =>
+          race.id === raceId
+      );
+
+    try {
+      let newImageUrl =
+        existingRace?.image_url ??
+        null;
+
+      if (editRaceImage) {
+        newImageUrl =
+          await uploadRaceImage(
+            editRaceImage
+          );
+      }
+
+      const { error } =
+        await supabase
+          .from("races")
+          .update({
+            name:
+              editName.trim(),
+
+            distance:
+              Number(editDistance),
+
+            elevation:
+              Number(editElevation),
+
+            race_date:
+              editDate,
+
+            image_url:
+              newImageUrl,
+          })
+          .eq("id", raceId)
+          .eq(
+            "created_by",
+            userId
+          );
+
+      if (error) {
+        if (
+          editRaceImage &&
+          newImageUrl
+        ) {
+          await deleteRaceImageFromStorage(
+            newImageUrl
+          );
+        }
+
+        throw error;
+      }
+
+      if (
+        editRaceImage &&
+        existingRace?.image_url
+      ) {
+        await deleteRaceImageFromStorage(
+          existingRace.image_url
+        );
+      }
+
+      cancelEditRace();
+
+      await loadEverything();
+    } catch (error: any) {
+      console.error(
+        "Erreur modification course :",
+        error
+      );
+
+      alert(
+        `Erreur : ${
+          error?.message ??
+          "Impossible de modifier la course."
+        }`
+      );
+    }
+  }
+
+  async function deleteRace(
+    raceId: string
+  ) {
+    if (!userId) return;
+
+    const race =
+      races.find(
+        (item) =>
+          item.id === raceId
+      );
+
+    if (
+      !window.confirm(
+        "Supprimer cette course ?"
+      )
+    ) {
+      return;
+    }
+
+    const { error } =
+      await supabase
+        .from("races")
+        .delete()
+        .eq("id", raceId)
+        .eq(
+          "created_by",
+          userId
+        );
 
     if (error) {
       alert(error.message);
       return;
     }
 
-    cancelEditRace();
-    await loadEverything();
-  }
-
-  async function deleteRace(raceId: string) {
-    if (!userId) return;
-
-    if (!window.confirm("Supprimer cette course ?")) {
-      return;
-    }
-
-    const { error } = await supabase
-      .from("races")
-      .delete()
-      .eq("id", raceId)
-      .eq("created_by", userId);
-
-    if (error) {
-      alert(error.message);
-      return;
+    if (race?.image_url) {
+      await deleteRaceImageFromStorage(
+        race.image_url
+      );
     }
 
     await loadEverything();
   }
 
   /* ======================================================
-     MODIFIER SORTIE
+     EDITION SORTIE
   ====================================================== */
 
-  function startEditTraining(training: Training) {
-    setEditingTrainingId(training.id);
-
-    setEditTrainingTitle(training.title);
-    setEditTrainingLocation(training.location);
-    setEditTrainingDuration(
-      String(training.duration_minutes)
+  function startEditTraining(
+    training: Training
+  ) {
+    setEditingTrainingId(
+      training.id
     );
 
-    setEditTrainingDate(training.training_date);
-    setEditTrainingComment(training.comment ?? "");
+    setEditTrainingTitle(
+      training.title
+    );
+
+    setEditTrainingLocation(
+      training.location
+    );
+
+    setEditTrainingDuration(
+      String(
+        training.duration_minutes
+      )
+    );
+
+    setEditTrainingDate(
+      training.training_date
+    );
+
+    setEditTrainingComment(
+      training.comment ?? ""
+    );
+
     setEditTrainingLevel(
-      training.expected_level ?? "<300"
+      training.expected_level ??
+        "<300"
     );
   }
 
@@ -473,21 +867,44 @@ export default function CoursesPage() {
     setEditingTrainingId(null);
   }
 
-  async function updateTraining(trainingId: string) {
+  async function updateTraining(
+    trainingId: string
+  ) {
     if (!userId) return;
 
-    const { error } = await supabase
-      .from("trainings")
-      .update({
-        title: editTrainingTitle.trim(),
-        location: editTrainingLocation.trim(),
-        duration_minutes: Number(editTrainingDuration),
-        training_date: editTrainingDate,
-        comment: editTrainingComment.trim() || null,
-        expected_level: editTrainingLevel,
-      })
-      .eq("id", trainingId)
-      .eq("created_by", userId);
+    const { error } =
+      await supabase
+        .from("trainings")
+        .update({
+          title:
+            editTrainingTitle.trim(),
+
+          location:
+            editTrainingLocation.trim(),
+
+          duration_minutes:
+            Number(
+              editTrainingDuration
+            ),
+
+          training_date:
+            editTrainingDate,
+
+          comment:
+            editTrainingComment.trim() ||
+            null,
+
+          expected_level:
+            editTrainingLevel,
+        })
+        .eq(
+          "id",
+          trainingId
+        )
+        .eq(
+          "created_by",
+          userId
+        );
 
     if (error) {
       alert(error.message);
@@ -495,21 +912,35 @@ export default function CoursesPage() {
     }
 
     cancelEditTraining();
+
     await loadEverything();
   }
 
-  async function deleteTraining(trainingId: string) {
+  async function deleteTraining(
+    trainingId: string
+  ) {
     if (!userId) return;
 
-    if (!window.confirm("Supprimer cette sortie ?")) {
+    if (
+      !window.confirm(
+        "Supprimer cette sortie ?"
+      )
+    ) {
       return;
     }
 
-    const { error } = await supabase
-      .from("trainings")
-      .delete()
-      .eq("id", trainingId)
-      .eq("created_by", userId);
+    const { error } =
+      await supabase
+        .from("trainings")
+        .delete()
+        .eq(
+          "id",
+          trainingId
+        )
+        .eq(
+          "created_by",
+          userId
+        );
 
     if (error) {
       alert(error.message);
@@ -523,27 +954,40 @@ export default function CoursesPage() {
      OUTILS
   ====================================================== */
 
-  function getProfileName(profileId: string) {
-    const profile = profiles.find(
-      (profile) => profile.id === profileId
-    );
+  function getProfileName(
+    profileId: string
+  ) {
+    const profile =
+      profiles.find(
+        (profile) =>
+          profile.id ===
+          profileId
+      );
 
-    if (!profile) return "Membre";
+    if (!profile) {
+      return "Membre";
+    }
 
     if (profile.nickname) {
       return profile.nickname;
     }
 
     return (
-      [profile.first_name, profile.last_name]
+      [
+        profile.first_name,
+        profile.last_name,
+      ]
         .filter(Boolean)
-        .join(" ") || "Membre"
+        .join(" ") ||
+      "Membre"
     );
   }
 
   function getRaceAttendance(
     raceId: string,
-    status: "participant" | "support"
+    status:
+      | "participant"
+      | "support"
   ) {
     return attendance.filter(
       (item) =>
@@ -552,7 +996,9 @@ export default function CoursesPage() {
     );
   }
 
-  function getMyStatus(raceId: string) {
+  function getMyStatus(
+    raceId: string
+  ) {
     return attendance.find(
       (item) =>
         item.race_id === raceId &&
@@ -560,30 +1006,44 @@ export default function CoursesPage() {
     )?.status;
   }
 
-  function getTrainingParticipants(trainingId: string) {
+  function getTrainingParticipants(
+    trainingId: string
+  ) {
     return trainingAttendance.filter(
-      (item) => item.training_id === trainingId
+      (item) =>
+        item.training_id ===
+        trainingId
     );
   }
 
-  function isParticipatingTraining(trainingId: string) {
+  function isParticipatingTraining(
+    trainingId: string
+  ) {
     return trainingAttendance.some(
       (item) =>
-        item.training_id === trainingId &&
+        item.training_id ===
+          trainingId &&
         item.user_id === userId
     );
   }
 
-  function getRaceCommentCount(raceId: string) {
+  function getRaceCommentCount(
+    raceId: string
+  ) {
     return comments.filter(
-      (comment) => comment.race_id === raceId
+      (comment) =>
+        comment.race_id ===
+        raceId
     ).length;
   }
 
-  function getTrainingCommentCount(trainingId: string) {
+  function getTrainingCommentCount(
+    trainingId: string
+  ) {
     return comments.filter(
       (comment) =>
-        comment.training_id === trainingId
+        comment.training_id ===
+        trainingId
     ).length;
   }
 
@@ -591,42 +1051,68 @@ export default function CoursesPage() {
      CALENDRIER
   ====================================================== */
 
-  const calendarDays = useMemo(() => {
-    const year = currentMonth.getFullYear();
-    const month = currentMonth.getMonth();
+  const calendarDays =
+    useMemo(() => {
+      const year =
+        currentMonth.getFullYear();
 
-    const firstDay = new Date(year, month, 1);
+      const month =
+        currentMonth.getMonth();
 
-    const daysInMonth = new Date(
-      year,
-      month + 1,
-      0
-    ).getDate();
+      const firstDay =
+        new Date(
+          year,
+          month,
+          1
+        );
 
-    let firstWeekDay = firstDay.getDay();
+      const daysInMonth =
+        new Date(
+          year,
+          month + 1,
+          0
+        ).getDate();
 
-    if (firstWeekDay === 0) {
-      firstWeekDay = 7;
-    }
+      let firstWeekDay =
+        firstDay.getDay();
 
-    const result: Array<number | null> = [];
+      if (
+        firstWeekDay === 0
+      ) {
+        firstWeekDay = 7;
+      }
 
-    for (let i = 1; i < firstWeekDay; i++) {
-      result.push(null);
-    }
+      const result:
+        Array<
+          number | null
+        > = [];
 
-    for (let day = 1; day <= daysInMonth; day++) {
-      result.push(day);
-    }
+      for (
+        let i = 1;
+        i < firstWeekDay;
+        i++
+      ) {
+        result.push(null);
+      }
 
-    return result;
-  }, [currentMonth]);
+      for (
+        let day = 1;
+        day <=
+        daysInMonth;
+        day++
+      ) {
+        result.push(day);
+      }
+
+      return result;
+    }, [currentMonth]);
 
   function previousMonth() {
     setCurrentMonth(
       new Date(
         currentMonth.getFullYear(),
-        currentMonth.getMonth() - 1,
+        currentMonth.getMonth() -
+          1,
         1
       )
     );
@@ -636,57 +1122,75 @@ export default function CoursesPage() {
     setCurrentMonth(
       new Date(
         currentMonth.getFullYear(),
-        currentMonth.getMonth() + 1,
+        currentMonth.getMonth() +
+          1,
         1
       )
     );
   }
 
-  function getCalendarDate(day: number) {
-    const year = currentMonth.getFullYear();
+  function getCalendarDate(
+    day: number
+  ) {
+    const year =
+      currentMonth.getFullYear();
 
-    const month = String(
-      currentMonth.getMonth() + 1
-    ).padStart(2, "0");
+    const month =
+      String(
+        currentMonth.getMonth() +
+          1
+      ).padStart(2, "0");
 
-    return `${year}-${month}-${String(day).padStart(
-      2,
-      "0"
-    )}`;
+    return `${year}-${month}-${String(
+      day
+    ).padStart(2, "0")}`;
   }
 
-  function racesForDay(day: number) {
-    const date = getCalendarDate(day);
+  function racesForDay(
+    day: number
+  ) {
+    const date =
+      getCalendarDate(day);
 
     return races.filter(
-      (race) => race.race_date === date
+      (race) =>
+        race.race_date ===
+        date
     );
   }
 
-  function trainingsForDay(day: number) {
-    const date = getCalendarDate(day);
+  function trainingsForDay(
+    day: number
+  ) {
+    const date =
+      getCalendarDate(day);
 
     return trainings.filter(
       (training) =>
-        training.training_date === date
+        training.training_date ===
+        date
     );
   }
 
   if (loading) {
     return (
       <main className="page-container">
-        <p>Chargement...</p>
+        Chargement...
       </main>
     );
   }
 
   return (
     <main className="courses-page">
-      {/* HEADER */}
+      {/* ==================================================
+          HEADER
+      ================================================== */}
 
       <section className="courses-hero">
         <div className="courses-hero-inner">
-          <p>MAURIENNE TRAIL TEAM</p>
+          <p>
+            MAURIENNE TRAIL TEAM
+          </p>
 
           <h1>
             LES PROCHAINS
@@ -702,42 +1206,68 @@ export default function CoursesPage() {
         </div>
       </section>
 
-      {/* AJOUT COURSE */}
+      {/* ==================================================
+          AJOUT COURSE
+      ================================================== */}
 
       <section className="page-container">
         <div className="race-create">
           <div className="race-create-heading">
-            <span>AJOUTER UNE COURSE</span>
-            <h2>Un nouvel objectif ?</h2>
+            <span>
+              AJOUTER UNE COURSE
+            </span>
+
+            <h2>
+              Un nouvel objectif ?
+            </h2>
+
+            <p>
+              Ajoute la course et son logo au calendrier du team.
+            </p>
           </div>
 
           {userId && (
             <form
-              className="race-form"
+              className="race-form race-form-with-image"
               onSubmit={addRace}
             >
               <div className="race-form-name">
-                <label>Nom de la course</label>
+                <label>
+                  Nom de la course
+                </label>
+
                 <input
                   value={name}
                   onChange={(e) =>
-                    setName(e.target.value)
+                    setName(
+                      e.target.value
+                    )
                   }
+                  placeholder="UTMB Nice..."
                 />
               </div>
 
               <div>
-                <label>Distance</label>
+                <label>
+                  Distance
+                </label>
 
                 <div className="race-input-unit">
                   <input
                     type="number"
+                    min="0"
+                    step="0.1"
                     value={distance}
                     onChange={(e) =>
-                      setDistance(e.target.value)
+                      setDistance(
+                        e.target.value
+                      )
                     }
                   />
-                  <span>KM</span>
+
+                  <span>
+                    KM
+                  </span>
                 </div>
               </div>
 
@@ -747,27 +1277,79 @@ export default function CoursesPage() {
                 <div className="race-input-unit">
                   <input
                     type="number"
+                    min="0"
                     value={elevation}
                     onChange={(e) =>
-                      setElevation(e.target.value)
+                      setElevation(
+                        e.target.value
+                      )
                     }
                   />
+
                   <span>M</span>
                 </div>
               </div>
 
               <div>
                 <label>Date</label>
+
                 <input
                   type="date"
                   value={raceDate}
                   onChange={(e) =>
-                    setRaceDate(e.target.value)
+                    setRaceDate(
+                      e.target.value
+                    )
                   }
                 />
               </div>
 
+              <div className="race-image-upload-zone">
+                <label>
+                  LOGO / VISUEL DE LA COURSE
+                </label>
+
+                <div className="race-image-upload-row">
+                  <label className="race-image-upload-button">
+                    + Ajouter une image
+
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={
+                        handleRaceImage
+                      }
+                    />
+                  </label>
+
+                  <span>
+                    PNG, JPG ou WEBP · 5 Mo max
+                  </span>
+                </div>
+
+                {raceImagePreview && (
+                  <div className="race-image-preview">
+                    <img
+                      src={
+                        raceImagePreview
+                      }
+                      alt="Aperçu"
+                    />
+
+                    <button
+                      type="button"
+                      onClick={
+                        removeRaceImageSelection
+                      }
+                    >
+                      ×
+                    </button>
+                  </div>
+                )}
+              </div>
+
               <button
+                type="submit"
                 className="race-submit"
                 disabled={saving}
               >
@@ -780,13 +1362,20 @@ export default function CoursesPage() {
         </div>
       </section>
 
-      {/* AJOUT ENTRAINEMENT */}
+      {/* ==================================================
+          AJOUT SORTIE
+      ================================================== */}
 
       <section className="page-container">
         <div className="training-create">
           <div className="training-create-heading">
-            <span>AJOUTER UNE SORTIE</span>
-            <h2>Une sortie prévue ?</h2>
+            <span>
+              AJOUTER UNE SORTIE
+            </span>
+
+            <h2>
+              Une sortie prévue ?
+            </h2>
 
             <p>
               Propose un entraînement au reste du team.
@@ -796,15 +1385,21 @@ export default function CoursesPage() {
           {userId && (
             <form
               className="training-form"
-              onSubmit={addTraining}
+              onSubmit={
+                addTraining
+              }
             >
               <div>
                 <label>Nom</label>
 
                 <input
-                  value={trainingTitle}
+                  value={
+                    trainingTitle
+                  }
                   onChange={(e) =>
-                    setTrainingTitle(e.target.value)
+                    setTrainingTitle(
+                      e.target.value
+                    )
                   }
                 />
               </div>
@@ -813,7 +1408,9 @@ export default function CoursesPage() {
                 <label>Lieu</label>
 
                 <input
-                  value={trainingLocation}
+                  value={
+                    trainingLocation
+                  }
                   onChange={(e) =>
                     setTrainingLocation(
                       e.target.value
@@ -828,7 +1425,10 @@ export default function CoursesPage() {
                 <div className="race-input-unit">
                   <input
                     type="number"
-                    value={trainingDuration}
+                    min="1"
+                    value={
+                      trainingDuration
+                    }
                     onChange={(e) =>
                       setTrainingDuration(
                         e.target.value
@@ -836,7 +1436,9 @@ export default function CoursesPage() {
                     }
                   />
 
-                  <span>MIN</span>
+                  <span>
+                    MIN
+                  </span>
                 </div>
               </div>
 
@@ -845,7 +1447,9 @@ export default function CoursesPage() {
 
                 <input
                   type="date"
-                  value={trainingDate}
+                  value={
+                    trainingDate
+                  }
                   onChange={(e) =>
                     setTrainingDate(
                       e.target.value
@@ -855,10 +1459,14 @@ export default function CoursesPage() {
               </div>
 
               <div>
-                <label>Niveau attendu</label>
+                <label>
+                  Niveau attendu
+                </label>
 
                 <select
-                  value={trainingLevel}
+                  value={
+                    trainingLevel
+                  }
                   onChange={(e) =>
                     setTrainingLevel(
                       e.target.value
@@ -868,23 +1476,40 @@ export default function CoursesPage() {
                   <option value="<300">
                     &lt; 300
                   </option>
-
-                  <option value="400">400</option>
-                  <option value="500">500</option>
-                  <option value="600">600</option>
-                  <option value="700">700</option>
-                  <option value="800">800</option>
-                  <option value="900">900</option>
-                  <option value="1000">1000</option>
+                  <option value="400">
+                    400
+                  </option>
+                  <option value="500">
+                    500
+                  </option>
+                  <option value="600">
+                    600
+                  </option>
+                  <option value="700">
+                    700
+                  </option>
+                  <option value="800">
+                    800
+                  </option>
+                  <option value="900">
+                    900
+                  </option>
+                  <option value="1000">
+                    1000
+                  </option>
                 </select>
               </div>
 
               <div className="training-form-comment">
-                <label>Commentaire</label>
+                <label>
+                  Commentaire
+                </label>
 
                 <textarea
                   rows={4}
-                  value={trainingComment}
+                  value={
+                    trainingComment
+                  }
                   onChange={(e) =>
                     setTrainingComment(
                       e.target.value
@@ -895,7 +1520,9 @@ export default function CoursesPage() {
 
               <button
                 className="training-submit"
-                disabled={savingTraining}
+                disabled={
+                  savingTraining
+                }
               >
                 {savingTraining
                   ? "Ajout..."
@@ -906,17 +1533,29 @@ export default function CoursesPage() {
         </div>
       </section>
 
-      {/* CALENDRIER */}
+      {/* ==================================================
+          CALENDRIER
+      ================================================== */}
 
       <section className="page-container courses-calendar-section">
         <div className="courses-section-title">
           <div>
-            <span>CALENDRIER</span>
-            <h2>Les rendez-vous du team</h2>
+            <span>
+              CALENDRIER
+            </span>
+
+            <h2>
+              Les rendez-vous du team
+            </h2>
           </div>
 
           <div className="calendar-controls">
-            <button onClick={previousMonth}>
+            <button
+              type="button"
+              onClick={
+                previousMonth
+              }
+            >
               ←
             </button>
 
@@ -924,13 +1563,20 @@ export default function CoursesPage() {
               {currentMonth.toLocaleDateString(
                 "fr-FR",
                 {
-                  month: "long",
-                  year: "numeric",
+                  month:
+                    "long",
+                  year:
+                    "numeric",
                 }
               )}
             </strong>
 
-            <button onClick={nextMonth}>
+            <button
+              type="button"
+              onClick={
+                nextMonth
+              }
+            >
               →
             </button>
           </div>
@@ -945,121 +1591,163 @@ export default function CoursesPage() {
             "VEN",
             "SAM",
             "DIM",
-          ].map((day) => (
-            <div
-              key={day}
-              className="calendar-weekday"
-            >
-              {day}
-            </div>
-          ))}
+          ].map(
+            (weekday) => (
+              <div
+                key={weekday}
+                className="calendar-weekday"
+              >
+                {weekday}
+              </div>
+            )
+          )}
 
-          {calendarDays.map((day, index) => {
-            if (!day) {
+          {calendarDays.map(
+            (day, index) => {
+              if (!day) {
+                return (
+                  <div
+                    key={`empty-${index}`}
+                    className="calendar-day calendar-empty"
+                  />
+                );
+              }
+
+              const dayRaces =
+                racesForDay(day);
+
+              const dayTrainings =
+                trainingsForDay(
+                  day
+                );
+
               return (
                 <div
-                  key={`empty-${index}`}
-                  className="calendar-day calendar-empty"
-                />
+                  key={day}
+                  className="calendar-day"
+                >
+                  <span className="calendar-number">
+                    {day}
+                  </span>
+
+                  {dayRaces.map(
+                    (race) => (
+                      <Link
+                        key={
+                          race.id
+                        }
+                        href={`/courses/course/${race.id}`}
+                        className="calendar-race calendar-event-link"
+                      >
+                        <strong>
+                          {
+                            race.name
+                          }
+                        </strong>
+
+                        <span>
+                          {
+                            race.distance
+                          }{" "}
+                          km ·{" "}
+                          {
+                            race.elevation
+                          }{" "}
+                          D+
+                        </span>
+
+                        <div className="calendar-race-status">
+                          🏃{" "}
+                          {
+                            getRaceAttendance(
+                              race.id,
+                              "participant"
+                            )
+                              .length
+                          }
+                          {" · "}
+                          📣{" "}
+                          {
+                            getRaceAttendance(
+                              race.id,
+                              "support"
+                            )
+                              .length
+                          }
+                          {" · "}
+                          💬{" "}
+                          {getRaceCommentCount(
+                            race.id
+                          )}
+                        </div>
+                      </Link>
+                    )
+                  )}
+
+                  {dayTrainings.map(
+                    (training) => (
+                      <Link
+                        key={
+                          training.id
+                        }
+                        href={`/courses/training/${training.id}`}
+                        className="calendar-training calendar-event-link"
+                      >
+                        <strong>
+                          {
+                            training.title
+                          }
+                        </strong>
+
+                        <span>
+                          {
+                            training.location
+                          }{" "}
+                          ·{" "}
+                          {
+                            training.duration_minutes
+                          }{" "}
+                          min
+                        </span>
+
+                        <div className="calendar-training-status">
+                          🏃{" "}
+                          {
+                            getTrainingParticipants(
+                              training.id
+                            )
+                              .length
+                          }
+                          {" · "}
+                          💬{" "}
+                          {getTrainingCommentCount(
+                            training.id
+                          )}
+                        </div>
+                      </Link>
+                    )
+                  )}
+                </div>
               );
             }
-
-            const dayRaces = racesForDay(day);
-            const dayTrainings =
-              trainingsForDay(day);
-
-            return (
-              <div
-                key={day}
-                className="calendar-day"
-              >
-                <span className="calendar-number">
-                  {day}
-                </span>
-
-                {dayRaces.map((race) => (
-                  <Link
-                    key={race.id}
-                    href={`/courses/course/${race.id}`}
-                    className="calendar-race calendar-event-link"
-                  >
-                    <strong>{race.name}</strong>
-
-                    <span>
-                      {race.distance} km ·{" "}
-                      {race.elevation} D+
-                    </span>
-
-                    <div className="calendar-race-status">
-                      🏃{" "}
-                      {
-                        getRaceAttendance(
-                          race.id,
-                          "participant"
-                        ).length
-                      }{" "}
-                      · 📣{" "}
-                      {
-                        getRaceAttendance(
-                          race.id,
-                          "support"
-                        ).length
-                      }{" "}
-                      · 💬{" "}
-                      {getRaceCommentCount(
-                        race.id
-                      )}
-                    </div>
-                  </Link>
-                ))}
-
-                {dayTrainings.map(
-                  (training) => (
-                    <Link
-                      key={training.id}
-                      href={`/courses/training/${training.id}`}
-                      className="calendar-training calendar-event-link"
-                    >
-                      <strong>
-                        {training.title}
-                      </strong>
-
-                      <span>
-                        {training.location} ·{" "}
-                        {
-                          training.duration_minutes
-                        }{" "}
-                        min
-                      </span>
-
-                      <div className="calendar-training-status">
-                        🏃{" "}
-                        {
-                          getTrainingParticipants(
-                            training.id
-                          ).length
-                        }{" "}
-                        · 💬{" "}
-                        {getTrainingCommentCount(
-                          training.id
-                        )}
-                      </div>
-                    </Link>
-                  )
-                )}
-              </div>
-            );
-          })}
+          )}
         </div>
       </section>
 
-      {/* COURSES */}
+      {/* ==================================================
+          COURSES
+      ================================================== */}
 
       <section className="page-container race-list-section">
         <div className="courses-section-title">
           <div>
-            <span>PROCHAINES COURSES</span>
-            <h2>Sur la ligne de départ</h2>
+            <span>
+              PROCHAINES COURSES
+            </span>
+
+            <h2>
+              Sur la ligne de départ
+            </h2>
           </div>
         </div>
 
@@ -1078,17 +1766,21 @@ export default function CoursesPage() {
               );
 
             const myStatus =
-              getMyStatus(race.id);
+              getMyStatus(
+                race.id
+              );
 
             const isCreator =
-              race.created_by === userId;
+              race.created_by ===
+              userId;
 
             const isEditing =
-              editingRaceId === race.id;
+              editingRaceId ===
+              race.id;
 
             return (
               <article
-                className="race-card"
+                className="race-card race-card-with-logo"
                 key={race.id}
               >
                 <div className="race-card-date">
@@ -1098,7 +1790,8 @@ export default function CoursesPage() {
                     ).toLocaleDateString(
                       "fr-FR",
                       {
-                        day: "2-digit",
+                        day:
+                          "2-digit",
                       }
                     )}
                   </strong>
@@ -1110,7 +1803,8 @@ export default function CoursesPage() {
                       .toLocaleDateString(
                         "fr-FR",
                         {
-                          month: "short",
+                          month:
+                            "short",
                         }
                       )
                       .toUpperCase()}
@@ -1124,61 +1818,133 @@ export default function CoursesPage() {
 
                   {isEditing ? (
                     <div className="race-edit-form">
-                      <label>Nom</label>
+                      <div>
+                        <label>
+                          Nom
+                        </label>
 
-                      <input
-                        value={editName}
-                        onChange={(e) =>
-                          setEditName(
-                            e.target.value
-                          )
-                        }
-                      />
-
-                      <div className="race-edit-grid">
                         <input
-                          type="number"
-                          value={editDistance}
-                          onChange={(e) =>
-                            setEditDistance(
-                              e.target.value
-                            )
+                          value={
+                            editName
                           }
-                        />
-
-                        <input
-                          type="number"
-                          value={editElevation}
                           onChange={(e) =>
-                            setEditElevation(
-                              e.target.value
-                            )
-                          }
-                        />
-
-                        <input
-                          type="date"
-                          value={editDate}
-                          onChange={(e) =>
-                            setEditDate(
-                              e.target.value
+                            setEditName(
+                              e.target
+                                .value
                             )
                           }
                         />
                       </div>
 
+                      <div className="race-edit-grid">
+                        <div>
+                          <label>
+                            Distance
+                          </label>
+
+                          <input
+                            type="number"
+                            value={
+                              editDistance
+                            }
+                            onChange={(e) =>
+                              setEditDistance(
+                                e
+                                  .target
+                                  .value
+                              )
+                            }
+                          />
+                        </div>
+
+                        <div>
+                          <label>
+                            D+
+                          </label>
+
+                          <input
+                            type="number"
+                            value={
+                              editElevation
+                            }
+                            onChange={(e) =>
+                              setEditElevation(
+                                e
+                                  .target
+                                  .value
+                              )
+                            }
+                          />
+                        </div>
+
+                        <div>
+                          <label>
+                            Date
+                          </label>
+
+                          <input
+                            type="date"
+                            value={
+                              editDate
+                            }
+                            onChange={(e) =>
+                              setEditDate(
+                                e
+                                  .target
+                                  .value
+                              )
+                            }
+                          />
+                        </div>
+                      </div>
+
+                      <div className="race-edit-image">
+                        <label>
+                          Logo / visuel
+                        </label>
+
+                        {editRaceImagePreview && (
+                          <div className="race-edit-image-preview">
+                            <img
+                              src={
+                                editRaceImagePreview
+                              }
+                              alt=""
+                            />
+                          </div>
+                        )}
+
+                        <label className="race-image-upload-button">
+                          Changer l&apos;image
+
+                          <input
+                            type="file"
+                            accept="image/*"
+                            onChange={
+                              handleEditRaceImage
+                            }
+                          />
+                        </label>
+                      </div>
+
                       <div className="race-edit-actions">
                         <button
+                          type="button"
                           onClick={() =>
-                            updateRace(race.id)
+                            updateRace(
+                              race.id
+                            )
                           }
                         >
                           Enregistrer
                         </button>
 
                         <button
+                          type="button"
                           className="race-edit-cancel"
-                          onClick={cancelEditRace}
+                          onClick={
+                            cancelEditRace
+                          }
                         >
                           Annuler
                         </button>
@@ -1186,26 +1952,60 @@ export default function CoursesPage() {
                     </div>
                   ) : (
                     <>
-                      <Link
-                        href={`/courses/course/${race.id}`}
-                        className="event-title-link"
-                      >
-                        <h3>{race.name}</h3>
-                      </Link>
+                      <div className="race-card-heading-with-logo">
+                        {race.image_url && (
+                          <Link
+                            href={`/courses/course/${race.id}`}
+                            className="race-card-logo"
+                          >
+                            <img
+                              src={
+                                race.image_url
+                              }
+                              alt={`Logo ${race.name}`}
+                            />
+                          </Link>
+                        )}
 
-                      <div className="race-stats">
                         <div>
-                          <span>DISTANCE</span>
-                          <strong>
-                            {race.distance} km
-                          </strong>
-                        </div>
+                          <Link
+                            href={`/courses/course/${race.id}`}
+                            className="event-title-link"
+                          >
+                            <h3>
+                              {
+                                race.name
+                              }
+                            </h3>
+                          </Link>
 
-                        <div>
-                          <span>DÉNIVELÉ</span>
-                          <strong>
-                            {race.elevation} m+
-                          </strong>
+                          <div className="race-stats">
+                            <div>
+                              <span>
+                                DISTANCE
+                              </span>
+
+                              <strong>
+                                {
+                                  race.distance
+                                }{" "}
+                                km
+                              </strong>
+                            </div>
+
+                            <div>
+                              <span>
+                                DÉNIVELÉ
+                              </span>
+
+                              <strong>
+                                {
+                                  race.elevation
+                                }{" "}
+                                m+
+                              </strong>
+                            </div>
+                          </div>
                         </div>
                       </div>
 
@@ -1228,6 +2028,7 @@ export default function CoursesPage() {
                       {isCreator && (
                         <div className="race-owner-actions">
                           <button
+                            type="button"
                             onClick={() =>
                               startEditRace(
                                 race
@@ -1238,9 +2039,12 @@ export default function CoursesPage() {
                           </button>
 
                           <button
+                            type="button"
                             className="race-delete-button"
                             onClick={() =>
-                              deleteRace(race.id)
+                              deleteRace(
+                                race.id
+                              )
                             }
                           >
                             Supprimer
@@ -1258,16 +2062,25 @@ export default function CoursesPage() {
                     </span>
 
                     <div className="race-names">
-                      {participants.map(
-                        (item) => (
-                          <span
-                            key={item.id}
-                            className="race-person participant"
-                          >
-                            {getProfileName(
-                              item.user_id
-                            )}
-                          </span>
+                      {participants.length ===
+                      0 ? (
+                        <span className="race-empty">
+                          Aucun pour le moment
+                        </span>
+                      ) : (
+                        participants.map(
+                          (item) => (
+                            <span
+                              key={
+                                item.id
+                              }
+                              className="race-person participant"
+                            >
+                              {getProfileName(
+                                item.user_id
+                              )}
+                            </span>
+                          )
                         )
                       )}
                     </div>
@@ -1279,16 +2092,25 @@ export default function CoursesPage() {
                     </span>
 
                     <div className="race-names">
-                      {supporters.map(
-                        (item) => (
-                          <span
-                            key={item.id}
-                            className="race-person supporter"
-                          >
-                            {getProfileName(
-                              item.user_id
-                            )}
-                          </span>
+                      {supporters.length ===
+                      0 ? (
+                        <span className="race-empty">
+                          Aucun pour le moment
+                        </span>
+                      ) : (
+                        supporters.map(
+                          (item) => (
+                            <span
+                              key={
+                                item.id
+                              }
+                              className="race-person supporter"
+                            >
+                              {getProfileName(
+                                item.user_id
+                              )}
+                            </span>
+                          )
                         )
                       )}
                     </div>
@@ -1298,6 +2120,7 @@ export default function CoursesPage() {
                 {userId && (
                   <div className="race-actions">
                     <button
+                      type="button"
                       className={`race-choice ${
                         myStatus ===
                         "participant"
@@ -1315,8 +2138,10 @@ export default function CoursesPage() {
                     </button>
 
                     <button
+                      type="button"
                       className={`race-choice ${
-                        myStatus === "support"
+                        myStatus ===
+                        "support"
                           ? "race-choice-active"
                           : ""
                       }`}
@@ -1332,9 +2157,12 @@ export default function CoursesPage() {
 
                     {myStatus && (
                       <button
+                        type="button"
                         className="race-remove"
                         onClick={() =>
-                          removeStatus(race.id)
+                          removeStatus(
+                            race.id
+                          )
                         }
                       >
                         ×
@@ -1348,7 +2176,9 @@ export default function CoursesPage() {
         </div>
       </section>
 
-      {/* SORTIES */}
+      {/* ==================================================
+          SORTIES
+      ================================================== */}
 
       <section className="page-container training-list-section">
         <div className="courses-section-title">
@@ -1357,360 +2187,425 @@ export default function CoursesPage() {
               SORTIES / ENTRAÎNEMENTS
             </span>
 
-            <h2>Les prochaines sorties</h2>
+            <h2>
+              Les prochaines sorties
+            </h2>
           </div>
         </div>
 
         <div className="training-list">
-          {trainings.map((training) => {
-            const participants =
-              getTrainingParticipants(
-                training.id
-              );
+          {trainings.map(
+            (training) => {
+              const participants =
+                getTrainingParticipants(
+                  training.id
+                );
 
-            const joined =
-              isParticipatingTraining(
-                training.id
-              );
+              const joined =
+                isParticipatingTraining(
+                  training.id
+                );
 
-            const isCreator =
-              training.created_by === userId;
+              const isCreator =
+                training.created_by ===
+                userId;
 
-            const isEditing =
-              editingTrainingId ===
-              training.id;
+              const isEditing =
+                editingTrainingId ===
+                training.id;
 
-            return (
-              <article
-                className="training-card"
-                key={training.id}
-              >
-                <div className="training-card-date">
-                  <strong>
-                    {new Date(
-                      `${training.training_date}T12:00:00`
-                    ).toLocaleDateString(
-                      "fr-FR",
-                      {
-                        day: "2-digit",
-                      }
-                    )}
-                  </strong>
-
-                  <span>
-                    {new Date(
-                      `${training.training_date}T12:00:00`
-                    )
-                      .toLocaleDateString(
+              return (
+                <article
+                  className="training-card"
+                  key={
+                    training.id
+                  }
+                >
+                  <div className="training-card-date">
+                    <strong>
+                      {new Date(
+                        `${training.training_date}T12:00:00`
+                      ).toLocaleDateString(
                         "fr-FR",
                         {
-                          month: "short",
+                          day:
+                            "2-digit",
                         }
+                      )}
+                    </strong>
+
+                    <span>
+                      {new Date(
+                        `${training.training_date}T12:00:00`
                       )
-                      .toUpperCase()}
-                  </span>
-                </div>
+                        .toLocaleDateString(
+                          "fr-FR",
+                          {
+                            month:
+                              "short",
+                          }
+                        )
+                        .toUpperCase()}
+                    </span>
+                  </div>
 
-                <div className="training-card-main">
-                  <p className="training-card-label">
-                    SORTIE / ENTRAÎNEMENT
-                  </p>
+                  <div className="training-card-main">
+                    <p className="training-card-label">
+                      SORTIE / ENTRAÎNEMENT
+                    </p>
 
-                  {isEditing ? (
-                    <div className="race-edit-form">
-                      <label>Nom</label>
+                    {isEditing ? (
+                      <div className="race-edit-form">
+                        <label>
+                          Nom
+                        </label>
 
-                      <input
-                        value={editTrainingTitle}
-                        onChange={(e) =>
-                          setEditTrainingTitle(
-                            e.target.value
-                          )
-                        }
-                      />
+                        <input
+                          value={
+                            editTrainingTitle
+                          }
+                          onChange={(e) =>
+                            setEditTrainingTitle(
+                              e.target
+                                .value
+                            )
+                          }
+                        />
 
-                      <div className="race-edit-grid">
-                        <div>
-                          <label>Lieu</label>
+                        <div className="race-edit-grid">
+                          <div>
+                            <label>
+                              Lieu
+                            </label>
 
-                          <input
-                            value={
-                              editTrainingLocation
-                            }
-                            onChange={(e) =>
-                              setEditTrainingLocation(
-                                e.target.value
-                              )
-                            }
-                          />
+                            <input
+                              value={
+                                editTrainingLocation
+                              }
+                              onChange={(e) =>
+                                setEditTrainingLocation(
+                                  e
+                                    .target
+                                    .value
+                                )
+                              }
+                            />
+                          </div>
+
+                          <div>
+                            <label>
+                              Durée
+                            </label>
+
+                            <input
+                              type="number"
+                              value={
+                                editTrainingDuration
+                              }
+                              onChange={(e) =>
+                                setEditTrainingDuration(
+                                  e
+                                    .target
+                                    .value
+                                )
+                              }
+                            />
+                          </div>
+
+                          <div>
+                            <label>
+                              Date
+                            </label>
+
+                            <input
+                              type="date"
+                              value={
+                                editTrainingDate
+                              }
+                              onChange={(e) =>
+                                setEditTrainingDate(
+                                  e
+                                    .target
+                                    .value
+                                )
+                              }
+                            />
+                          </div>
                         </div>
 
-                        <div>
-                          <label>Durée</label>
+                        <label>
+                          Niveau attendu
+                        </label>
 
-                          <input
-                            type="number"
-                            value={
-                              editTrainingDuration
-                            }
-                            onChange={(e) =>
-                              setEditTrainingDuration(
-                                e.target.value
-                              )
-                            }
-                          />
-                        </div>
-
-                        <div>
-                          <label>Date</label>
-
-                          <input
-                            type="date"
-                            value={
-                              editTrainingDate
-                            }
-                            onChange={(e) =>
-                              setEditTrainingDate(
-                                e.target.value
-                              )
-                            }
-                          />
-                        </div>
-                      </div>
-
-                      <label>
-                        Niveau attendu
-                      </label>
-
-                      <select
-                        value={editTrainingLevel}
-                        onChange={(e) =>
-                          setEditTrainingLevel(
-                            e.target.value
-                          )
-                        }
-                      >
-                        <option value="<300">
-                          &lt; 300
-                        </option>
-                        <option value="400">
-                          400
-                        </option>
-                        <option value="500">
-                          500
-                        </option>
-                        <option value="600">
-                          600
-                        </option>
-                        <option value="700">
-                          700
-                        </option>
-                        <option value="800">
-                          800
-                        </option>
-                        <option value="900">
-                          900
-                        </option>
-                        <option value="1000">
-                          1000
-                        </option>
-                      </select>
-
-                      <label>
-                        Commentaire
-                      </label>
-
-                      <textarea
-                        rows={4}
-                        value={
-                          editTrainingComment
-                        }
-                        onChange={(e) =>
-                          setEditTrainingComment(
-                            e.target.value
-                          )
-                        }
-                      />
-
-                      <div className="race-edit-actions">
-                        <button
-                          onClick={() =>
-                            updateTraining(
-                              training.id
+                        <select
+                          value={
+                            editTrainingLevel
+                          }
+                          onChange={(e) =>
+                            setEditTrainingLevel(
+                              e.target
+                                .value
                             )
                           }
                         >
-                          Enregistrer
-                        </button>
+                          <option value="<300">
+                            &lt; 300
+                          </option>
+                          <option value="400">
+                            400
+                          </option>
+                          <option value="500">
+                            500
+                          </option>
+                          <option value="600">
+                            600
+                          </option>
+                          <option value="700">
+                            700
+                          </option>
+                          <option value="800">
+                            800
+                          </option>
+                          <option value="900">
+                            900
+                          </option>
+                          <option value="1000">
+                            1000
+                          </option>
+                        </select>
 
-                        <button
-                          className="race-edit-cancel"
-                          onClick={
-                            cancelEditTraining
+                        <label>
+                          Commentaire
+                        </label>
+
+                        <textarea
+                          rows={4}
+                          value={
+                            editTrainingComment
                           }
-                        >
-                          Annuler
-                        </button>
-                      </div>
-                    </div>
-                  ) : (
-                    <>
-                      <Link
-                        href={`/courses/training/${training.id}`}
-                        className="event-title-link"
-                      >
-                        <h3>
-                          {training.title}
-                        </h3>
-                      </Link>
+                          onChange={(e) =>
+                            setEditTrainingComment(
+                              e.target
+                                .value
+                            )
+                          }
+                        />
 
-                      <div className="training-info-grid">
-                        <div>
-                          <span>LIEU</span>
-                          <strong>
-                            {training.location}
-                          </strong>
-                        </div>
-
-                        <div>
-                          <span>DURÉE</span>
-                          <strong>
-                            {
-                              training.duration_minutes
-                            }{" "}
-                            min
-                          </strong>
-                        </div>
-
-                        <div>
-                          <span>
-                            NIVEAU ATTENDU
-                          </span>
-
-                          <strong>
-                            {training.expected_level ??
-                              "Non défini"}
-                          </strong>
-                        </div>
-
-                        <div>
-                          <span>CRÉÉ PAR</span>
-
-                          <strong>
-                            {getProfileName(
-                              training.created_by
-                            )}
-                          </strong>
-                        </div>
-                      </div>
-
-                      {training.comment && (
-                        <p className="training-comment">
-                          {training.comment}
-                        </p>
-                      )}
-
-                      <Link
-                        href={`/courses/training/${training.id}`}
-                        className="event-comment-count"
-                      >
-                        💬{" "}
-                        {getTrainingCommentCount(
-                          training.id
-                        )}{" "}
-                        commentaire
-                        {getTrainingCommentCount(
-                          training.id
-                        ) !== 1
-                          ? "s"
-                          : ""}
-                      </Link>
-
-                      {isCreator && (
-                        <div className="race-owner-actions">
+                        <div className="race-edit-actions">
                           <button
+                            type="button"
                             onClick={() =>
-                              startEditTraining(
-                                training
-                              )
-                            }
-                          >
-                            Modifier
-                          </button>
-
-                          <button
-                            className="race-delete-button"
-                            onClick={() =>
-                              deleteTraining(
+                              updateTraining(
                                 training.id
                               )
                             }
                           >
-                            Supprimer
+                            Enregistrer
+                          </button>
+
+                          <button
+                            type="button"
+                            className="race-edit-cancel"
+                            onClick={
+                              cancelEditTraining
+                            }
+                          >
+                            Annuler
                           </button>
                         </div>
-                      )}
-
-                      <div className="training-participants">
-                        <span className="race-people-title">
-                          🏃 PARTICIPANTS
-                        </span>
-
-                        <div className="race-names">
-                          {participants.map(
-                            (item) => (
-                              <span
-                                key={item.id}
-                                className="race-person participant"
-                              >
-                                {getProfileName(
-                                  item.user_id
-                                )}
-                              </span>
-                            )
-                          )}
-                        </div>
                       </div>
+                    ) : (
+                      <>
+                        <Link
+                          href={`/courses/training/${training.id}`}
+                          className="event-title-link"
+                        >
+                          <h3>
+                            {
+                              training.title
+                            }
+                          </h3>
+                        </Link>
 
-                      {userId && (
-                        <div className="training-actions">
-                          {!joined ? (
+                        <div className="training-info-grid">
+                          <div>
+                            <span>
+                              LIEU
+                            </span>
+
+                            <strong>
+                              {
+                                training.location
+                              }
+                            </strong>
+                          </div>
+
+                          <div>
+                            <span>
+                              DURÉE
+                            </span>
+
+                            <strong>
+                              {
+                                training.duration_minutes
+                              }{" "}
+                              min
+                            </strong>
+                          </div>
+
+                          <div>
+                            <span>
+                              NIVEAU ATTENDU
+                            </span>
+
+                            <strong>
+                              {training.expected_level ??
+                                "Non défini"}
+                            </strong>
+                          </div>
+
+                          <div>
+                            <span>
+                              CRÉÉ PAR
+                            </span>
+
+                            <strong>
+                              {getProfileName(
+                                training.created_by
+                              )}
+                            </strong>
+                          </div>
+                        </div>
+
+                        {training.comment && (
+                          <p className="training-comment">
+                            {
+                              training.comment
+                            }
+                          </p>
+                        )}
+
+                        <Link
+                          href={`/courses/training/${training.id}`}
+                          className="event-comment-count"
+                        >
+                          💬{" "}
+                          {getTrainingCommentCount(
+                            training.id
+                          )}{" "}
+                          commentaire
+                          {getTrainingCommentCount(
+                            training.id
+                          ) !== 1
+                            ? "s"
+                            : ""}
+                        </Link>
+
+                        {isCreator && (
+                          <div className="race-owner-actions">
                             <button
-                              className="race-choice"
+                              type="button"
                               onClick={() =>
-                                joinTraining(
+                                startEditTraining(
+                                  training
+                                )
+                              }
+                            >
+                              Modifier
+                            </button>
+
+                            <button
+                              type="button"
+                              className="race-delete-button"
+                              onClick={() =>
+                                deleteTraining(
                                   training.id
                                 )
                               }
                             >
-                              🏃 Je participe
+                              Supprimer
                             </button>
-                          ) : (
-                            <>
-                              <button className="race-choice race-choice-active">
-                                ✓ Je participe
-                              </button>
+                          </div>
+                        )}
 
+                        <div className="training-participants">
+                          <span className="race-people-title">
+                            🏃 PARTICIPANTS
+                          </span>
+
+                          <div className="race-names">
+                            {participants.length ===
+                            0 ? (
+                              <span className="race-empty">
+                                Aucun pour le moment
+                              </span>
+                            ) : (
+                              participants.map(
+                                (
+                                  item
+                                ) => (
+                                  <span
+                                    key={
+                                      item.id
+                                    }
+                                    className="race-person participant"
+                                  >
+                                    {getProfileName(
+                                      item.user_id
+                                    )}
+                                  </span>
+                                )
+                              )
+                            )}
+                          </div>
+                        </div>
+
+                        {userId && (
+                          <div className="training-actions">
+                            {!joined ? (
                               <button
-                                className="race-remove"
+                                type="button"
+                                className="race-choice"
                                 onClick={() =>
-                                  leaveTraining(
+                                  joinTraining(
                                     training.id
                                   )
                                 }
                               >
-                                ×
+                                🏃 Je participe
                               </button>
-                            </>
-                          )}
-                        </div>
-                      )}
-                    </>
-                  )}
-                </div>
-              </article>
-            );
-          })}
+                            ) : (
+                              <>
+                                <button
+                                  type="button"
+                                  className="race-choice race-choice-active"
+                                  disabled
+                                >
+                                  ✓ Je participe
+                                </button>
+
+                                <button
+                                  type="button"
+                                  className="race-remove"
+                                  onClick={() =>
+                                    leaveTraining(
+                                      training.id
+                                    )
+                                  }
+                                >
+                                  ×
+                                </button>
+                              </>
+                            )}
+                          </div>
+                        )}
+                      </>
+                    )}
+                  </div>
+                </article>
+              );
+            }
+          )}
         </div>
       </section>
     </main>

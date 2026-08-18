@@ -11,6 +11,8 @@ type Race = {
   distance: number;
   elevation: number;
   race_date: string;
+  created_by: string | null;
+  image_url: string | null;
 };
 
 type Comment = {
@@ -28,14 +30,19 @@ type Profile = {
 };
 
 export default function RaceDetailPage() {
-  const params = useParams<{ id: string }>();
+  const params =
+    useParams<{ id: string }>();
 
-  const raceId = params.id;
+  const raceId =
+    params.id;
 
-  const supabase = createClient();
+  const supabase =
+    createClient();
 
   const [race, setRace] =
-    useState<Race | null>(null);
+    useState<Race | null>(
+      null
+    );
 
   const [comments, setComments] =
     useState<Comment[]>([]);
@@ -44,7 +51,9 @@ export default function RaceDetailPage() {
     useState<Profile[]>([]);
 
   const [userId, setUserId] =
-    useState<string | null>(null);
+    useState<string | null>(
+      null
+    );
 
   const [message, setMessage] =
     useState("");
@@ -64,64 +73,103 @@ export default function RaceDetailPage() {
 
     const {
       data: { user },
-    } = await supabase.auth.getUser();
+    } =
+      await supabase.auth.getUser();
 
-    setUserId(user?.id ?? null);
+    setUserId(
+      user?.id ?? null
+    );
 
-    const { data: raceData } =
-      await supabase
-        .from("races")
-        .select("*")
-        .eq("id", raceId)
-        .single();
+    const {
+      data: raceData,
+      error: raceError,
+    } = await supabase
+      .from("races")
+      .select("*")
+      .eq("id", raceId)
+      .single();
 
-    const { data: commentsData } =
-      await supabase
-        .from("event_comments")
-        .select("*")
-        .eq("race_id", raceId)
-        .order("created_at", {
+    if (raceError) {
+      console.error(
+        "Erreur course :",
+        raceError
+      );
+
+      setRace(null);
+      setLoading(false);
+
+      return;
+    }
+
+    const {
+      data: commentsData,
+    } = await supabase
+      .from("event_comments")
+      .select("*")
+      .eq(
+        "race_id",
+        raceId
+      )
+      .order(
+        "created_at",
+        {
           ascending: true,
-        });
+        }
+      );
 
-    const { data: profilesData } =
-      await supabase
-        .from("profiles")
-        .select(
-          "id, first_name, last_name, nickname"
-        );
+    const {
+      data: profilesData,
+    } = await supabase
+      .from("profiles")
+      .select(
+        "id, first_name, last_name, nickname"
+      );
 
-    setRace(raceData as Race);
+    setRace(
+      raceData as Race
+    );
 
     setComments(
-      (commentsData ?? []) as Comment[]
+      (commentsData ??
+        []) as Comment[]
     );
 
     setProfiles(
-      (profilesData ?? []) as Profile[]
+      (profilesData ??
+        []) as Profile[]
     );
 
     setLoading(false);
   }
 
-  function getProfileName(profileId: string) {
-    const profile = profiles.find(
-      (profile) =>
-        profile.id === profileId
-    );
+  function getProfileName(
+    profileId: string
+  ) {
+    const profile =
+      profiles.find(
+        (profile) =>
+          profile.id ===
+          profileId
+      );
 
     if (!profile) {
       return "Membre";
     }
 
-    if (profile.nickname) {
+    if (
+      profile.nickname
+    ) {
       return profile.nickname;
     }
 
     return (
-      [profile.first_name, profile.last_name]
+      [
+        profile.first_name,
+        profile.last_name,
+      ]
         .filter(Boolean)
-        .join(" ") || "Membre"
+        .join(" ") ||
+      "Membre"
     );
   }
 
@@ -143,19 +191,30 @@ export default function RaceDetailPage() {
 
     setSending(true);
 
-    const { error } = await supabase
-      .from("event_comments")
-      .insert({
-        user_id: userId,
-        race_id: raceId,
-        training_id: null,
-        message: message.trim(),
-      });
+    const { error } =
+      await supabase
+        .from("event_comments")
+        .insert({
+          user_id:
+            userId,
+
+          race_id:
+            raceId,
+
+          training_id:
+            null,
+
+          message:
+            message.trim(),
+        });
 
     setSending(false);
 
     if (error) {
-      alert(error.message);
+      alert(
+        error.message
+      );
+
       return;
     }
 
@@ -167,22 +226,36 @@ export default function RaceDetailPage() {
   async function deleteComment(
     commentId: string
   ) {
-    if (!userId) return;
+    if (!userId) {
+      return;
+    }
 
-    const confirmed = window.confirm(
-      "Supprimer ce message ?"
-    );
+    if (
+      !window.confirm(
+        "Supprimer ce message ?"
+      )
+    ) {
+      return;
+    }
 
-    if (!confirmed) return;
-
-    const { error } = await supabase
-      .from("event_comments")
-      .delete()
-      .eq("id", commentId)
-      .eq("user_id", userId);
+    const { error } =
+      await supabase
+        .from("event_comments")
+        .delete()
+        .eq(
+          "id",
+          commentId
+        )
+        .eq(
+          "user_id",
+          userId
+        );
 
     if (error) {
-      alert(error.message);
+      alert(
+        error.message
+      );
+
       return;
     }
 
@@ -214,131 +287,188 @@ export default function RaceDetailPage() {
         ← Retour aux événements
       </Link>
 
-      <section className="event-detail-header race-detail-header">
-        <span>COURSE</span>
-
-        <h1>{race.name}</h1>
-
-        <div className="event-detail-stats">
-          <div>
-            <small>DISTANCE</small>
-            <strong>
-              {race.distance} km
-            </strong>
+      <section className="event-detail-header race-detail-header race-detail-with-logo">
+        {race.image_url && (
+          <div className="race-detail-logo">
+            <img
+              src={
+                race.image_url
+              }
+              alt={`Logo ${race.name}`}
+            />
           </div>
+        )}
 
-          <div>
-            <small>DÉNIVELÉ</small>
-            <strong>
-              {race.elevation} m+
-            </strong>
-          </div>
+        <div className="race-detail-content">
+          <span>
+            COURSE
+          </span>
 
-          <div>
-            <small>DATE</small>
+          <h1>
+            {race.name}
+          </h1>
 
-            <strong>
-              {new Date(
-                `${race.race_date}T12:00:00`
-              ).toLocaleDateString(
-                "fr-FR"
-              )}
-            </strong>
-          </div>
+          <div className="event-detail-stats">
+            <div>
+              <small>
+                DISTANCE
+              </small>
 
-          <div>
-            <small>DISCUSSION</small>
-            <strong>
-              💬 {comments.length}
-            </strong>
+              <strong>
+                {
+                  race.distance
+                }{" "}
+                km
+              </strong>
+            </div>
+
+            <div>
+              <small>
+                DÉNIVELÉ
+              </small>
+
+              <strong>
+                {
+                  race.elevation
+                }{" "}
+                m+
+              </strong>
+            </div>
+
+            <div>
+              <small>
+                DATE
+              </small>
+
+              <strong>
+                {new Date(
+                  `${race.race_date}T12:00:00`
+                ).toLocaleDateString(
+                  "fr-FR"
+                )}
+              </strong>
+            </div>
+
+            <div>
+              <small>
+                DISCUSSION
+              </small>
+
+              <strong>
+                💬{" "}
+                {
+                  comments.length
+                }
+              </strong>
+            </div>
           </div>
         </div>
       </section>
 
       <section className="event-discussion">
         <div className="event-discussion-title">
-          <span>DISCUSSION</span>
+          <span>
+            DISCUSSION
+          </span>
 
           <h2>
-            {comments.length} message
-            {comments.length !== 1
+            {
+              comments.length
+            }{" "}
+            message
+            {comments.length !==
+            1
               ? "s"
               : ""}
           </h2>
         </div>
 
         <div className="event-comments">
-          {comments.length === 0 && (
+          {comments.length ===
+            0 && (
             <div className="event-no-comments">
-              Aucun message pour le moment.
-              Sois le premier à lancer la
-              discussion.
+              Aucun message pour
+              le moment.
             </div>
           )}
 
-          {comments.map((comment) => (
-            <article
-              key={comment.id}
-              className="event-comment"
-            >
-              <div className="event-comment-avatar">
-                {getProfileName(
-                  comment.user_id
-                )
-                  .charAt(0)
-                  .toUpperCase()}
-              </div>
-
-              <div className="event-comment-content">
-                <div className="event-comment-head">
-                  <div>
-                    <strong>
-                      {getProfileName(
-                        comment.user_id
-                      )}
-                    </strong>
-
-                    <span>
-                      {new Date(
-                        comment.created_at
-                      ).toLocaleString(
-                        "fr-FR",
-                        {
-                          day: "2-digit",
-                          month: "short",
-                          hour: "2-digit",
-                          minute: "2-digit",
-                        }
-                      )}
-                    </span>
-                  </div>
-
-                  {comment.user_id ===
-                    userId && (
-                    <button
-                      type="button"
-                      className="comment-delete"
-                      onClick={() =>
-                        deleteComment(
-                          comment.id
-                        )
-                      }
-                    >
-                      Supprimer
-                    </button>
-                  )}
+          {comments.map(
+            (comment) => (
+              <article
+                key={
+                  comment.id
+                }
+                className="event-comment"
+              >
+                <div className="event-comment-avatar">
+                  {getProfileName(
+                    comment.user_id
+                  )
+                    .charAt(0)
+                    .toUpperCase()}
                 </div>
 
-                <p>{comment.message}</p>
-              </div>
-            </article>
-          ))}
+                <div className="event-comment-content">
+                  <div className="event-comment-head">
+                    <div>
+                      <strong>
+                        {getProfileName(
+                          comment.user_id
+                        )}
+                      </strong>
+
+                      <span>
+                        {new Date(
+                          comment.created_at
+                        ).toLocaleString(
+                          "fr-FR",
+                          {
+                            day:
+                              "2-digit",
+                            month:
+                              "short",
+                            hour:
+                              "2-digit",
+                            minute:
+                              "2-digit",
+                          }
+                        )}
+                      </span>
+                    </div>
+
+                    {comment.user_id ===
+                      userId && (
+                      <button
+                        type="button"
+                        className="comment-delete"
+                        onClick={() =>
+                          deleteComment(
+                            comment.id
+                          )
+                        }
+                      >
+                        Supprimer
+                      </button>
+                    )}
+                  </div>
+
+                  <p>
+                    {
+                      comment.message
+                    }
+                  </p>
+                </div>
+              </article>
+            )
+          )}
         </div>
 
         {userId ? (
           <form
             className="comment-form"
-            onSubmit={sendComment}
+            onSubmit={
+              sendComment
+            }
           >
             <label>
               Écrire un message
@@ -346,10 +476,15 @@ export default function RaceDetailPage() {
 
             <textarea
               rows={4}
-              value={message}
-              onChange={(event) =>
+              value={
+                message
+              }
+              onChange={(
+                event
+              ) =>
                 setMessage(
-                  event.target.value
+                  event.target
+                    .value
                 )
               }
               placeholder="Organisation, covoiturage, matériel, rendez-vous..."
@@ -357,7 +492,9 @@ export default function RaceDetailPage() {
 
             <button
               type="submit"
-              disabled={sending}
+              disabled={
+                sending
+              }
             >
               {sending
                 ? "Envoi..."
@@ -366,8 +503,9 @@ export default function RaceDetailPage() {
           </form>
         ) : (
           <div className="event-login-message">
-            Connecte-toi pour participer
-            à la discussion.
+            Connecte-toi pour
+            participer à la
+            discussion.
           </div>
         )}
       </section>
