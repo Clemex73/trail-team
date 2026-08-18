@@ -5903,3 +5903,487 @@ label {
     width: 100%;
   }
 }
+
+/* ==========================================================
+   PROFIL PUBLIC MEMBRE
+========================================================== */
+
+.member-profile-page {
+  padding-top: 45px;
+  padding-bottom: 100px;
+}
+
+.member-profile-header {
+  display: grid;
+  grid-template-columns:
+    minmax(0, 1.2fr)
+    minmax(320px, 0.8fr);
+
+  gap: 35px;
+
+  margin-top: 15px;
+}
+
+.member-profile-main {
+  display: flex;
+
+  gap: 25px;
+
+  align-items: flex-start;
+}
+
+.member-profile-avatar {
+  flex: 0 0 155px;
+
+  width: 155px;
+  height: 155px;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  overflow: hidden;
+
+  border-radius: 50%;
+
+  background:
+    linear-gradient(
+      135deg,
+      #ede9fe,
+      #ddd6fe
+    );
+
+  border: 6px solid #f5f3ff;
+
+  color: #5b21b6;
+
+  font-size: 3rem;
+  font-weight: 900;
+}
+
+.member-profile-avatar img {
+  width: 100%;
+  height: 100%;
+
+  object-fit: cover;
+}
+
+.member-profile-identity > span {
+  color: #6d28d9;
+
+  font-size: 0.65rem;
+  font-weight: 1000;
+
+  letter-spacing: 0.2em;
+}
+
+.member-profile-identity h1 {
+  margin: 8px 0 5px;
+
+  color: #28134d;
+
+  font-size: clamp(
+    2.6rem,
+    5vw,
+    4.7rem
+  );
+
+  line-height: 0.95;
+}
+
+.member-profile-identity > p {
+  margin: 0 0 25px;
+
+  color: #807685;
+}
+
+.member-profile-bio,
+.member-profile-goals {
+  margin-top: 22px;
+}
+
+.member-profile-bio h3,
+.member-profile-goals h3 {
+  margin: 0 0 7px;
+
+  color: #6d28d9;
+
+  font-size: 0.62rem;
+
+  letter-spacing: 0.16em;
+}
+
+.member-profile-bio p,
+.member-profile-goals p {
+  margin: 0;
+
+  color: #5d5662;
+
+  line-height: 1.65;
+}
+
+/* UTMB */
+
+.member-profile-utmb {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 12px;
+}
+
+.member-utmb-general {
+  display: flex;
+
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 20px;
+
+  padding: 23px;
+
+  border-radius: 16px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #4b188f,
+      #752dd7
+    );
+
+  color: white;
+}
+
+.member-utmb-general > div {
+  padding: 3px;
+
+  background: white;
+
+  border-radius: 7px;
+}
+
+.member-utmb-general img {
+  display: block;
+  height: auto;
+}
+
+.member-utmb-general strong {
+  font-size: 3rem;
+
+  line-height: 1;
+}
+
+.member-utmb-grid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(4, 1fr);
+
+  gap: 9px;
+}
+
+.member-index-box {
+  display: flex;
+
+  min-width: 0;
+  min-height: 105px;
+
+  flex-direction: column;
+
+  align-items: center;
+  justify-content: center;
+
+  gap: 10px;
+
+  padding: 10px;
+
+  background: #f8f7fc;
+
+  border: 1px solid #e6e1eb;
+
+  border-radius: 12px;
+}
+
+.member-index-box img {
+  max-width: 100%;
+
+  height: auto;
+
+  object-fit: contain;
+}
+
+.member-index-box strong {
+  color: #4c1d95;
+
+  font-size: 1.15rem;
+}
+
+/* STATS */
+
+.member-profile-stats {
+  display: grid;
+
+  grid-template-columns:
+    repeat(4, 1fr);
+
+  margin-top: 25px;
+
+  background: white;
+
+  border: 1px solid #e6e0eb;
+}
+
+.member-profile-stats > div {
+  padding: 22px;
+
+  text-align: center;
+
+  border-right:
+    1px solid #ece7f0;
+}
+
+.member-profile-stats > div:last-child {
+  border-right: 0;
+}
+
+.member-profile-stats strong {
+  display: block;
+
+  color: #6825c5;
+
+  font-size: 2rem;
+}
+
+.member-profile-stats span {
+  display: block;
+
+  margin-top: 6px;
+
+  color: #8f8797;
+
+  font-size: 0.58rem;
+  font-weight: 1000;
+
+  letter-spacing: 0.12em;
+}
+
+/* SECTIONS */
+
+.member-profile-section {
+  margin-top: 70px;
+}
+
+.member-event-grid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(auto-fit, minmax(260px, 1fr));
+
+  gap: 15px;
+}
+
+.member-event-card {
+  display: block;
+
+  padding: 20px;
+
+  background: white;
+
+  border: 1px solid #e5dfe9;
+
+  color: inherit;
+
+  text-decoration: none;
+
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.member-event-card:hover {
+  transform: translateY(-3px);
+
+  box-shadow:
+    0 12px 30px
+    rgba(40, 20, 70, 0.08);
+}
+
+.member-event-card > span {
+  color: #6d28d9;
+
+  font-size: 0.6rem;
+  font-weight: 1000;
+
+  letter-spacing: 0.14em;
+}
+
+.member-event-card h3 {
+  margin: 9px 0;
+
+  color: #28134d;
+
+  font-size: 1.3rem;
+}
+
+.member-event-card p {
+  margin: 0 0 12px;
+
+  color: #776e7d;
+}
+
+.member-event-card time {
+  display: block;
+
+  margin-top: 14px;
+
+  padding-top: 12px;
+
+  border-top:
+    1px solid #eee9f1;
+
+  color: #968e9c;
+
+  font-size: 0.7rem;
+}
+
+.member-race-event {
+  display: grid;
+
+  grid-template-columns:
+    auto 1fr;
+
+  gap: 15px;
+}
+
+.member-event-logo {
+  width: 75px;
+  height: 75px;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  overflow: hidden;
+
+  background: #fafafa;
+
+  border:
+    1px solid #e4dee8;
+
+  border-radius: 11px;
+}
+
+.member-event-logo img {
+  width: 100%;
+  height: 100%;
+
+  padding: 5px;
+
+  object-fit: contain;
+}
+
+.member-race-option {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 3px;
+
+  margin-top: 9px;
+}
+
+.member-race-option strong {
+  color: #6524bb;
+}
+
+.member-race-option small {
+  color: #79717f;
+}
+
+.member-training-columns {
+  display: grid;
+
+  grid-template-columns:
+    repeat(2, 1fr);
+
+  gap: 25px;
+}
+
+.member-column-title {
+  margin: 0 0 15px;
+
+  color: #4c3d55;
+
+  font-size: 0.85rem;
+}
+
+.member-training-event {
+  background: #f5f5f6;
+}
+
+.member-training-meta {
+  display: flex;
+
+  gap: 12px;
+
+  flex-wrap: wrap;
+
+  color: #756d7b;
+}
+
+.member-empty-block {
+  padding: 25px;
+
+  background: #f7f5f9;
+
+  border: 1px dashed #d8d0df;
+
+  color: #8c8492;
+
+  text-align: center;
+}
+
+/* MOBILE */
+
+@media (max-width: 900px) {
+  .member-profile-header {
+    grid-template-columns: 1fr;
+  }
+
+  .member-profile-stats {
+    grid-template-columns:
+      repeat(2, 1fr);
+  }
+
+  .member-training-columns {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 600px) {
+  .member-profile-main {
+    flex-direction: column;
+  }
+
+  .member-profile-avatar {
+    width: 120px;
+    height: 120px;
+
+    flex-basis: 120px;
+  }
+
+  .member-utmb-grid {
+    grid-template-columns:
+      repeat(2, 1fr);
+  }
+
+  .member-profile-stats {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .member-race-event {
+    grid-template-columns: 1fr;
+  }
+}
