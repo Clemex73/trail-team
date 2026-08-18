@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { createClient } from "@/utils/supabase/client";
@@ -49,6 +48,15 @@ type Profile = {
   bio: string | null;
 };
 
+type UtmbProfile = {
+  user_id: string;
+  general_index: number | null;
+  index_20k: number | null;
+  index_50k: number | null;
+  index_100k: number | null;
+  index_100m: number | null;
+};
+
 export default function RaceDetailPage() {
   const params =
     useParams<{ id: string }>();
@@ -71,6 +79,9 @@ export default function RaceDetailPage() {
 
   const [profiles, setProfiles] =
     useState<Profile[]>([]);
+
+  const [utmbProfiles, setUtmbProfiles] =
+    useState<UtmbProfile[]>([]);
 
   const [userId, setUserId] =
     useState<string | null>(null);
@@ -156,6 +167,21 @@ export default function RaceDetailPage() {
         "id, first_name, last_name, nickname, avatar_url, bio"
       );
 
+    const {
+      data: utmbProfilesData,
+    } = await supabase
+      .from("utmb_profiles")
+      .select(
+        `
+        user_id,
+        general_index,
+        index_20k,
+        index_50k,
+        index_100k,
+        index_100m
+        `
+      );
+
     setRace(
       raceData as Race
     );
@@ -180,8 +206,17 @@ export default function RaceDetailPage() {
         []) as Profile[]
     );
 
+    setUtmbProfiles(
+      (utmbProfilesData ??
+        []) as UtmbProfile[]
+    );
+
     setLoading(false);
   }
+
+  /* ==========================================================
+     PROFILS
+  ========================================================== */
 
   function getProfile(
     profileId: string
@@ -239,6 +274,202 @@ export default function RaceDetailPage() {
     );
   }
 
+  /* ==========================================================
+     UTMB INDEX
+  ========================================================== */
+
+  function getUtmbProfile(
+    profileId: string
+  ) {
+    return utmbProfiles.find(
+      (utmb) =>
+        utmb.user_id ===
+        profileId
+    );
+  }
+
+  function getUtmbIndexForRace(
+    profileId: string,
+    distance: number
+  ) {
+    const utmb =
+      getUtmbProfile(
+        profileId
+      );
+
+    if (!utmb) {
+      return null;
+    }
+
+    let categoryIndex:
+      | number
+      | null = null;
+
+    /*
+     * Choix automatique de
+     * l'index selon la distance
+     */
+
+    if (distance <= 30) {
+      categoryIndex =
+        utmb.index_20k;
+    } else if (
+      distance <= 70
+    ) {
+      categoryIndex =
+        utmb.index_50k;
+    } else if (
+      distance <= 120
+    ) {
+      categoryIndex =
+        utmb.index_100k;
+    } else {
+      categoryIndex =
+        utmb.index_100m;
+    }
+
+    /*
+     * Si l'index de catégorie
+     * n'existe pas, utilisation
+     * de l'index général.
+     */
+
+    return (
+      categoryIndex ??
+      utmb.general_index ??
+      null
+    );
+  }
+
+  /* ==========================================================
+     FORMULE MTT
+  ========================================================== */
+
+  function estimateTrailTime(
+    distance: number,
+    elevation: number,
+    index: number
+  ) {
+    /*
+     * ------------------------------------------------------
+     * FORMULE DE BASE
+     * ------------------------------------------------------
+     *
+     * T_base =
+     *
+     * exp(-2.292)
+     *
+     * ×
+     *
+     * (
+     *   Distance
+     *   +
+     *   1.089 × D+/100
+     * ) ^ 1.221
+     *
+     * ×
+     *
+     * exp(
+     *   -0.001975 × UTMB Index
+     * )
+     */
+
+    const effortDistance =
+      distance +
+      1.089 *
+        (elevation / 100);
+
+    const baseTime =
+      Math.exp(-2.292) *
+      Math.pow(
+        effortDistance,
+        1.221
+      ) *
+      Math.exp(
+        -0.001975 *
+          index
+      );
+
+    /*
+     * ------------------------------------------------------
+     * CORRECTIF COURTES DISTANCES
+     * ------------------------------------------------------
+     */
+
+    const f =
+      distance <= 20
+        ? 1
+        : Math.exp(
+            -(distance - 20)
+          );
+
+    const g =
+      Math.exp(
+        -Math.pow(
+          (distance - 5) / 2,
+          2
+        )
+      );
+
+    const shortCorrection =
+      1 +
+      f *
+        (
+          0.1586658593 +
+          0.0012097293 *
+            (index - 483)
+        ) +
+      g *
+        (
+          0.1011671557 +
+          0.0009509742 *
+            (index - 483)
+        );
+
+    /*
+     * Temps final en heures
+     */
+
+    const finalTime =
+      baseTime *
+      shortCorrection;
+
+    return finalTime;
+  }
+
+  /* ==========================================================
+     FORMAT DU TEMPS
+  ========================================================== */
+
+  function formatEstimatedTime(
+    hours: number
+  ) {
+    const totalMinutes =
+      Math.round(
+        hours * 60
+      );
+
+    const h =
+      Math.floor(
+        totalMinutes / 60
+      );
+
+    const minutes =
+      totalMinutes % 60;
+
+    if (h === 0) {
+      return `${minutes} min`;
+    }
+
+    return `${h}h${String(
+      minutes
+    ).padStart(2, "0")}`;
+  }
+
+  /* ==========================================================
+     PARTICIPANTS
+  ========================================================== */
+
   function getOptionParticipants(
     optionId: string
   ) {
@@ -254,16 +485,22 @@ export default function RaceDetailPage() {
   function getSupporters() {
     return attendance.filter(
       (item) =>
-        item.status === "support"
+        item.status ===
+        "support"
     );
   }
 
   function getMyAttendance() {
     return attendance.find(
       (item) =>
-        item.user_id === userId
+        item.user_id ===
+        userId
     );
   }
+
+  /* ==========================================================
+     JE PARTICIPE
+  ========================================================== */
 
   async function participate(
     raceOptionId: string
@@ -272,21 +509,30 @@ export default function RaceDetailPage() {
       alert(
         "Tu dois être connecté."
       );
+
       return;
     }
 
     const { error } =
       await supabase
-        .from("race_attendance")
+        .from(
+          "race_attendance"
+        )
         .upsert(
           {
-            race_id: raceId,
+            race_id:
+              raceId,
+
             race_option_id:
               raceOptionId,
-            user_id: userId,
+
+            user_id:
+              userId,
+
             status:
               "participant",
           },
+
           {
             onConflict:
               "race_id,user_id",
@@ -294,31 +540,49 @@ export default function RaceDetailPage() {
         );
 
     if (error) {
-      alert(error.message);
+      alert(
+        error.message
+      );
+
       return;
     }
 
     await loadPage();
   }
+
+  /* ==========================================================
+     JE SUPPORTE
+  ========================================================== */
 
   async function supportRace() {
     if (!userId) {
       alert(
         "Tu dois être connecté."
       );
+
       return;
     }
 
     const { error } =
       await supabase
-        .from("race_attendance")
+        .from(
+          "race_attendance"
+        )
         .upsert(
           {
-            race_id: raceId,
-            race_option_id: null,
-            user_id: userId,
-            status: "support",
+            race_id:
+              raceId,
+
+            race_option_id:
+              null,
+
+            user_id:
+              userId,
+
+            status:
+              "support",
           },
+
           {
             onConflict:
               "race_id,user_id",
@@ -326,12 +590,19 @@ export default function RaceDetailPage() {
         );
 
     if (error) {
-      alert(error.message);
+      alert(
+        error.message
+      );
+
       return;
     }
 
     await loadPage();
   }
+
+  /* ==========================================================
+     ANNULER PARTICIPATION
+  ========================================================== */
 
   async function removeAttendance() {
     if (!userId) {
@@ -340,18 +611,33 @@ export default function RaceDetailPage() {
 
     const { error } =
       await supabase
-        .from("race_attendance")
+        .from(
+          "race_attendance"
+        )
         .delete()
-        .eq("race_id", raceId)
-        .eq("user_id", userId);
+        .eq(
+          "race_id",
+          raceId
+        )
+        .eq(
+          "user_id",
+          userId
+        );
 
     if (error) {
-      alert(error.message);
+      alert(
+        error.message
+      );
+
       return;
     }
 
     await loadPage();
   }
+
+  /* ==========================================================
+     COMMENTAIRES
+  ========================================================== */
 
   async function sendComment(
     event: React.FormEvent
@@ -362,6 +648,7 @@ export default function RaceDetailPage() {
       alert(
         "Tu dois être connecté pour écrire un message."
       );
+
       return;
     }
 
@@ -373,11 +660,19 @@ export default function RaceDetailPage() {
 
     const { error } =
       await supabase
-        .from("event_comments")
+        .from(
+          "event_comments"
+        )
         .insert({
-          user_id: userId,
-          race_id: raceId,
-          training_id: null,
+          user_id:
+            userId,
+
+          race_id:
+            raceId,
+
+          training_id:
+            null,
+
           message:
             message.trim(),
         });
@@ -385,7 +680,10 @@ export default function RaceDetailPage() {
     setSending(false);
 
     if (error) {
-      alert(error.message);
+      alert(
+        error.message
+      );
+
       return;
     }
 
@@ -411,18 +709,33 @@ export default function RaceDetailPage() {
 
     const { error } =
       await supabase
-        .from("event_comments")
+        .from(
+          "event_comments"
+        )
         .delete()
-        .eq("id", commentId)
-        .eq("user_id", userId);
+        .eq(
+          "id",
+          commentId
+        )
+        .eq(
+          "user_id",
+          userId
+        );
 
     if (error) {
-      alert(error.message);
+      alert(
+        error.message
+      );
+
       return;
     }
 
     await loadPage();
   }
+
+  /* ==========================================================
+     CHARGEMENT
+  ========================================================== */
 
   if (loading) {
     return (
@@ -449,11 +762,13 @@ export default function RaceDetailPage() {
   const totalParticipants =
     attendance.filter(
       (item) =>
-        item.status === "participant"
+        item.status ===
+        "participant"
     ).length;
 
   return (
     <main className="page-container event-detail-page">
+
       <Link
         href="/courses"
         className="event-back"
@@ -466,16 +781,20 @@ export default function RaceDetailPage() {
       ================================================== */}
 
       <section className="event-detail-header race-detail-header race-detail-with-logo">
+
         {race.image_url && (
           <div className="race-detail-logo">
             <img
-              src={race.image_url}
+              src={
+                race.image_url
+              }
               alt={`Logo ${race.name}`}
             />
           </div>
         )}
 
         <div className="race-detail-content">
+
           <span>
             COURSE
           </span>
@@ -486,11 +805,13 @@ export default function RaceDetailPage() {
 
           {race.location && (
             <p className="race-detail-location">
-              📍 {race.location}
+              📍{" "}
+              {race.location}
             </p>
           )}
 
           <div className="event-detail-stats">
+
             <div>
               <small>
                 DATE
@@ -524,7 +845,9 @@ export default function RaceDetailPage() {
 
               <strong>
                 🏃{" "}
-                {totalParticipants}
+                {
+                  totalParticipants
+                }
               </strong>
             </div>
 
@@ -535,7 +858,9 @@ export default function RaceDetailPage() {
 
               <strong>
                 📣{" "}
-                {supporters.length}
+                {
+                  supporters.length
+                }
               </strong>
             </div>
 
@@ -546,9 +871,12 @@ export default function RaceDetailPage() {
 
               <strong>
                 💬{" "}
-                {comments.length}
+                {
+                  comments.length
+                }
               </strong>
             </div>
+
           </div>
         </div>
       </section>
@@ -558,7 +886,9 @@ export default function RaceDetailPage() {
       ================================================== */}
 
       <section className="race-detail-registration">
+
         <div className="race-detail-section-title">
+
           <span>
             INSCRIPTION TEAM
           </span>
@@ -566,15 +896,19 @@ export default function RaceDetailPage() {
           <h2>
             Tu seras de la partie ?
           </h2>
+
         </div>
 
         <div className="race-detail-options">
+
           {raceOptions.map(
             (option) => {
+
               const selected =
                 myAttendance?.status ===
                   "participant" &&
-                myAttendance.race_option_id ===
+                myAttendance
+                  .race_option_id ===
                   option.id;
 
               const participants =
@@ -584,26 +918,37 @@ export default function RaceDetailPage() {
 
               return (
                 <div
-                  key={option.id}
+                  key={
+                    option.id
+                  }
                   className={`race-detail-option ${
                     selected
                       ? "race-detail-option-selected"
                       : ""
                   }`}
                 >
+
                   <div>
+
                     <span>
                       {option.name ||
                         `${option.distance} KM`}
                     </span>
 
                     <h3>
-                      {option.distance} km
+                      {
+                        option.distance
+                      }{" "}
+                      km
                     </h3>
 
                     <p>
-                      {option.elevation} m+
+                      {
+                        option.elevation
+                      }{" "}
+                      m+
                     </p>
+
                   </div>
 
                   <div className="race-detail-option-count">
@@ -632,14 +977,17 @@ export default function RaceDetailPage() {
                         : "Je participe"}
                     </button>
                   )}
+
                 </div>
               );
             }
           )}
+
         </div>
 
         {userId && (
           <div className="race-detail-support-actions">
+
             <button
               type="button"
               className={
@@ -648,7 +996,9 @@ export default function RaceDetailPage() {
                   ? "race-choice race-choice-active"
                   : "race-choice"
               }
-              onClick={supportRace}
+              onClick={
+                supportRace
+              }
             >
               📣{" "}
               {myAttendance?.status ===
@@ -668,8 +1018,10 @@ export default function RaceDetailPage() {
                 Annuler ma participation
               </button>
             )}
+
           </div>
         )}
+
       </section>
 
       {/* ==================================================
@@ -677,7 +1029,9 @@ export default function RaceDetailPage() {
       ================================================== */}
 
       <section className="race-detail-members-section">
+
         <div className="race-detail-section-title">
+
           <span>
             LE TEAM
           </span>
@@ -685,10 +1039,12 @@ export default function RaceDetailPage() {
           <h2>
             Qui sera présent ?
           </h2>
+
         </div>
 
         {raceOptions.map(
           (option) => {
+
             const participants =
               getOptionParticipants(
                 option.id
@@ -696,23 +1052,35 @@ export default function RaceDetailPage() {
 
             return (
               <div
-                key={option.id}
+                key={
+                  option.id
+                }
                 className="race-detail-members-group"
               >
+
                 <div className="race-detail-members-heading">
+
                   <div>
+
                     <span>
                       {option.name ||
                         "FORMAT"}
                     </span>
 
                     <h3>
-                      {option.distance} km
+                      {
+                        option.distance
+                      }{" "}
+                      km
                     </h3>
 
                     <p>
-                      {option.elevation} m+
+                      {
+                        option.elevation
+                      }{" "}
+                      m+
                     </p>
+
                   </div>
 
                   <strong>
@@ -725,25 +1093,57 @@ export default function RaceDetailPage() {
                       ? "s"
                       : ""}
                   </strong>
+
                 </div>
 
                 {participants.length ===
                 0 ? (
+
                   <div className="race-detail-no-member">
                     Personne inscrit pour le moment.
                   </div>
+
                 ) : (
+
                   <div className="race-detail-member-grid">
+
                     {participants.map(
-                      (attendanceItem) => {
+                      (
+                        attendanceItem
+                      ) => {
+
                         const profile =
                           getProfile(
                             attendanceItem.user_id
                           );
 
-                        if (!profile) {
+                        if (
+                          !profile
+                        ) {
                           return null;
                         }
+
+                        /*
+                         * ========================================
+                         * CALCUL TEMPS ESTIME
+                         * ========================================
+                         */
+
+                        const utmbIndex =
+                          getUtmbIndexForRace(
+                            attendanceItem.user_id,
+                            option.distance
+                          );
+
+                        const estimatedTime =
+                          utmbIndex !==
+                          null
+                            ? estimateTrailTime(
+                                option.distance,
+                                option.elevation,
+                                utmbIndex
+                              )
+                            : null;
 
                         return (
                           <Link
@@ -753,8 +1153,11 @@ export default function RaceDetailPage() {
                             href={`/equipe/${profile.id}`}
                             className="race-detail-member-card"
                           >
+
                             <div className="race-detail-member-avatar">
+
                               {profile.avatar_url ? (
+
                                 <img
                                   src={
                                     profile.avatar_url
@@ -765,7 +1168,9 @@ export default function RaceDetailPage() {
                                     )
                                   }
                                 />
+
                               ) : (
+
                                 <span>
                                   {getProfileName(
                                     profile.id
@@ -775,10 +1180,13 @@ export default function RaceDetailPage() {
                                     )
                                     .toUpperCase()}
                                 </span>
+
                               )}
+
                             </div>
 
-                            <div>
+                            <div className="race-detail-member-info">
+
                               <strong>
                                 {getFullName(
                                   profile.id
@@ -786,12 +1194,47 @@ export default function RaceDetailPage() {
                               </strong>
 
                               {profile.nickname && (
-                                <span>
+                                <span className="race-detail-member-nickname">
                                   @
                                   {
                                     profile.nickname
                                   }
                                 </span>
+                              )}
+
+                              {/* ==================================
+                                  TEMPS ESTIME MTT
+                              ================================== */}
+
+                              {estimatedTime !==
+                                null &&
+                                utmbIndex !==
+                                  null && (
+
+                                <div className="race-member-estimate">
+
+                                  <div className="race-member-estimate-main">
+
+                                    <span>
+                                      TEMPS ESTIMÉ
+                                    </span>
+
+                                    <strong>
+                                      {formatEstimatedTime(
+                                        estimatedTime
+                                      )}
+                                    </strong>
+
+                                  </div>
+
+                                  <small>
+                                    UTMB Index{" "}
+                                    {
+                                      utmbIndex
+                                    }
+                                  </small>
+
+                                </div>
                               )}
 
                               {profile.bio && (
@@ -801,23 +1244,32 @@ export default function RaceDetailPage() {
                                   }
                                 </p>
                               )}
+
                             </div>
+
                           </Link>
                         );
                       }
                     )}
+
                   </div>
                 )}
+
               </div>
             );
           }
         )}
 
-        {/* SUPPORTERS */}
+        {/* ==================================================
+            SUPPORTERS
+        ================================================== */}
 
         <div className="race-detail-members-group race-detail-supporters-group">
+
           <div className="race-detail-members-heading">
+
             <div>
+
               <span>
                 SUPPORT
               </span>
@@ -825,6 +1277,7 @@ export default function RaceDetailPage() {
               <h3>
                 Les supporters
               </h3>
+
             </div>
 
             <strong>
@@ -832,27 +1285,38 @@ export default function RaceDetailPage() {
                 supporters.length
               }{" "}
               supporter
-              {supporters.length !== 1
+              {supporters.length !==
+              1
                 ? "s"
                 : ""}
             </strong>
+
           </div>
 
           {supporters.length ===
           0 ? (
+
             <div className="race-detail-no-member">
               Aucun supporter pour le moment.
             </div>
+
           ) : (
+
             <div className="race-detail-member-grid">
+
               {supporters.map(
-                (attendanceItem) => {
+                (
+                  attendanceItem
+                ) => {
+
                   const profile =
                     getProfile(
                       attendanceItem.user_id
                     );
 
-                  if (!profile) {
+                  if (
+                    !profile
+                  ) {
                     return null;
                   }
 
@@ -864,8 +1328,11 @@ export default function RaceDetailPage() {
                       href={`/equipe/${profile.id}`}
                       className="race-detail-member-card"
                     >
+
                       <div className="race-detail-member-avatar">
+
                         {profile.avatar_url ? (
+
                           <img
                             src={
                               profile.avatar_url
@@ -876,18 +1343,25 @@ export default function RaceDetailPage() {
                               )
                             }
                           />
+
                         ) : (
+
                           <span>
                             {getProfileName(
                               profile.id
                             )
-                              .charAt(0)
+                              .charAt(
+                                0
+                              )
                               .toUpperCase()}
                           </span>
+
                         )}
+
                       </div>
 
-                      <div>
+                      <div className="race-detail-member-info">
+
                         <strong>
                           {getFullName(
                             profile.id
@@ -895,7 +1369,7 @@ export default function RaceDetailPage() {
                         </strong>
 
                         {profile.nickname && (
-                          <span>
+                          <span className="race-detail-member-nickname">
                             @
                             {
                               profile.nickname
@@ -910,14 +1384,19 @@ export default function RaceDetailPage() {
                             }
                           </p>
                         )}
+
                       </div>
+
                     </Link>
                   );
                 }
               )}
+
             </div>
           )}
+
         </div>
+
       </section>
 
       {/* ==================================================
@@ -925,7 +1404,9 @@ export default function RaceDetailPage() {
       ================================================== */}
 
       <section className="event-discussion">
+
         <div className="event-discussion-title">
+
           <span>
             DISCUSSION
           </span>
@@ -940,36 +1421,46 @@ export default function RaceDetailPage() {
               ? "s"
               : ""}
           </h2>
+
         </div>
 
         <div className="event-comments">
+
           {comments.length ===
             0 && (
+
             <div className="event-no-comments">
-              Aucun message pour
-              le moment.
+              Aucun message pour le moment.
             </div>
+
           )}
 
           {comments.map(
             (comment) => (
+
               <article
                 key={
                   comment.id
                 }
                 className="event-comment"
               >
+
                 <div className="event-comment-avatar">
+
                   {getProfileName(
                     comment.user_id
                   )
                     .charAt(0)
                     .toUpperCase()}
+
                 </div>
 
                 <div className="event-comment-content">
+
                   <div className="event-comment-head">
+
                     <div>
+
                       <strong>
                         {getProfileName(
                           comment.user_id
@@ -984,19 +1475,24 @@ export default function RaceDetailPage() {
                           {
                             day:
                               "2-digit",
+
                             month:
                               "short",
+
                             hour:
                               "2-digit",
+
                             minute:
                               "2-digit",
                           }
                         )}
                       </span>
+
                     </div>
 
                     {comment.user_id ===
                       userId && (
+
                       <button
                         type="button"
                         className="comment-delete"
@@ -1008,7 +1504,9 @@ export default function RaceDetailPage() {
                       >
                         Supprimer
                       </button>
+
                     )}
+
                   </div>
 
                   <p>
@@ -1016,27 +1514,37 @@ export default function RaceDetailPage() {
                       comment.message
                     }
                   </p>
+
                 </div>
+
               </article>
+
             )
           )}
+
         </div>
 
         {userId ? (
+
           <form
             className="comment-form"
             onSubmit={
               sendComment
             }
           >
+
             <label>
               Écrire un message
             </label>
 
             <textarea
               rows={4}
-              value={message}
-              onChange={(event) =>
+              value={
+                message
+              }
+              onChange={(
+                event
+              ) =>
                 setMessage(
                   event.target.value
                 )
@@ -1046,19 +1554,27 @@ export default function RaceDetailPage() {
 
             <button
               type="submit"
-              disabled={sending}
+              disabled={
+                sending
+              }
             >
               {sending
                 ? "Envoi..."
                 : "Envoyer le message"}
             </button>
+
           </form>
+
         ) : (
+
           <div className="event-login-message">
             Connecte-toi pour participer à la discussion.
           </div>
+
         )}
+
       </section>
+
     </main>
   );
 }

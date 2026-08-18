@@ -7141,3 +7141,123 @@ label {
 
   cursor: wait;
 }
+
+/* ==========================================================
+   TEMPS ESTIME MTT - CARTE PARTICIPANT
+========================================================== */
+
+.race-detail-member-info {
+  min-width: 0;
+  flex: 1;
+}
+
+.race-detail-member-nickname {
+  display: block;
+
+  margin-top: 2px;
+
+  color: #7d7483;
+
+  font-size: 0.72rem;
+}
+
+/* ==========================================================
+   BLOC ESTIMATION
+========================================================== */
+
+.race-member-estimate {
+  display: flex;
+
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 12px;
+
+  margin-top: 10px;
+
+  padding: 9px 11px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #f4edff,
+      #faf7ff
+    );
+
+  border:
+    1px solid #ded0f1;
+
+  border-radius: 8px;
+}
+
+/* ==========================================================
+   PARTIE TEMPS
+========================================================== */
+
+.race-member-estimate-main {
+  display: flex;
+
+  align-items: center;
+
+  gap: 8px;
+}
+
+.race-member-estimate-main > span {
+  margin: 0;
+
+  color: #79628f;
+
+  font-size: 0.5rem;
+
+  font-weight: 1000;
+
+  letter-spacing: 0.09em;
+
+  white-space: nowrap;
+}
+
+.race-member-estimate-main > strong {
+  color: #5d20a8;
+
+  font-size: 1rem;
+
+  font-weight: 1000;
+
+  white-space: nowrap;
+}
+
+/* ==========================================================
+   INDEX UTILISE
+========================================================== */
+
+.race-member-estimate > small {
+  color: #95879f;
+
+  font-size: 0.55rem;
+
+  font-weight: 800;
+
+  white-space: nowrap;
+}
+
+/* ==========================================================
+   MOBILE
+========================================================== */
+
+@media (max-width: 600px) {
+
+  .race-member-estimate {
+    align-items: flex-start;
+
+    flex-direction: column;
+
+    gap: 5px;
+  }
+
+  .race-member-estimate-main {
+    width: 100%;
+
+    justify-content:
+      space-between;
+  }
+}
