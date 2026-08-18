@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import { createClient } from "@/utils/supabase/server";
 
 const logoMap = {
@@ -19,6 +20,8 @@ export default async function EquipePage() {
       first_name,
       last_name,
       nickname,
+      avatar_url,
+      bio,
       utmb_profiles (
         general_index,
         index_20k,
@@ -41,24 +44,16 @@ export default async function EquipePage() {
   }
 
   return (
-    <main className="page-container">
-      <div style={{ marginBottom: "32px" }}>
-        <span className="purple-badge">TRAIL TEAM</span>
+    <main className="page-container team-page">
+      <div className="team-heading">
+        <span className="purple-badge">
+          TRAIL TEAM
+        </span>
 
-        <h1
-          style={{
-            marginTop: "12px",
-            marginBottom: "8px",
-          }}
-        >
-          Notre équipe
-        </h1>
+        <h1>Notre équipe</h1>
 
-        <p
-          className="text-muted"
-          style={{ margin: 0 }}
-        >
-          Découvrez les membres et leurs UTMB Index.
+        <p className="text-muted">
+          Découvrez les membres, leurs profils et leurs UTMB Index.
         </p>
       </div>
 
@@ -67,154 +62,117 @@ export default async function EquipePage() {
           <p>Aucun membre pour le moment.</p>
         </div>
       ) : (
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))",
-            gap: "24px",
-          }}
-        >
+        <div className="team-grid">
           {profiles.map((profile) => {
             const utmb = Array.isArray(profile.utmb_profiles)
               ? profile.utmb_profiles[0]
               : profile.utmb_profiles;
 
+            const fullName =
+              `${profile.first_name ?? ""} ${profile.last_name ?? ""}`.trim() ||
+              "Membre";
+
             return (
-              <article
+              <Link
                 key={profile.id}
-                className="card"
-                style={{
-                  position: "relative",
-                  overflow: "hidden",
-                }}
+                href={`/equipe/${profile.id}`}
+                className="team-card-link"
               >
-                <div
-                  style={{
-                    position: "absolute",
-                    top: 0,
-                    left: 0,
-                    width: "100%",
-                    height: "5px",
-                    background: "linear-gradient(90deg, #4c1d95, #8b5cf6)",
-                  }}
-                />
+                <article className="card team-card">
+                  <div className="team-card-line" />
 
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "flex-start",
-                    gap: "20px",
-                    marginBottom: "24px",
-                    flexWrap: "wrap",
-                  }}
-                >
-                  <div>
-                    <h2 style={{ marginBottom: "5px" }}>
-                      {profile.first_name ?? "Prénom"}{" "}
-                      {profile.last_name ?? "Nom"}
-                    </h2>
+                  <div className="team-card-top">
+                    <div className="team-member-main">
+                      <div className="team-avatar">
+                        {profile.avatar_url ? (
+                          <img
+                            src={profile.avatar_url}
+                            alt={fullName}
+                          />
+                        ) : (
+                          <span>
+                            {(profile.first_name?.[0] ??
+                              profile.nickname?.[0] ??
+                              "?").toUpperCase()}
+                          </span>
+                        )}
+                      </div>
 
-                    {profile.nickname && (
-                      <p
-                        className="text-muted"
-                        style={{ margin: 0 }}
-                      >
-                        @{profile.nickname}
-                      </p>
-                    )}
+                      <div className="team-member-identity">
+                        <h2>
+                          {profile.first_name ?? "Prénom"}{" "}
+                          {profile.last_name ?? "Nom"}
+                        </h2>
+
+                        {profile.nickname && (
+                          <p className="text-muted">
+                            @{profile.nickname}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="team-utmb-general">
+                      <div className="team-utmb-general-logo">
+                        <Image
+                          src={logoMap.general}
+                          alt="UTMB Index"
+                          width={110}
+                          height={34}
+                        />
+                      </div>
+
+                      <div className="team-utmb-general-score">
+                        {utmb?.general_index ?? "-"}
+                      </div>
+                    </div>
                   </div>
 
-                  <div
-                    style={{
-                      minWidth: "130px",
-                      textAlign: "center",
-                      background: "linear-gradient(135deg, #4c1d95, #6d28d9)",
-                      color: "white",
-                      borderRadius: "14px",
-                      padding: "14px",
-                    }}
-                  >
-                    <div
-                      style={{
-                        display: "flex",
-                        justifyContent: "center",
-                        marginBottom: "8px",
-                      }}
-                    >
-                      <Image
-                        src={logoMap.general}
-                        alt="UTMB Index"
-                        width={110}
-                        height={34}
-                        style={{
-                          height: "auto",
-                          objectFit: "contain",
-                          borderRadius: "6px",
-                          background: "white",
-                          padding: "2px",
-                        }}
+                  <div className="team-bio">
+                    {profile.bio?.trim()
+                      ? profile.bio
+                      : "Bio à venir."}
+                  </div>
+
+                  {utmb ? (
+                    <div className="team-index-grid">
+                      <IndexBox
+                        logo={logoMap["20k"]}
+                        alt="20K"
+                        value={utmb.index_20k}
+                      />
+
+                      <IndexBox
+                        logo={logoMap["50k"]}
+                        alt="50K"
+                        value={utmb.index_50k}
+                      />
+
+                      <IndexBox
+                        logo={logoMap["100k"]}
+                        alt="100K"
+                        value={utmb.index_100k}
+                      />
+
+                      <IndexBox
+                        logo={logoMap["100m"]}
+                        alt="100M"
+                        value={utmb.index_100m}
                       />
                     </div>
-
-                    <div
-                      style={{
-                        fontSize: "1.8rem",
-                        lineHeight: 1,
-                        fontWeight: 800,
-                      }}
-                    >
-                      {utmb?.general_index ?? "-"}
+                  ) : (
+                    <div className="team-no-utmb">
+                      <p className="text-muted">
+                        Aucun score UTMB renseigné.
+                      </p>
                     </div>
-                  </div>
-                </div>
+                  )}
 
-                {utmb ? (
-                  <div
-                    style={{
-                      display: "grid",
-                      gridTemplateColumns: "repeat(4, 1fr)",
-                      gap: "10px",
-                    }}
-                  >
-                    <IndexBox
-                      logo={logoMap["20k"]}
-                      alt="20K"
-                      value={utmb.index_20k}
-                    />
-                    <IndexBox
-                      logo={logoMap["50k"]}
-                      alt="50K"
-                      value={utmb.index_50k}
-                    />
-                    <IndexBox
-                      logo={logoMap["100k"]}
-                      alt="100K"
-                      value={utmb.index_100k}
-                    />
-                    <IndexBox
-                      logo={logoMap["100m"]}
-                      alt="100M"
-                      value={utmb.index_100m}
-                    />
+                  <div className="team-card-footer">
+                    Voir le profil →
                   </div>
-                ) : (
-                  <div
-                    style={{
-                      background: "#f8f7fc",
-                      borderRadius: "10px",
-                      padding: "14px",
-                    }}
-                  >
-                    <p
-                      className="text-muted"
-                      style={{ margin: 0 }}
-                    >
-                      Aucun score UTMB renseigné.
-                    </p>
-                  </div>
-                )}
-              </article>
+                </article>
+              </Link>
             );
           })}
         </div>
@@ -233,40 +191,20 @@ function IndexBox({
   value: number | null;
 }) {
   return (
-    <div
-      style={{
-        textAlign: "center",
-        padding: "14px 8px",
-        background: "#f8f7fc",
-        border: "1px solid #e7e3ee",
-        borderRadius: "10px",
-      }}
-    >
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "center",
-          marginBottom: "10px",
-        }}
-      >
+    <div className="team-index-box">
+      <div className="team-index-logo">
         <Image
           src={logo}
           alt={alt}
           width={90}
           height={28}
-          style={{
-            height: "auto",
-            objectFit: "contain",
-          }}
         />
       </div>
 
       <div
-        style={{
-          color: value ? "#4c1d95" : "#9b96a3",
-          fontSize: "1.15rem",
-          fontWeight: 800,
-        }}
+        className={`team-index-value ${
+          value ? "team-index-value-active" : ""
+        }`}
       >
         {value ?? "-"}
       </div>
