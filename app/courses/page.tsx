@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { createClient } from "@/utils/supabase/client";
 
@@ -34,12 +35,22 @@ type Training = {
   training_date: string;
   comment: string | null;
   created_by: string;
+  expected_level: string | null;
 };
 
 type TrainingAttendance = {
   id: string;
   training_id: string;
   user_id: string;
+};
+
+type EventComment = {
+  id: string;
+  user_id: string;
+  race_id: string | null;
+  training_id: string | null;
+  message: string;
+  created_at: string;
 };
 
 export default function CoursesPage() {
@@ -52,6 +63,8 @@ export default function CoursesPage() {
   const [trainings, setTrainings] = useState<Training[]>([]);
   const [trainingAttendance, setTrainingAttendance] =
     useState<TrainingAttendance[]>([]);
+
+  const [comments, setComments] = useState<EventComment[]>([]);
 
   const [userId, setUserId] = useState<string | null>(null);
 
@@ -77,6 +90,7 @@ export default function CoursesPage() {
   const [trainingDuration, setTrainingDuration] = useState("");
   const [trainingDate, setTrainingDate] = useState("");
   const [trainingComment, setTrainingComment] = useState("");
+  const [trainingLevel, setTrainingLevel] = useState("<300");
 
   const [savingTraining, setSavingTraining] = useState(false);
 
@@ -107,6 +121,8 @@ export default function CoursesPage() {
   const [editTrainingDate, setEditTrainingDate] = useState("");
   const [editTrainingComment, setEditTrainingComment] =
     useState("");
+  const [editTrainingLevel, setEditTrainingLevel] =
+    useState("<300");
 
   /* ======================================================
      CALENDRIER
@@ -139,75 +155,52 @@ export default function CoursesPage() {
 
     setUserId(user?.id ?? null);
 
-    const { data: racesData, error: racesError } =
-      await supabase
-        .from("races")
-        .select("*")
-        .order("race_date", { ascending: true });
+    const { data: racesData } = await supabase
+      .from("races")
+      .select("*")
+      .order("race_date", { ascending: true });
 
-    if (racesError) {
-      console.error("Erreur courses :", racesError);
-    }
-
-    const {
-      data: attendanceData,
-      error: attendanceError,
-    } = await supabase
+    const { data: attendanceData } = await supabase
       .from("race_attendance")
       .select("*");
 
-    if (attendanceError) {
-      console.error(
-        "Erreur participations courses :",
-        attendanceError
-      );
-    }
-
-    const {
-      data: profilesData,
-      error: profilesError,
-    } = await supabase
+    const { data: profilesData } = await supabase
       .from("profiles")
       .select("id, first_name, last_name, nickname");
 
-    if (profilesError) {
-      console.error("Erreur profils :", profilesError);
-    }
-
-    const {
-      data: trainingsData,
-      error: trainingsError,
-    } = await supabase
+    const { data: trainingsData } = await supabase
       .from("trainings")
       .select("*")
       .order("training_date", { ascending: true });
 
-    if (trainingsError) {
-      console.error("Erreur sorties :", trainingsError);
-    }
-
-    const {
-      data: trainingAttendanceData,
-      error: trainingAttendanceError,
-    } = await supabase
+    const { data: trainingAttendanceData } = await supabase
       .from("training_attendance")
       .select("*");
 
-    if (trainingAttendanceError) {
-      console.error(
-        "Erreur participations sorties :",
-        trainingAttendanceError
-      );
-    }
+    const { data: commentsData } = await supabase
+      .from("event_comments")
+      .select("*");
 
     setRaces((racesData ?? []) as Race[]);
-    setAttendance((attendanceData ?? []) as Attendance[]);
-    setProfiles((profilesData ?? []) as Profile[]);
 
-    setTrainings((trainingsData ?? []) as Training[]);
+    setAttendance(
+      (attendanceData ?? []) as Attendance[]
+    );
+
+    setProfiles(
+      (profilesData ?? []) as Profile[]
+    );
+
+    setTrainings(
+      (trainingsData ?? []) as Training[]
+    );
 
     setTrainingAttendance(
       (trainingAttendanceData ?? []) as TrainingAttendance[]
+    );
+
+    setComments(
+      (commentsData ?? []) as EventComment[]
     );
 
     setLoading(false);
@@ -245,7 +238,7 @@ export default function CoursesPage() {
     setSaving(false);
 
     if (error) {
-      console.error("Erreur ajout course :", error);
+      console.error(error);
       alert(`Erreur : ${error.message}`);
       return;
     }
@@ -274,11 +267,10 @@ export default function CoursesPage() {
       !trainingTitle.trim() ||
       !trainingLocation.trim() ||
       !trainingDuration ||
-      !trainingDate
+      !trainingDate ||
+      !trainingLevel
     ) {
-      alert(
-        "Merci de remplir le nom, le lieu, la durée et la date."
-      );
+      alert("Merci de remplir tous les champs.");
       return;
     }
 
@@ -292,13 +284,14 @@ export default function CoursesPage() {
         duration_minutes: Number(trainingDuration),
         training_date: trainingDate,
         comment: trainingComment.trim() || null,
+        expected_level: trainingLevel,
         created_by: userId,
       });
 
     setSavingTraining(false);
 
     if (error) {
-      console.error("Erreur ajout sortie :", error);
+      console.error(error);
       alert(`Erreur : ${error.message}`);
       return;
     }
@@ -308,12 +301,13 @@ export default function CoursesPage() {
     setTrainingDuration("");
     setTrainingDate("");
     setTrainingComment("");
+    setTrainingLevel("<300");
 
     await loadEverything();
   }
 
   /* ======================================================
-     PARTICIPER / SUPPORTER COURSE
+     PARTICIPATION COURSE
   ====================================================== */
 
   async function chooseStatus(
@@ -339,8 +333,7 @@ export default function CoursesPage() {
       );
 
     if (error) {
-      console.error(error);
-      alert("Impossible d'enregistrer ton choix.");
+      alert(error.message);
       return;
     }
 
@@ -348,42 +341,24 @@ export default function CoursesPage() {
   }
 
   async function removeStatus(raceId: string) {
-    if (!userId) {
-      return;
-    }
+    if (!userId) return;
 
-    const { error } = await supabase
+    await supabase
       .from("race_attendance")
       .delete()
       .eq("race_id", raceId)
       .eq("user_id", userId);
 
-    if (error) {
-      console.error(error);
-      alert("Impossible de retirer ta participation.");
-      return;
-    }
-
     await loadEverything();
   }
 
   /* ======================================================
-     PARTICIPER SORTIE
+     PARTICIPATION SORTIE
   ====================================================== */
 
   async function joinTraining(trainingId: string) {
     if (!userId) {
-      alert("Tu dois être connecté pour participer.");
-      return;
-    }
-
-    const alreadyJoined = trainingAttendance.some(
-      (item) =>
-        item.training_id === trainingId &&
-        item.user_id === userId
-    );
-
-    if (alreadyJoined) {
+      alert("Tu dois être connecté.");
       return;
     }
 
@@ -395,15 +370,7 @@ export default function CoursesPage() {
       });
 
     if (error) {
-      console.error(
-        "Erreur participation sortie :",
-        error
-      );
-
-      alert(
-        `Impossible de participer à cette sortie : ${error.message}`
-      );
-
+      alert(error.message);
       return;
     }
 
@@ -411,28 +378,13 @@ export default function CoursesPage() {
   }
 
   async function leaveTraining(trainingId: string) {
-    if (!userId) {
-      return;
-    }
+    if (!userId) return;
 
-    const { error } = await supabase
+    await supabase
       .from("training_attendance")
       .delete()
       .eq("training_id", trainingId)
       .eq("user_id", userId);
-
-    if (error) {
-      console.error(
-        "Erreur retrait participation :",
-        error
-      );
-
-      alert(
-        `Impossible de retirer ta participation : ${error.message}`
-      );
-
-      return;
-    }
 
     await loadEverything();
   }
@@ -443,7 +395,6 @@ export default function CoursesPage() {
 
   function startEditRace(race: Race) {
     setEditingRaceId(race.id);
-
     setEditName(race.name);
     setEditDistance(String(race.distance));
     setEditElevation(String(race.elevation));
@@ -452,27 +403,10 @@ export default function CoursesPage() {
 
   function cancelEditRace() {
     setEditingRaceId(null);
-
-    setEditName("");
-    setEditDistance("");
-    setEditElevation("");
-    setEditDate("");
   }
 
   async function updateRace(raceId: string) {
-    if (!userId) {
-      return;
-    }
-
-    if (
-      !editName.trim() ||
-      !editDistance ||
-      !editElevation ||
-      !editDate
-    ) {
-      alert("Merci de remplir tous les champs.");
-      return;
-    }
+    if (!userId) return;
 
     const { error } = await supabase
       .from("races")
@@ -486,30 +420,18 @@ export default function CoursesPage() {
       .eq("created_by", userId);
 
     if (error) {
-      console.error("Erreur modification :", error);
-      alert(`Erreur : ${error.message}`);
+      alert(error.message);
       return;
     }
 
     cancelEditRace();
-
     await loadEverything();
   }
 
-  /* ======================================================
-     SUPPRIMER COURSE
-  ====================================================== */
-
   async function deleteRace(raceId: string) {
-    if (!userId) {
-      return;
-    }
+    if (!userId) return;
 
-    const confirmed = window.confirm(
-      "Supprimer cette course ? Les participations et supporters associés seront également supprimés."
-    );
-
-    if (!confirmed) {
+    if (!window.confirm("Supprimer cette course ?")) {
       return;
     }
 
@@ -520,13 +442,8 @@ export default function CoursesPage() {
       .eq("created_by", userId);
 
     if (error) {
-      console.error("Erreur suppression :", error);
-      alert(`Erreur : ${error.message}`);
+      alert(error.message);
       return;
-    }
-
-    if (editingRaceId === raceId) {
-      cancelEditRace();
     }
 
     await loadEverything();
@@ -540,108 +457,51 @@ export default function CoursesPage() {
     setEditingTrainingId(training.id);
 
     setEditTrainingTitle(training.title);
-
-    setEditTrainingLocation(
-      training.location
-    );
-
+    setEditTrainingLocation(training.location);
     setEditTrainingDuration(
       String(training.duration_minutes)
     );
 
-    setEditTrainingDate(
-      training.training_date
-    );
-
-    setEditTrainingComment(
-      training.comment ?? ""
+    setEditTrainingDate(training.training_date);
+    setEditTrainingComment(training.comment ?? "");
+    setEditTrainingLevel(
+      training.expected_level ?? "<300"
     );
   }
 
   function cancelEditTraining() {
     setEditingTrainingId(null);
-
-    setEditTrainingTitle("");
-    setEditTrainingLocation("");
-    setEditTrainingDuration("");
-    setEditTrainingDate("");
-    setEditTrainingComment("");
   }
 
-  async function updateTraining(
-    trainingId: string
-  ) {
-    if (!userId) {
-      return;
-    }
-
-    if (
-      !editTrainingTitle.trim() ||
-      !editTrainingLocation.trim() ||
-      !editTrainingDuration ||
-      !editTrainingDate
-    ) {
-      alert(
-        "Merci de remplir le nom, le lieu, la durée et la date."
-      );
-
-      return;
-    }
+  async function updateTraining(trainingId: string) {
+    if (!userId) return;
 
     const { error } = await supabase
       .from("trainings")
       .update({
         title: editTrainingTitle.trim(),
-
-        location:
-          editTrainingLocation.trim(),
-
-        duration_minutes: Number(
-          editTrainingDuration
-        ),
-
-        training_date:
-          editTrainingDate,
-
-        comment:
-          editTrainingComment.trim() ||
-          null,
+        location: editTrainingLocation.trim(),
+        duration_minutes: Number(editTrainingDuration),
+        training_date: editTrainingDate,
+        comment: editTrainingComment.trim() || null,
+        expected_level: editTrainingLevel,
       })
       .eq("id", trainingId)
       .eq("created_by", userId);
 
     if (error) {
-      console.error(
-        "Erreur modification sortie :",
-        error
-      );
-
-      alert(`Erreur : ${error.message}`);
-
+      alert(error.message);
       return;
     }
 
     cancelEditTraining();
-
     await loadEverything();
   }
 
-  /* ======================================================
-     SUPPRIMER SORTIE
-  ====================================================== */
+  async function deleteTraining(trainingId: string) {
+    if (!userId) return;
 
-  async function deleteTraining(
-    trainingId: string
-  ) {
-    if (!userId) {
-      return;
-    }
-
-    const confirmed = window.confirm(
-      "Supprimer cette sortie ? Les participations associées seront également supprimées."
-    );
-
-    if (!confirmed) {
+    if (!window.confirm("Supprimer cette sortie ?")) {
       return;
     }
 
@@ -652,54 +512,34 @@ export default function CoursesPage() {
       .eq("created_by", userId);
 
     if (error) {
-      console.error(
-        "Erreur suppression sortie :",
-        error
-      );
-
-      alert(`Erreur : ${error.message}`);
-
+      alert(error.message);
       return;
-    }
-
-    if (editingTrainingId === trainingId) {
-      cancelEditTraining();
     }
 
     await loadEverything();
   }
 
   /* ======================================================
-     PROFILS
+     OUTILS
   ====================================================== */
 
   function getProfileName(profileId: string) {
     const profile = profiles.find(
-      (profile) =>
-        profile.id === profileId
+      (profile) => profile.id === profileId
     );
 
-    if (!profile) {
-      return "Membre";
-    }
+    if (!profile) return "Membre";
 
     if (profile.nickname) {
       return profile.nickname;
     }
 
-    const fullName = [
-      profile.first_name,
-      profile.last_name,
-    ]
-      .filter(Boolean)
-      .join(" ");
-
-    return fullName || "Membre";
+    return (
+      [profile.first_name, profile.last_name]
+        .filter(Boolean)
+        .join(" ") || "Membre"
+    );
   }
-
-  /* ======================================================
-     PARTICIPATIONS COURSES
-  ====================================================== */
 
   function getRaceAttendance(
     raceId: string,
@@ -713,10 +553,6 @@ export default function CoursesPage() {
   }
 
   function getMyStatus(raceId: string) {
-    if (!userId) {
-      return null;
-    }
-
     return attendance.find(
       (item) =>
         item.race_id === raceId &&
@@ -724,26 +560,13 @@ export default function CoursesPage() {
     )?.status;
   }
 
-  /* ======================================================
-     PARTICIPATIONS SORTIES
-  ====================================================== */
-
-  function getTrainingParticipants(
-    trainingId: string
-  ) {
+  function getTrainingParticipants(trainingId: string) {
     return trainingAttendance.filter(
-      (item) =>
-        item.training_id === trainingId
+      (item) => item.training_id === trainingId
     );
   }
 
-  function isParticipatingTraining(
-    trainingId: string
-  ) {
-    if (!userId) {
-      return false;
-    }
-
+  function isParticipatingTraining(trainingId: string) {
     return trainingAttendance.some(
       (item) =>
         item.training_id === trainingId &&
@@ -751,50 +574,48 @@ export default function CoursesPage() {
     );
   }
 
+  function getRaceCommentCount(raceId: string) {
+    return comments.filter(
+      (comment) => comment.race_id === raceId
+    ).length;
+  }
+
+  function getTrainingCommentCount(trainingId: string) {
+    return comments.filter(
+      (comment) =>
+        comment.training_id === trainingId
+    ).length;
+  }
+
   /* ======================================================
      CALENDRIER
   ====================================================== */
 
   const calendarDays = useMemo(() => {
-    const year =
-      currentMonth.getFullYear();
+    const year = currentMonth.getFullYear();
+    const month = currentMonth.getMonth();
 
-    const month =
-      currentMonth.getMonth();
+    const firstDay = new Date(year, month, 1);
 
-    const firstDay =
-      new Date(year, month, 1);
+    const daysInMonth = new Date(
+      year,
+      month + 1,
+      0
+    ).getDate();
 
-    const daysInMonth =
-      new Date(
-        year,
-        month + 1,
-        0
-      ).getDate();
-
-    let firstWeekDay =
-      firstDay.getDay();
+    let firstWeekDay = firstDay.getDay();
 
     if (firstWeekDay === 0) {
       firstWeekDay = 7;
     }
 
-    const result:
-      Array<number | null> = [];
+    const result: Array<number | null> = [];
 
-    for (
-      let i = 1;
-      i < firstWeekDay;
-      i++
-    ) {
+    for (let i = 1; i < firstWeekDay; i++) {
       result.push(null);
     }
 
-    for (
-      let day = 1;
-      day <= daysInMonth;
-      day++
-    ) {
+    for (let day = 1; day <= daysInMonth; day++) {
       result.push(day);
     }
 
@@ -821,51 +642,35 @@ export default function CoursesPage() {
     );
   }
 
-  function racesForDay(day: number) {
-    const year =
-      currentMonth.getFullYear();
+  function getCalendarDate(day: number) {
+    const year = currentMonth.getFullYear();
 
     const month = String(
       currentMonth.getMonth() + 1
     ).padStart(2, "0");
 
-    const formattedDay =
-      String(day).padStart(2, "0");
+    return `${year}-${month}-${String(day).padStart(
+      2,
+      "0"
+    )}`;
+  }
 
-    const date =
-      `${year}-${month}-${formattedDay}`;
+  function racesForDay(day: number) {
+    const date = getCalendarDate(day);
 
     return races.filter(
-      (race) =>
-        race.race_date === date
+      (race) => race.race_date === date
     );
   }
 
-  function trainingsForDay(
-    day: number
-  ) {
-    const year =
-      currentMonth.getFullYear();
-
-    const month = String(
-      currentMonth.getMonth() + 1
-    ).padStart(2, "0");
-
-    const formattedDay =
-      String(day).padStart(2, "0");
-
-    const date =
-      `${year}-${month}-${formattedDay}`;
+  function trainingsForDay(day: number) {
+    const date = getCalendarDate(day);
 
     return trainings.filter(
       (training) =>
         training.training_date === date
     );
   }
-
-  /* ======================================================
-     CHARGEMENT
-  ====================================================== */
 
   if (loading) {
     return (
@@ -877,9 +682,7 @@ export default function CoursesPage() {
 
   return (
     <main className="courses-page">
-      {/* ======================================================
-          HEADER
-      ====================================================== */}
+      {/* HEADER */}
 
       <section className="courses-hero">
         <div className="courses-hero-inner">
@@ -895,71 +698,45 @@ export default function CoursesPage() {
 
           <p className="courses-description">
             Courses, entraînements et rendez-vous du team.
-            Choisis ton prochain défi ou rejoins une sortie.
           </p>
         </div>
       </section>
 
-      {/* ======================================================
-          AJOUT COURSE
-      ====================================================== */}
+      {/* AJOUT COURSE */}
 
       <section className="page-container">
         <div className="race-create">
           <div className="race-create-heading">
-            <span>
-              AJOUTER UNE COURSE
-            </span>
-
-            <h2>
-              Un nouvel objectif ?
-            </h2>
-
-            <p>
-              Ajoute une course au calendrier du team.
-            </p>
+            <span>AJOUTER UNE COURSE</span>
+            <h2>Un nouvel objectif ?</h2>
           </div>
 
-          {userId ? (
+          {userId && (
             <form
               className="race-form"
               onSubmit={addRace}
             >
               <div className="race-form-name">
-                <label>
-                  Nom de la course
-                </label>
-
+                <label>Nom de la course</label>
                 <input
                   value={name}
-                  onChange={(event) =>
-                    setName(
-                      event.target.value
-                    )
+                  onChange={(e) =>
+                    setName(e.target.value)
                   }
-                  placeholder="Trail des Aiguilles..."
                 />
               </div>
 
               <div>
-                <label>
-                  Distance
-                </label>
+                <label>Distance</label>
 
                 <div className="race-input-unit">
                   <input
                     type="number"
-                    min="0"
-                    step="0.1"
                     value={distance}
-                    onChange={(event) =>
-                      setDistance(
-                        event.target.value
-                      )
+                    onChange={(e) =>
+                      setDistance(e.target.value)
                     }
-                    placeholder="42"
                   />
-
                   <span>KM</span>
                 </div>
               </div>
@@ -970,90 +747,65 @@ export default function CoursesPage() {
                 <div className="race-input-unit">
                   <input
                     type="number"
-                    min="0"
                     value={elevation}
-                    onChange={(event) =>
-                      setElevation(
-                        event.target.value
-                      )
+                    onChange={(e) =>
+                      setElevation(e.target.value)
                     }
-                    placeholder="2500"
                   />
-
                   <span>M</span>
                 </div>
               </div>
 
               <div>
                 <label>Date</label>
-
                 <input
                   type="date"
                   value={raceDate}
-                  onChange={(event) =>
-                    setRaceDate(
-                      event.target.value
-                    )
+                  onChange={(e) =>
+                    setRaceDate(e.target.value)
                   }
                 />
               </div>
 
               <button
-                type="submit"
-                disabled={saving}
                 className="race-submit"
+                disabled={saving}
               >
                 {saving
                   ? "Ajout..."
                   : "Ajouter la course"}
               </button>
             </form>
-          ) : (
-            <div className="race-login-message">
-              Connecte-toi pour ajouter une course.
-            </div>
           )}
         </div>
       </section>
 
-      {/* ======================================================
-          AJOUT SORTIE
-      ====================================================== */}
+      {/* AJOUT ENTRAINEMENT */}
 
       <section className="page-container">
         <div className="training-create">
           <div className="training-create-heading">
-            <span>
-              AJOUTER UNE SORTIE
-            </span>
-
-            <h2>
-              Une sortie prévue ?
-            </h2>
+            <span>AJOUTER UNE SORTIE</span>
+            <h2>Une sortie prévue ?</h2>
 
             <p>
-              Propose un entraînement ou une sortie au reste du team.
+              Propose un entraînement au reste du team.
             </p>
           </div>
 
-          {userId ? (
+          {userId && (
             <form
               className="training-form"
               onSubmit={addTraining}
             >
-              <div className="training-form-title">
-                <label>
-                  Nom de la sortie
-                </label>
+              <div>
+                <label>Nom</label>
 
                 <input
                   value={trainingTitle}
-                  onChange={(event) =>
-                    setTrainingTitle(
-                      event.target.value
-                    )
+                  onChange={(e) =>
+                    setTrainingTitle(e.target.value)
                   }
-                  placeholder="Sortie trail du dimanche..."
                 />
               </div>
 
@@ -1062,12 +814,11 @@ export default function CoursesPage() {
 
                 <input
                   value={trainingLocation}
-                  onChange={(event) =>
+                  onChange={(e) =>
                     setTrainingLocation(
-                      event.target.value
+                      e.target.value
                     )
                   }
-                  placeholder="Saint-Jean-de-Maurienne"
                 />
               </div>
 
@@ -1077,14 +828,12 @@ export default function CoursesPage() {
                 <div className="race-input-unit">
                   <input
                     type="number"
-                    min="1"
                     value={trainingDuration}
-                    onChange={(event) =>
+                    onChange={(e) =>
                       setTrainingDuration(
-                        event.target.value
+                        e.target.value
                       )
                     }
-                    placeholder="120"
                   />
 
                   <span>MIN</span>
@@ -1097,68 +846,77 @@ export default function CoursesPage() {
                 <input
                   type="date"
                   value={trainingDate}
-                  onChange={(event) =>
+                  onChange={(e) =>
                     setTrainingDate(
-                      event.target.value
+                      e.target.value
                     )
                   }
                 />
               </div>
 
-              <div className="training-form-comment">
-                <label>
-                  Commentaire
-                </label>
+              <div>
+                <label>Niveau attendu</label>
 
-                <textarea
-                  value={trainingComment}
-                  onChange={(event) =>
-                    setTrainingComment(
-                      event.target.value
+                <select
+                  value={trainingLevel}
+                  onChange={(e) =>
+                    setTrainingLevel(
+                      e.target.value
                     )
                   }
-                  placeholder="Départ 8h, allure tranquille, prévoir de l'eau..."
+                >
+                  <option value="<300">
+                    &lt; 300
+                  </option>
+
+                  <option value="400">400</option>
+                  <option value="500">500</option>
+                  <option value="600">600</option>
+                  <option value="700">700</option>
+                  <option value="800">800</option>
+                  <option value="900">900</option>
+                  <option value="1000">1000</option>
+                </select>
+              </div>
+
+              <div className="training-form-comment">
+                <label>Commentaire</label>
+
+                <textarea
                   rows={4}
+                  value={trainingComment}
+                  onChange={(e) =>
+                    setTrainingComment(
+                      e.target.value
+                    )
+                  }
                 />
               </div>
 
               <button
-                type="submit"
-                disabled={savingTraining}
                 className="training-submit"
+                disabled={savingTraining}
               >
                 {savingTraining
                   ? "Ajout..."
                   : "Ajouter la sortie"}
               </button>
             </form>
-          ) : (
-            <div className="race-login-message">
-              Connecte-toi pour ajouter une sortie.
-            </div>
           )}
         </div>
       </section>
 
-      {/* ======================================================
-          CALENDRIER
-      ====================================================== */}
+      {/* CALENDRIER */}
 
       <section className="page-container courses-calendar-section">
         <div className="courses-section-title">
           <div>
             <span>CALENDRIER</span>
-
-            <h2>
-              Les rendez-vous du team
-            </h2>
+            <h2>Les rendez-vous du team</h2>
           </div>
 
           <div className="calendar-controls">
-            <button
-              type="button"
-              onClick={previousMonth}
-            >
+            <button onClick={previousMonth}>
               ←
             </button>
 
@@ -1172,173 +930,140 @@ export default function CoursesPage() {
               )}
             </strong>
 
-            <button
-              type="button"
-              onClick={nextMonth}
-            >
+            <button onClick={nextMonth}>
               →
             </button>
           </div>
         </div>
 
         <div className="race-calendar">
-          <div className="calendar-weekday">
-            LUN
-          </div>
+          {[
+            "LUN",
+            "MAR",
+            "MER",
+            "JEU",
+            "VEN",
+            "SAM",
+            "DIM",
+          ].map((day) => (
+            <div
+              key={day}
+              className="calendar-weekday"
+            >
+              {day}
+            </div>
+          ))}
 
-          <div className="calendar-weekday">
-            MAR
-          </div>
-
-          <div className="calendar-weekday">
-            MER
-          </div>
-
-          <div className="calendar-weekday">
-            JEU
-          </div>
-
-          <div className="calendar-weekday">
-            VEN
-          </div>
-
-          <div className="calendar-weekday">
-            SAM
-          </div>
-
-          <div className="calendar-weekday">
-            DIM
-          </div>
-
-          {calendarDays.map(
-            (day, index) => {
-              if (!day) {
-                return (
-                  <div
-                    key={`empty-${index}`}
-                    className="calendar-day calendar-empty"
-                  />
-                );
-              }
-
-              const dayRaces =
-                racesForDay(day);
-
-              const dayTrainings =
-                trainingsForDay(day);
-
+          {calendarDays.map((day, index) => {
+            if (!day) {
               return (
                 <div
-                  key={day}
-                  className={`calendar-day ${
-                    dayRaces.length ||
-                    dayTrainings.length
-                      ? "calendar-day-race"
-                      : ""
-                  }`}
-                >
-                  <span className="calendar-number">
-                    {day}
-                  </span>
-
-                  {dayRaces.map(
-                    (race) => (
-                      <div
-                        key={race.id}
-                        className="calendar-race"
-                      >
-                        <strong>
-                          {race.name}
-                        </strong>
-
-                        <span>
-                          {race.distance} km ·{" "}
-                          {race.elevation} D+
-                        </span>
-
-                        <div className="calendar-race-status">
-                          🏃{" "}
-                          {
-                            getRaceAttendance(
-                              race.id,
-                              "participant"
-                            ).length
-                          }
-
-                          <span>·</span>
-
-                          📣{" "}
-                          {
-                            getRaceAttendance(
-                              race.id,
-                              "support"
-                            ).length
-                          }
-                        </div>
-                      </div>
-                    )
-                  )}
-
-                  {dayTrainings.map(
-                    (training) => (
-                      <div
-                        key={training.id}
-                        className="calendar-training"
-                      >
-                        <strong>
-                          {training.title}
-                        </strong>
-
-                        <span>
-                          {training.location} ·{" "}
-                          {
-                            training.duration_minutes
-                          }{" "}
-                          min
-                        </span>
-
-                        <div className="calendar-training-status">
-                          🏃{" "}
-                          {
-                            getTrainingParticipants(
-                              training.id
-                            ).length
-                          }
-                        </div>
-                      </div>
-                    )
-                  )}
-                </div>
+                  key={`empty-${index}`}
+                  className="calendar-day calendar-empty"
+                />
               );
             }
-          )}
+
+            const dayRaces = racesForDay(day);
+            const dayTrainings =
+              trainingsForDay(day);
+
+            return (
+              <div
+                key={day}
+                className="calendar-day"
+              >
+                <span className="calendar-number">
+                  {day}
+                </span>
+
+                {dayRaces.map((race) => (
+                  <Link
+                    key={race.id}
+                    href={`/courses/course/${race.id}`}
+                    className="calendar-race calendar-event-link"
+                  >
+                    <strong>{race.name}</strong>
+
+                    <span>
+                      {race.distance} km ·{" "}
+                      {race.elevation} D+
+                    </span>
+
+                    <div className="calendar-race-status">
+                      🏃{" "}
+                      {
+                        getRaceAttendance(
+                          race.id,
+                          "participant"
+                        ).length
+                      }{" "}
+                      · 📣{" "}
+                      {
+                        getRaceAttendance(
+                          race.id,
+                          "support"
+                        ).length
+                      }{" "}
+                      · 💬{" "}
+                      {getRaceCommentCount(
+                        race.id
+                      )}
+                    </div>
+                  </Link>
+                ))}
+
+                {dayTrainings.map(
+                  (training) => (
+                    <Link
+                      key={training.id}
+                      href={`/courses/training/${training.id}`}
+                      className="calendar-training calendar-event-link"
+                    >
+                      <strong>
+                        {training.title}
+                      </strong>
+
+                      <span>
+                        {training.location} ·{" "}
+                        {
+                          training.duration_minutes
+                        }{" "}
+                        min
+                      </span>
+
+                      <div className="calendar-training-status">
+                        🏃{" "}
+                        {
+                          getTrainingParticipants(
+                            training.id
+                          ).length
+                        }{" "}
+                        · 💬{" "}
+                        {getTrainingCommentCount(
+                          training.id
+                        )}
+                      </div>
+                    </Link>
+                  )
+                )}
+              </div>
+            );
+          })}
         </div>
       </section>
 
-      {/* ======================================================
-          LISTE COURSES
-      ====================================================== */}
+      {/* COURSES */}
 
       <section className="page-container race-list-section">
         <div className="courses-section-title">
           <div>
-            <span>
-              PROCHAINES COURSES
-            </span>
-
-            <h2>
-              Sur la ligne de départ
-            </h2>
+            <span>PROCHAINES COURSES</span>
+            <h2>Sur la ligne de départ</h2>
           </div>
         </div>
 
         <div className="race-list">
-          {races.length === 0 && (
-            <div className="no-races">
-              Aucune course pour le moment.
-            </div>
-          )}
-
           {races.map((race) => {
             const participants =
               getRaceAttendance(
@@ -1399,86 +1124,61 @@ export default function CoursesPage() {
 
                   {isEditing ? (
                     <div className="race-edit-form">
-                      <div>
-                        <label>Nom</label>
+                      <label>Nom</label>
+
+                      <input
+                        value={editName}
+                        onChange={(e) =>
+                          setEditName(
+                            e.target.value
+                          )
+                        }
+                      />
+
+                      <div className="race-edit-grid">
+                        <input
+                          type="number"
+                          value={editDistance}
+                          onChange={(e) =>
+                            setEditDistance(
+                              e.target.value
+                            )
+                          }
+                        />
 
                         <input
-                          value={editName}
-                          onChange={(event) =>
-                            setEditName(
-                              event.target.value
+                          type="number"
+                          value={editElevation}
+                          onChange={(e) =>
+                            setEditElevation(
+                              e.target.value
+                            )
+                          }
+                        />
+
+                        <input
+                          type="date"
+                          value={editDate}
+                          onChange={(e) =>
+                            setEditDate(
+                              e.target.value
                             )
                           }
                         />
                       </div>
 
-                      <div className="race-edit-grid">
-                        <div>
-                          <label>
-                            Distance
-                          </label>
-
-                          <input
-                            type="number"
-                            min="0"
-                            step="0.1"
-                            value={editDistance}
-                            onChange={(event) =>
-                              setEditDistance(
-                                event.target.value
-                              )
-                            }
-                          />
-                        </div>
-
-                        <div>
-                          <label>D+</label>
-
-                          <input
-                            type="number"
-                            min="0"
-                            value={editElevation}
-                            onChange={(event) =>
-                              setEditElevation(
-                                event.target.value
-                              )
-                            }
-                          />
-                        </div>
-
-                        <div>
-                          <label>Date</label>
-
-                          <input
-                            type="date"
-                            value={editDate}
-                            onChange={(event) =>
-                              setEditDate(
-                                event.target.value
-                              )
-                            }
-                          />
-                        </div>
-                      </div>
-
                       <div className="race-edit-actions">
                         <button
-                          type="button"
                           onClick={() =>
-                            updateRace(
-                              race.id
-                            )
+                            updateRace(race.id)
                           }
                         >
                           Enregistrer
                         </button>
 
                         <button
-                          type="button"
                           className="race-edit-cancel"
-                          onClick={
-                            cancelEditRace
-                          }
+                          onClick={cancelEditRace}
                         >
                           Annuler
                         </button>
@@ -1486,42 +1186,48 @@ export default function CoursesPage() {
                     </div>
                   ) : (
                     <>
-                      <h3>
-                        {race.name}
-                      </h3>
+                      <Link
+                        href={`/courses/course/${race.id}`}
+                        className="event-title-link"
+                      >
+                        <h3>{race.name}</h3>
+                      </Link>
 
                       <div className="race-stats">
                         <div>
-                          <span>
-                            DISTANCE
-                          </span>
-
+                          <span>DISTANCE</span>
                           <strong>
-                            {
-                              race.distance
-                            }{" "}
-                            km
+                            {race.distance} km
                           </strong>
                         </div>
 
                         <div>
-                          <span>
-                            DÉNIVELÉ
-                          </span>
-
+                          <span>DÉNIVELÉ</span>
                           <strong>
-                            {
-                              race.elevation
-                            }{" "}
-                            m+
+                            {race.elevation} m+
                           </strong>
                         </div>
                       </div>
 
+                      <Link
+                        href={`/courses/course/${race.id}`}
+                        className="event-comment-count"
+                      >
+                        💬{" "}
+                        {getRaceCommentCount(
+                          race.id
+                        )}{" "}
+                        commentaire
+                        {getRaceCommentCount(
+                          race.id
+                        ) !== 1
+                          ? "s"
+                          : ""}
+                      </Link>
+
                       {isCreator && (
                         <div className="race-owner-actions">
                           <button
-                            type="button"
                             onClick={() =>
                               startEditRace(
                                 race
@@ -1532,12 +1238,9 @@ export default function CoursesPage() {
                           </button>
 
                           <button
-                            type="button"
                             className="race-delete-button"
                             onClick={() =>
-                              deleteRace(
-                                race.id
-                              )
+                              deleteRace(race.id)
                             }
                           >
                             Supprimer
@@ -1555,25 +1258,16 @@ export default function CoursesPage() {
                     </span>
 
                     <div className="race-names">
-                      {participants.length ===
-                      0 ? (
-                        <span className="race-empty">
-                          Aucun pour le moment
-                        </span>
-                      ) : (
-                        participants.map(
-                          (item) => (
-                            <span
-                              key={
-                                item.id
-                              }
-                              className="race-person participant"
-                            >
-                              {getProfileName(
-                                item.user_id
-                              )}
-                            </span>
-                          )
+                      {participants.map(
+                        (item) => (
+                          <span
+                            key={item.id}
+                            className="race-person participant"
+                          >
+                            {getProfileName(
+                              item.user_id
+                            )}
+                          </span>
                         )
                       )}
                     </div>
@@ -1585,25 +1279,16 @@ export default function CoursesPage() {
                     </span>
 
                     <div className="race-names">
-                      {supporters.length ===
-                      0 ? (
-                        <span className="race-empty">
-                          Aucun pour le moment
-                        </span>
-                      ) : (
-                        supporters.map(
-                          (item) => (
-                            <span
-                              key={
-                                item.id
-                              }
-                              className="race-person supporter"
-                            >
-                              {getProfileName(
-                                item.user_id
-                              )}
-                            </span>
-                          )
+                      {supporters.map(
+                        (item) => (
+                          <span
+                            key={item.id}
+                            className="race-person supporter"
+                          >
+                            {getProfileName(
+                              item.user_id
+                            )}
+                          </span>
                         )
                       )}
                     </div>
@@ -1613,7 +1298,6 @@ export default function CoursesPage() {
                 {userId && (
                   <div className="race-actions">
                     <button
-                      type="button"
                       className={`race-choice ${
                         myStatus ===
                         "participant"
@@ -1631,10 +1315,8 @@ export default function CoursesPage() {
                     </button>
 
                     <button
-                      type="button"
                       className={`race-choice ${
-                        myStatus ===
-                        "support"
+                        myStatus === "support"
                           ? "race-choice-active"
                           : ""
                       }`}
@@ -1650,12 +1332,9 @@ export default function CoursesPage() {
 
                     {myStatus && (
                       <button
-                        type="button"
                         className="race-remove"
                         onClick={() =>
-                          removeStatus(
-                            race.id
-                          )
+                          removeStatus(race.id)
                         }
                       >
                         ×
@@ -1669,9 +1348,7 @@ export default function CoursesPage() {
         </div>
       </section>
 
-      {/* ======================================================
-          LISTE SORTIES / ENTRAINEMENTS
-      ====================================================== */}
+      {/* SORTIES */}
 
       <section className="page-container training-list-section">
         <div className="courses-section-title">
@@ -1680,374 +1357,360 @@ export default function CoursesPage() {
               SORTIES / ENTRAÎNEMENTS
             </span>
 
-            <h2>
-              Les prochaines sorties
-            </h2>
+            <h2>Les prochaines sorties</h2>
           </div>
         </div>
 
         <div className="training-list">
-          {trainings.length === 0 && (
-            <div className="no-races">
-              Aucune sortie prévue pour le moment.
-            </div>
-          )}
+          {trainings.map((training) => {
+            const participants =
+              getTrainingParticipants(
+                training.id
+              );
 
-          {trainings.map(
-            (training) => {
-              const participants =
-                getTrainingParticipants(
-                  training.id
-                );
+            const joined =
+              isParticipatingTraining(
+                training.id
+              );
 
-              const isParticipating =
-                isParticipatingTraining(
-                  training.id
-                );
+            const isCreator =
+              training.created_by === userId;
 
-              const isCreator =
-                training.created_by ===
-                userId;
+            const isEditing =
+              editingTrainingId ===
+              training.id;
 
-              const isEditing =
-                editingTrainingId ===
-                training.id;
+            return (
+              <article
+                className="training-card"
+                key={training.id}
+              >
+                <div className="training-card-date">
+                  <strong>
+                    {new Date(
+                      `${training.training_date}T12:00:00`
+                    ).toLocaleDateString(
+                      "fr-FR",
+                      {
+                        day: "2-digit",
+                      }
+                    )}
+                  </strong>
 
-              return (
-                <article
-                  className="training-card"
-                  key={training.id}
-                >
-                  {/* DATE */}
-
-                  <div className="training-card-date">
-                    <strong>
-                      {new Date(
-                        `${training.training_date}T12:00:00`
-                      ).toLocaleDateString(
+                  <span>
+                    {new Date(
+                      `${training.training_date}T12:00:00`
+                    )
+                      .toLocaleDateString(
                         "fr-FR",
                         {
-                          day: "2-digit",
+                          month: "short",
                         }
-                      )}
-                    </strong>
-
-                    <span>
-                      {new Date(
-                        `${training.training_date}T12:00:00`
                       )
-                        .toLocaleDateString(
-                          "fr-FR",
-                          {
-                            month:
-                              "short",
-                          }
-                        )
-                        .toUpperCase()}
-                    </span>
-                  </div>
+                      .toUpperCase()}
+                  </span>
+                </div>
 
-                  {/* CONTENU */}
+                <div className="training-card-main">
+                  <p className="training-card-label">
+                    SORTIE / ENTRAÎNEMENT
+                  </p>
 
-                  <div className="training-card-main">
-                    <p className="training-card-label">
-                      SORTIE / ENTRAÎNEMENT
-                    </p>
+                  {isEditing ? (
+                    <div className="race-edit-form">
+                      <label>Nom</label>
 
-                    {isEditing ? (
-                      <div className="race-edit-form">
+                      <input
+                        value={editTrainingTitle}
+                        onChange={(e) =>
+                          setEditTrainingTitle(
+                            e.target.value
+                          )
+                        }
+                      />
+
+                      <div className="race-edit-grid">
                         <div>
-                          <label>
-                            Nom
-                          </label>
+                          <label>Lieu</label>
 
                           <input
                             value={
-                              editTrainingTitle
+                              editTrainingLocation
                             }
-                            onChange={(
-                              event
-                            ) =>
-                              setEditTrainingTitle(
-                                event
-                                  .target
-                                  .value
+                            onChange={(e) =>
+                              setEditTrainingLocation(
+                                e.target.value
                               )
                             }
                           />
-                        </div>
-
-                        <div className="race-edit-grid">
-                          <div>
-                            <label>
-                              Lieu
-                            </label>
-
-                            <input
-                              value={
-                                editTrainingLocation
-                              }
-                              onChange={(
-                                event
-                              ) =>
-                                setEditTrainingLocation(
-                                  event
-                                    .target
-                                    .value
-                                )
-                              }
-                            />
-                          </div>
-
-                          <div>
-                            <label>
-                              Durée
-                            </label>
-
-                            <input
-                              type="number"
-                              min="1"
-                              value={
-                                editTrainingDuration
-                              }
-                              onChange={(
-                                event
-                              ) =>
-                                setEditTrainingDuration(
-                                  event
-                                    .target
-                                    .value
-                                )
-                              }
-                            />
-                          </div>
-
-                          <div>
-                            <label>
-                              Date
-                            </label>
-
-                            <input
-                              type="date"
-                              value={
-                                editTrainingDate
-                              }
-                              onChange={(
-                                event
-                              ) =>
-                                setEditTrainingDate(
-                                  event
-                                    .target
-                                    .value
-                                )
-                              }
-                            />
-                          </div>
                         </div>
 
                         <div>
-                          <label>
-                            Commentaire
-                          </label>
+                          <label>Durée</label>
 
-                          <textarea
-                            rows={4}
+                          <input
+                            type="number"
                             value={
-                              editTrainingComment
+                              editTrainingDuration
                             }
-                            onChange={(
-                              event
-                            ) =>
-                              setEditTrainingComment(
-                                event
-                                  .target
-                                  .value
+                            onChange={(e) =>
+                              setEditTrainingDuration(
+                                e.target.value
                               )
                             }
                           />
                         </div>
 
-                        <div className="race-edit-actions">
+                        <div>
+                          <label>Date</label>
+
+                          <input
+                            type="date"
+                            value={
+                              editTrainingDate
+                            }
+                            onChange={(e) =>
+                              setEditTrainingDate(
+                                e.target.value
+                              )
+                            }
+                          />
+                        </div>
+                      </div>
+
+                      <label>
+                        Niveau attendu
+                      </label>
+
+                      <select
+                        value={editTrainingLevel}
+                        onChange={(e) =>
+                          setEditTrainingLevel(
+                            e.target.value
+                          )
+                        }
+                      >
+                        <option value="<300">
+                          &lt; 300
+                        </option>
+                        <option value="400">
+                          400
+                        </option>
+                        <option value="500">
+                          500
+                        </option>
+                        <option value="600">
+                          600
+                        </option>
+                        <option value="700">
+                          700
+                        </option>
+                        <option value="800">
+                          800
+                        </option>
+                        <option value="900">
+                          900
+                        </option>
+                        <option value="1000">
+                          1000
+                        </option>
+                      </select>
+
+                      <label>
+                        Commentaire
+                      </label>
+
+                      <textarea
+                        rows={4}
+                        value={
+                          editTrainingComment
+                        }
+                        onChange={(e) =>
+                          setEditTrainingComment(
+                            e.target.value
+                          )
+                        }
+                      />
+
+                      <div className="race-edit-actions">
+                        <button
+                          onClick={() =>
+                            updateTraining(
+                              training.id
+                            )
+                          }
+                        >
+                          Enregistrer
+                        </button>
+
+                        <button
+                          className="race-edit-cancel"
+                          onClick={
+                            cancelEditTraining
+                          }
+                        >
+                          Annuler
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <>
+                      <Link
+                        href={`/courses/training/${training.id}`}
+                        className="event-title-link"
+                      >
+                        <h3>
+                          {training.title}
+                        </h3>
+                      </Link>
+
+                      <div className="training-info-grid">
+                        <div>
+                          <span>LIEU</span>
+                          <strong>
+                            {training.location}
+                          </strong>
+                        </div>
+
+                        <div>
+                          <span>DURÉE</span>
+                          <strong>
+                            {
+                              training.duration_minutes
+                            }{" "}
+                            min
+                          </strong>
+                        </div>
+
+                        <div>
+                          <span>
+                            NIVEAU ATTENDU
+                          </span>
+
+                          <strong>
+                            {training.expected_level ??
+                              "Non défini"}
+                          </strong>
+                        </div>
+
+                        <div>
+                          <span>CRÉÉ PAR</span>
+
+                          <strong>
+                            {getProfileName(
+                              training.created_by
+                            )}
+                          </strong>
+                        </div>
+                      </div>
+
+                      {training.comment && (
+                        <p className="training-comment">
+                          {training.comment}
+                        </p>
+                      )}
+
+                      <Link
+                        href={`/courses/training/${training.id}`}
+                        className="event-comment-count"
+                      >
+                        💬{" "}
+                        {getTrainingCommentCount(
+                          training.id
+                        )}{" "}
+                        commentaire
+                        {getTrainingCommentCount(
+                          training.id
+                        ) !== 1
+                          ? "s"
+                          : ""}
+                      </Link>
+
+                      {isCreator && (
+                        <div className="race-owner-actions">
                           <button
-                            type="button"
                             onClick={() =>
-                              updateTraining(
+                              startEditTraining(
+                                training
+                              )
+                            }
+                          >
+                            Modifier
+                          </button>
+
+                          <button
+                            className="race-delete-button"
+                            onClick={() =>
+                              deleteTraining(
                                 training.id
                               )
                             }
                           >
-                            Enregistrer
+                            Supprimer
                           </button>
+                        </div>
+                      )}
 
-                          <button
-                            type="button"
-                            className="race-edit-cancel"
-                            onClick={
-                              cancelEditTraining
-                            }
-                          >
-                            Annuler
-                          </button>
+                      <div className="training-participants">
+                        <span className="race-people-title">
+                          🏃 PARTICIPANTS
+                        </span>
+
+                        <div className="race-names">
+                          {participants.map(
+                            (item) => (
+                              <span
+                                key={item.id}
+                                className="race-person participant"
+                              >
+                                {getProfileName(
+                                  item.user_id
+                                )}
+                              </span>
+                            )
+                          )}
                         </div>
                       </div>
-                    ) : (
-                      <>
-                        <h3>
-                          {
-                            training.title
-                          }
-                        </h3>
 
-                        <div className="training-info-grid">
-                          <div>
-                            <span>
-                              LIEU
-                            </span>
-
-                            <strong>
-                              {
-                                training.location
-                              }
-                            </strong>
-                          </div>
-
-                          <div>
-                            <span>
-                              DURÉE
-                            </span>
-
-                            <strong>
-                              {
-                                training.duration_minutes
-                              }{" "}
-                              min
-                            </strong>
-                          </div>
-
-                          <div>
-                            <span>
-                              CRÉÉ PAR
-                            </span>
-
-                            <strong>
-                              {getProfileName(
-                                training.created_by
-                              )}
-                            </strong>
-                          </div>
-                        </div>
-
-                        {training.comment && (
-                          <p className="training-comment">
-                            {
-                              training.comment
-                            }
-                          </p>
-                        )}
-
-                        {isCreator && (
-                          <div className="race-owner-actions">
+                      {userId && (
+                        <div className="training-actions">
+                          {!joined ? (
                             <button
-                              type="button"
+                              className="race-choice"
                               onClick={() =>
-                                startEditTraining(
-                                  training
-                                )
-                              }
-                            >
-                              Modifier
-                            </button>
-
-                            <button
-                              type="button"
-                              className="race-delete-button"
-                              onClick={() =>
-                                deleteTraining(
+                                joinTraining(
                                   training.id
                                 )
                               }
                             >
-                              Supprimer
+                              🏃 Je participe
                             </button>
-                          </div>
-                        )}
+                          ) : (
+                            <>
+                              <button className="race-choice race-choice-active">
+                                ✓ Je participe
+                              </button>
 
-                        <div className="training-participants">
-                          <span className="race-people-title">
-                            🏃 PARTICIPANTS
-                          </span>
-
-                          <div className="race-names">
-                            {participants.length ===
-                            0 ? (
-                              <span className="race-empty">
-                                Aucun pour le moment
-                              </span>
-                            ) : (
-                              participants.map(
-                                (item) => (
-                                  <span
-                                    key={
-                                      item.id
-                                    }
-                                    className="race-person participant"
-                                  >
-                                    {getProfileName(
-                                      item.user_id
-                                    )}
-                                  </span>
-                                )
-                              )
-                            )}
-                          </div>
-                        </div>
-
-                        {userId && (
-                          <div className="training-actions">
-                            {!isParticipating ? (
                               <button
-                                type="button"
-                                className="race-choice"
+                                className="race-remove"
                                 onClick={() =>
-                                  joinTraining(
+                                  leaveTraining(
                                     training.id
                                   )
                                 }
                               >
-                                🏃 Je participe
+                                ×
                               </button>
-                            ) : (
-                              <>
-                                <button
-                                  type="button"
-                                  className="race-choice race-choice-active"
-                                  disabled
-                                >
-                                  ✓ Je participe
-                                </button>
-
-                                <button
-                                  type="button"
-                                  className="race-remove"
-                                  onClick={() =>
-                                    leaveTraining(
-                                      training.id
-                                    )
-                                  }
-                                >
-                                  ×
-                                </button>
-                              </>
-                            )}
-                          </div>
-                        )}
-                      </>
-                    )}
-                  </div>
-                </article>
-              );
-            }
-          )}
+                            </>
+                          )}
+                        </div>
+                      )}
+                    </>
+                  )}
+                </div>
+              </article>
+            );
+          })}
         </div>
       </section>
     </main>
