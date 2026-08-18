@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { createClient } from "@/utils/supabase/client";
 
@@ -46,6 +46,7 @@ type Profile = {
   nickname: string | null;
   avatar_url: string | null;
   bio: string | null;
+  is_admin: boolean;
 };
 
 type UtmbProfile = {
@@ -62,6 +63,7 @@ export default function RaceDetailPage() {
     useParams<{ id: string }>();
 
   const raceId = params.id;
+  const router = useRouter();
 
   const supabase = createClient();
 
@@ -93,6 +95,18 @@ export default function RaceDetailPage() {
     useState(true);
 
   const [sending, setSending] =
+    useState(false);
+
+  const [newOptionName, setNewOptionName] =
+    useState("");
+
+  const [newOptionDistance, setNewOptionDistance] =
+    useState("");
+
+  const [newOptionElevation, setNewOptionElevation] =
+    useState("");
+
+  const [savingOption, setSavingOption] =
     useState(false);
 
   useEffect(() => {
@@ -164,7 +178,7 @@ export default function RaceDetailPage() {
     } = await supabase
       .from("profiles")
       .select(
-        "id, first_name, last_name, nickname, avatar_url, bio"
+        "id, first_name, last_name, nickname, avatar_url, bio, is_admin"
       );
 
     const {
@@ -271,6 +285,29 @@ export default function RaceDetailPage() {
         .join(" ") ||
       profile.nickname ||
       "Membre"
+    );
+  }
+
+  function isCurrentUserAdmin() {
+    if (!userId) {
+      return false;
+    }
+
+    return (
+      profiles.find(
+        (profile) => profile.id === userId
+      )?.is_admin === true
+    );
+  }
+
+  function canManageCurrentRace() {
+    if (!race || !userId) {
+      return false;
+    }
+
+    return (
+      race.created_by === userId ||
+      isCurrentUserAdmin()
     );
   }
 
@@ -636,6 +673,126 @@ export default function RaceDetailPage() {
   }
 
   /* ==========================================================
+     AJOUTER UN FORMAT A LA COURSE
+  ========================================================== */
+
+  async function addRaceOption(
+    event: React.FormEvent
+  ) {
+    event.preventDefault();
+
+    if (!userId) {
+      alert(
+        "Tu dois être connecté pour ajouter un format."
+      );
+      return;
+    }
+
+    if (
+      !newOptionDistance ||
+      newOptionElevation === ""
+    ) {
+      alert(
+        "Merci de renseigner la distance et le D+."
+      );
+      return;
+    }
+
+    const distance =
+      Number(newOptionDistance);
+
+    const elevation =
+      Number(newOptionElevation);
+
+    if (
+      !Number.isFinite(distance) ||
+      distance <= 0 ||
+      !Number.isFinite(elevation) ||
+      elevation < 0
+    ) {
+      alert(
+        "La distance et le D+ ne sont pas valides."
+      );
+      return;
+    }
+
+    setSavingOption(true);
+
+    const { error } =
+      await supabase
+        .from("race_options")
+        .insert({
+          race_id: raceId,
+          name:
+            newOptionName.trim() ||
+            null,
+          distance,
+          elevation,
+        });
+
+    setSavingOption(false);
+
+    if (error) {
+      alert(error.message);
+      return;
+    }
+
+    setNewOptionName("");
+    setNewOptionDistance("");
+    setNewOptionElevation("");
+
+    await loadPage();
+  }
+
+  /* ==========================================================
+     SUPPRIMER LA COURSE - CREATEUR OU ADMIN
+  ========================================================== */
+
+  async function deleteCurrentRace() {
+    if (
+      !userId ||
+      !race ||
+      !canManageCurrentRace()
+    ) {
+      return;
+    }
+
+    const confirmed =
+      window.confirm(
+        "Supprimer complètement cet événement ?"
+      );
+
+    if (!confirmed) {
+      return;
+    }
+
+    let deleteQuery =
+      supabase
+        .from("races")
+        .delete()
+        .eq("id", race.id);
+
+    if (!isCurrentUserAdmin()) {
+      deleteQuery =
+        deleteQuery.eq(
+          "created_by",
+          userId
+        );
+    }
+
+    const { error } =
+      await deleteQuery;
+
+    if (error) {
+      alert(error.message);
+      return;
+    }
+
+    router.push("/courses");
+    router.refresh();
+  }
+
+  /* ==========================================================
      COMMENTAIRES
   ========================================================== */
 
@@ -881,6 +1038,25 @@ export default function RaceDetailPage() {
         </div>
       </section>
 
+      {canManageCurrentRace() && (
+        <div className="race-detail-admin-actions">
+          <Link
+            href="/courses"
+            className="race-detail-admin-edit"
+          >
+            Modifier l&apos;événement
+          </Link>
+
+          <button
+            type="button"
+            className="race-delete-button"
+            onClick={deleteCurrentRace}
+          >
+            Supprimer l&apos;événement
+          </button>
+        </div>
+      )}
+
       {/* ==================================================
           INSCRIPTION
       ================================================== */}
@@ -984,6 +1160,92 @@ export default function RaceDetailPage() {
           )}
 
         </div>
+
+        {userId && (
+          <form
+            className="race-detail-add-format"
+            onSubmit={addRaceOption}
+          >
+            <div className="race-detail-add-format-heading">
+              <span>
+                AJOUTER UNE DISTANCE
+              </span>
+
+              <strong>
+                Un format manque à cet événement ?
+              </strong>
+
+              <p>
+                Tous les membres connectés peuvent ajouter un format.
+              </p>
+            </div>
+
+            <div className="race-detail-add-format-fields">
+              <div>
+                <label>
+                  Nom du format
+                </label>
+
+                <input
+                  value={newOptionName}
+                  onChange={(event) =>
+                    setNewOptionName(
+                      event.target.value
+                    )
+                  }
+                  placeholder="50K, Trail long..."
+                />
+              </div>
+
+              <div>
+                <label>
+                  Distance
+                </label>
+
+                <input
+                  type="number"
+                  min="0.1"
+                  step="0.1"
+                  value={newOptionDistance}
+                  onChange={(event) =>
+                    setNewOptionDistance(
+                      event.target.value
+                    )
+                  }
+                  placeholder="58"
+                />
+              </div>
+
+              <div>
+                <label>
+                  D+
+                </label>
+
+                <input
+                  type="number"
+                  min="0"
+                  step="1"
+                  value={newOptionElevation}
+                  onChange={(event) =>
+                    setNewOptionElevation(
+                      event.target.value
+                    )
+                  }
+                  placeholder="3300"
+                />
+              </div>
+
+              <button
+                type="submit"
+                disabled={savingOption}
+              >
+                {savingOption
+                  ? "Ajout..."
+                  : "+ Ajouter le format"}
+              </button>
+            </div>
+          </form>
+        )}
 
         {userId && (
           <div className="race-detail-support-actions">

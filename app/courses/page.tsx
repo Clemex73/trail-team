@@ -36,6 +36,7 @@ type Profile = {
   first_name: string | null;
   last_name: string | null;
   nickname: string | null;
+  is_admin: boolean;
 };
 
 type Training = {
@@ -202,7 +203,7 @@ export default function CoursesPage() {
 
     const { data: profilesData } = await supabase
       .from("profiles")
-      .select("id, first_name, last_name, nickname");
+      .select("id, first_name, last_name, nickname, is_admin");
 
     const { data: trainingsData } = await supabase
       .from("trainings")
@@ -255,6 +256,29 @@ export default function CoursesPage() {
       [profile.first_name, profile.last_name]
         .filter(Boolean)
         .join(" ") || "Membre"
+    );
+  }
+
+  function isCurrentUserAdmin() {
+    if (!userId) {
+      return false;
+    }
+
+    return (
+      profiles.find(
+        (profile) => profile.id === userId
+      )?.is_admin === true
+    );
+  }
+
+  function canManageRace(race: Race) {
+    if (!userId) {
+      return false;
+    }
+
+    return (
+      race.created_by === userId ||
+      isCurrentUserAdmin()
     );
   }
 
@@ -729,8 +753,8 @@ export default function CoursesPage() {
       const firstOption =
         editOptions[0];
 
-      const { error: raceError } =
-        await supabase
+      let raceUpdateQuery =
+        supabase
           .from("races")
           .update({
             name:
@@ -754,8 +778,20 @@ export default function CoursesPage() {
               firstOption?.elevation ??
               race.elevation,
           })
-          .eq("id", race.id)
-          .eq("created_by", userId);
+          .eq("id", race.id);
+
+      // Un membre normal ne peut modifier que sa course.
+      // L'admin peut modifier n'importe quelle course.
+      if (!isCurrentUserAdmin()) {
+        raceUpdateQuery =
+          raceUpdateQuery.eq(
+            "created_by",
+            userId
+          );
+      }
+
+      const { error: raceError } =
+        await raceUpdateQuery;
 
       if (raceError) {
         throw raceError;
@@ -801,11 +837,24 @@ export default function CoursesPage() {
       return;
     }
 
-    const { error } = await supabase
-      .from("races")
-      .delete()
-      .eq("id", raceId)
-      .eq("created_by", userId);
+    let deleteQuery =
+      supabase
+        .from("races")
+        .delete()
+        .eq("id", raceId);
+
+    // Un membre normal ne peut supprimer que sa course.
+    // L'admin peut supprimer n'importe quelle course.
+    if (!isCurrentUserAdmin()) {
+      deleteQuery =
+        deleteQuery.eq(
+          "created_by",
+          userId
+        );
+    }
+
+    const { error } =
+      await deleteQuery;
 
     if (error) {
       alert(error.message);
@@ -1646,6 +1695,9 @@ export default function CoursesPage() {
             const isCreator =
               race.created_by === userId;
 
+            const canManage =
+              canManageRace(race);
+
             const isEditing =
               editingRaceId === race.id;
 
@@ -2046,7 +2098,7 @@ export default function CoursesPage() {
                         </div>
                       )}
 
-                      {isCreator && (
+                      {canManage && (
                         <div className="race-owner-actions">
                           <button
                             type="button"

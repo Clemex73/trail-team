@@ -7261,3 +7261,233 @@ label {
       space-between;
   }
 }
+
+/* ==========================================================
+   AJOUTER UNE DISTANCE - PAGE COURSE
+========================================================== */
+
+.race-add-format-section {
+  margin-top: 34px;
+  padding: 24px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #faf7ff,
+      #f4effb
+    );
+
+  border: 1px solid #e0d5ec;
+  border-radius: 14px;
+}
+
+.race-add-format-heading {
+  margin-bottom: 18px;
+}
+
+.race-add-format-heading > span {
+  display: block;
+
+  color: #6d28d9;
+
+  font-size: 0.6rem;
+  font-weight: 1000;
+
+  letter-spacing: 0.18em;
+}
+
+.race-add-format-heading h3 {
+  margin: 6px 0 0;
+
+  color: #28134d;
+
+  font-size: 1.5rem;
+}
+
+.race-add-format-heading p {
+  margin: 7px 0 0;
+
+  color: #7f7487;
+
+  font-size: 0.8rem;
+
+  line-height: 1.5;
+}
+
+/* ==========================================================
+   FORMULAIRE
+========================================================== */
+
+.race-add-format-form {
+  display: grid;
+
+  grid-template-columns:
+    minmax(160px, 1.4fr)
+    minmax(120px, 0.8fr)
+    minmax(120px, 0.8fr)
+    auto;
+
+  gap: 12px;
+
+  align-items: end;
+}
+
+.race-add-format-field {
+  display: flex;
+  flex-direction: column;
+
+  gap: 6px;
+}
+
+.race-add-format-field label {
+  color: #5b4c67;
+
+  font-size: 0.65rem;
+  font-weight: 900;
+
+  letter-spacing: 0.05em;
+}
+
+.race-add-format-field input {
+  width: 100%;
+
+  min-height: 44px;
+
+  padding: 10px 12px;
+
+  background: white;
+
+  border: 1px solid #d9cfdf;
+  border-radius: 8px;
+
+  color: #2e2038;
+
+  font-size: 0.9rem;
+
+  outline: none;
+
+  transition:
+    border 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.race-add-format-field input:focus {
+  border-color: #7c3aed;
+
+  box-shadow:
+    0 0 0 3px
+    rgba(124, 58, 237, 0.08);
+}
+
+/* ==========================================================
+   CHAMPS AVEC UNITES
+========================================================== */
+
+.race-add-format-unit {
+  position: relative;
+}
+
+.race-add-format-unit input {
+  padding-right: 48px;
+}
+
+.race-add-format-unit span {
+  position: absolute;
+
+  top: 50%;
+  right: 12px;
+
+  transform: translateY(-50%);
+
+  color: #8d8095;
+
+  font-size: 0.7rem;
+  font-weight: 900;
+}
+
+/* ==========================================================
+   BOUTON
+========================================================== */
+
+.race-add-format-submit {
+  min-height: 44px;
+
+  padding: 11px 18px;
+
+  border: none;
+  border-radius: 8px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #6d28d9,
+      #4f1f91
+    );
+
+  color: white;
+
+  font-size: 0.8rem;
+  font-weight: 900;
+
+  cursor: pointer;
+
+  white-space: nowrap;
+
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    opacity 0.2s ease;
+}
+
+.race-add-format-submit:hover:not(:disabled) {
+  transform: translateY(-2px);
+
+  box-shadow:
+    0 10px 24px
+    rgba(87, 37, 145, 0.18);
+}
+
+.race-add-format-submit:disabled {
+  opacity: 0.55;
+  cursor: wait;
+}
+
+/* ==========================================================
+   MESSAGE
+========================================================== */
+
+.race-add-format-message {
+  margin-top: 12px;
+
+  color: #6c5d76;
+
+  font-size: 0.74rem;
+}
+
+/* ==========================================================
+   MOBILE
+========================================================== */
+
+@media (max-width: 800px) {
+  .race-add-format-form {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .race-add-format-submit {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 520px) {
+  .race-add-format-section {
+    padding: 18px;
+  }
+
+  .race-add-format-form {
+    grid-template-columns: 1fr;
+  }
+
+  .race-add-format-submit {
+    width: 100%;
+  }
+}
