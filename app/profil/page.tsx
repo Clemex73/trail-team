@@ -94,6 +94,8 @@ export default function ProfilPage() {
       data: { user },
     } = await supabase.auth.getUser();
 
+    console.log("USER CONNECTE :", user?.id);
+
     if (!user) {
       setUserId(null);
       setLoading(false);
@@ -436,69 +438,56 @@ export default function ProfilPage() {
   ====================================================== */
 
   async function syncUtmb() {
-    if (!userId) {
-      return;
-    }
-
-    if (!utmbUrl.trim()) {
-      alert(
-        "Enregistre d'abord ton lien UTMB."
-      );
-      return;
-    }
-
-    setSyncingUtmb(true);
-
-    try {
-      const response =
-        await fetch(
-          "/api/sync-utmb",
-          {
-            method: "POST",
-
-            headers: {
-              "Content-Type":
-                "application/json",
-            },
-
-            body: JSON.stringify({
-              userId,
-            }),
-          }
-        );
-
-      const data =
-        await response.json();
-
-      if (!response.ok) {
-        throw new Error(
-          data?.error ||
-            data?.message ||
-            "La synchronisation UTMB a échoué."
-        );
-      }
-
-      alert(
-        "Scores UTMB synchronisés."
-      );
-
-      await loadProfile();
-    } catch (error: any) {
-      console.error(
-        "Erreur sync UTMB :",
-        error
-      );
-
-      alert(
-        `Erreur : ${
-          error?.message ??
-          "Impossible de synchroniser UTMB."
-        }`
-      );
-    } finally {
-      setSyncingUtmb(false);
-    }
+  if (!userId) {
+    return;
   }
+
+  if (!utmbUrl.trim()) {
+    alert("Enregistre d'abord ton lien UTMB.");
+    return;
+  }
+
+  setSyncingUtmb(true);
+
+  try {
+    const response = await fetch("/api/sync-utmb", {
+      method: "GET",
+      cache: "no-store",
+    });
+
+    if (!response.ok) {
+      const text = await response.text();
+
+      console.error(
+        "Erreur route sync UTMB :",
+        response.status,
+        text
+      );
+
+      throw new Error(
+        text || `Erreur HTTP ${response.status}`
+      );
+    }
+
+    alert("Scores UTMB synchronisés.");
+
+    await loadProfile();
+  } catch (error: any) {
+    console.error(
+      "Erreur sync UTMB :",
+      error
+    );
+
+    alert(
+      `Erreur : ${
+        error?.message ??
+        "Impossible de synchroniser UTMB."
+      }`
+    );
+  } finally {
+    setSyncingUtmb(false);
+  }
+}
 
   if (loading) {
     return (
