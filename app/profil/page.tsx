@@ -82,6 +82,94 @@ export default function ProfilPage() {
 
   const [syncingUtmb, setSyncingUtmb] =
     useState(false);
+  
+  const [
+  syncingAllUtmb,
+  setSyncingAllUtmb,
+  ] = useState(false);
+
+  async function syncAllUtmb() {
+  if (!userId) {
+    return;
+  }
+
+  const confirmed =
+    window.confirm(
+      "Synchroniser les indices UTMB de tous les membres du team ?"
+    );
+
+  if (!confirmed) {
+    return;
+  }
+
+  setSyncingAllUtmb(true);
+
+  try {
+    const response =
+      await fetch(
+        "/api/sync-utmb-all",
+        {
+          method: "GET",
+          cache: "no-store",
+        }
+      );
+
+    const text =
+      await response.text();
+
+    let result:
+      | {
+          success?: boolean;
+          total?: number;
+          updated?: number;
+          failed?: number;
+          error?: string;
+        }
+      | null = null;
+
+    try {
+      result =
+        text
+          ? JSON.parse(text)
+          : null;
+    } catch {
+      console.error(
+        "Réponse serveur invalide :",
+        text
+      );
+    }
+
+    if (!response.ok) {
+      throw new Error(
+        result?.error ||
+          `Erreur HTTP ${response.status}`
+      );
+    }
+
+    alert(
+      `Synchronisation terminée !
+
+${result?.updated ?? 0} membre(s) mis à jour
+${result?.failed ?? 0} échec(s)
+${result?.total ?? 0} profil(s) traité(s)`
+    );
+
+    await loadProfile();
+  } catch (error) {
+    console.error(
+      "Erreur synchronisation UTMB générale :",
+      error
+    );
+
+    alert(
+      error instanceof Error
+        ? error.message
+        : "Erreur pendant la synchronisation générale UTMB."
+    );
+  } finally {
+    setSyncingAllUtmb(false);
+  }
+}
 
   useEffect(() => {
     loadProfile();
@@ -810,6 +898,43 @@ export default function ProfilPage() {
               </div>
             )}
           </div>
+
+          {userId ===
+  process.env
+    .NEXT_PUBLIC_ADMIN_USER_ID && (
+  <div className="utmb-admin-zone">
+    <div className="utmb-admin-heading">
+      <span>
+        ADMINISTRATION
+      </span>
+
+      <strong>
+        Synchronisation globale
+      </strong>
+
+      <p>
+        Met à jour les indices UTMB
+        de tous les membres ayant
+        configuré leur profil UTMB.
+      </p>
+    </div>
+
+    <button
+      type="button"
+      className="utmb-admin-sync-button"
+      onClick={
+        syncAllUtmb
+      }
+      disabled={
+        syncingAllUtmb
+      }
+    >
+      {syncingAllUtmb
+        ? "Synchronisation de tous les membres..."
+        : "🔄 Synchroniser tous les UTMB"}
+    </button>
+  </div>
+)}
 
           {/* SCORES */}
 
