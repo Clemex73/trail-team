@@ -5372,21 +5372,141 @@ label {
 }
 
 @media (max-width: 600px) {
+  .team-page {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+
+  .team-heading {
+    margin-bottom: 22px;
+  }
+
   .team-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+
+    gap: 10px;
+  }
+
+  .team-card {
+    padding: 12px 10px;
+    border-radius: 11px;
+  }
+
+  .team-card-line {
+    height: 4px;
   }
 
   .team-card-top {
     grid-template-columns: 1fr;
+
+    gap: 10px;
+
+    margin-bottom: 10px;
+  }
+
+  .team-member-main {
+    gap: 8px;
+  }
+
+  .team-avatar {
+    flex: 0 0 44px;
+
+    width: 44px;
+    height: 44px;
+
+    border-width: 3px;
+
+    font-size: 1rem;
+  }
+
+  .team-member-identity h2 {
+    margin-bottom: 2px;
+
+    font-size: 0.88rem;
+    line-height: 1.05;
+  }
+
+  .team-member-identity p {
+    font-size: 0.68rem;
   }
 
   .team-utmb-general {
     width: 100%;
+
+    padding: 8px;
+
+    border-radius: 9px;
+  }
+
+  .team-utmb-general-logo {
+    margin-bottom: 5px;
+  }
+
+  .team-utmb-general-logo img {
+    width: 82px;
+
+    border-radius: 4px;
+  }
+
+  .team-utmb-general-score {
+    font-size: 1.25rem;
+  }
+
+  .team-bio {
+    min-height: 42px;
+
+    margin-bottom: 10px;
+
+    font-size: 0.7rem;
+    line-height: 1.35;
+
+    -webkit-line-clamp: 2;
   }
 
   .team-index-grid {
     grid-template-columns:
-      repeat(2, 1fr);
+      repeat(4, minmax(0, 1fr));
+
+    gap: 4px;
+  }
+
+  .team-index-box {
+    padding: 7px 2px;
+
+    border-radius: 7px;
+  }
+
+  .team-index-logo {
+    min-height: 18px;
+
+    margin-bottom: 5px;
+  }
+
+  .team-index-logo img {
+    max-width: 38px;
+  }
+
+  .team-index-value {
+    font-size: 0.74rem;
+  }
+
+  .team-card-footer {
+    margin-top: 10px;
+
+    padding-top: 9px;
+
+    font-size: 0.6rem;
+
+    letter-spacing: 0.03em;
+  }
+
+  .team-no-utmb {
+    padding: 8px;
+  }
+
+  .team-no-utmb p {
+    font-size: 0.68rem;
   }
 }
 
