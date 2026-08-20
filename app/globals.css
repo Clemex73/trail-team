@@ -8520,3 +8520,1216 @@ label {
     font-size: 0.53rem;
   }
 }
+
+/* ==========================================================
+   MTT CARDS
+========================================================== */
+
+.cards-page {
+  padding-top: 55px;
+  padding-bottom: 120px;
+}
+
+.cards-game-header {
+  max-width: 800px;
+}
+
+.cards-game-header > span {
+  color: #6d28d9;
+
+  font-size: 0.68rem;
+  font-weight: 1000;
+
+  letter-spacing: 0.25em;
+}
+
+.cards-game-header h1 {
+  margin: 10px 0;
+
+  color: #28134d;
+
+  font-size:
+    clamp(
+      3.2rem,
+      8vw,
+      6.5rem
+    );
+
+  line-height: 0.9;
+}
+
+.cards-game-header h1 strong {
+  color: #742bd3;
+}
+
+.cards-game-header p {
+  max-width: 650px;
+
+  color: #766d7d;
+
+  font-size: 1rem;
+
+  line-height: 1.6;
+}
+
+/* ==========================================================
+   STATS
+========================================================== */
+
+.cards-stats {
+  display: grid;
+
+  grid-template-columns:
+    repeat(4, 1fr);
+
+  margin-top: 40px;
+
+  background: white;
+
+  border: 1px solid #e3dce8;
+}
+
+.cards-stats > div {
+  padding: 22px;
+
+  border-right:
+    1px solid #ece7f0;
+}
+
+.cards-stats > div:last-child {
+  border-right: 0;
+}
+
+.cards-stats strong {
+  display: block;
+
+  color: #6723c4;
+
+  font-size: 2rem;
+}
+
+.cards-stats span {
+  color: #8c8293;
+
+  font-size: 0.58rem;
+
+  font-weight: 1000;
+
+  letter-spacing: 0.12em;
+}
+
+/* ==========================================================
+   TITRES SECTIONS
+========================================================== */
+
+.cards-section-heading {
+  margin-bottom: 25px;
+}
+
+.cards-section-heading span {
+  color: #6d28d9;
+
+  font-size: 0.62rem;
+
+  font-weight: 1000;
+
+  letter-spacing: 0.2em;
+}
+
+.cards-section-heading h2 {
+  margin: 7px 0 0;
+
+  color: #28134d;
+
+  font-size: 2.3rem;
+}
+
+/* ==========================================================
+   TIRAGE
+========================================================== */
+
+.cards-draw-section {
+  margin-top: 70px;
+}
+
+.cards-draw-zone {
+  display: flex;
+
+  align-items: center;
+
+  gap: 45px;
+
+  min-height: 440px;
+
+  padding: 40px;
+
+  background:
+    radial-gradient(
+      circle at 30% 50%,
+      rgba(124,58,237,.12),
+      transparent 35%
+    ),
+    #f7f4fb;
+
+  border:
+    1px solid #ded6e6;
+}
+
+/* ==========================================================
+   BOOSTER
+========================================================== */
+
+.cards-pack {
+  width: 255px;
+  height: 370px;
+
+  flex-shrink: 0;
+
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
+  justify-content: center;
+
+  overflow: hidden;
+
+  border-radius: 18px;
+
+  background:
+    linear-gradient(
+      145deg,
+      #29104f,
+      #7b2be2
+    );
+
+  color: white;
+
+  box-shadow:
+    0 25px 60px
+    rgba(53, 17, 91, .25);
+}
+
+.cards-pack-logo {
+  width: 80px;
+  height: 80px;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 50%;
+
+  border:
+    2px solid
+    rgba(255,255,255,.5);
+
+  font-size: 1.4rem;
+
+  font-weight: 1000;
+}
+
+.cards-pack > span {
+  margin-top: 28px;
+
+  color: #dac8ef;
+
+  font-size: .58rem;
+
+  font-weight: 1000;
+
+  letter-spacing: .22em;
+}
+
+.cards-pack > strong {
+  margin-top: 15px;
+
+  font-size: 4rem;
+}
+
+.cards-pack p {
+  margin: 15px 25px 0;
+
+  color: #dfd1ed;
+
+  font-size: .75rem;
+
+  text-align: center;
+}
+
+/* ==========================================================
+   OUVERTURE
+========================================================== */
+
+.cards-opening {
+  position: relative;
+
+  width: 255px;
+  height: 370px;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  overflow: hidden;
+
+  border-radius: 18px;
+
+  background: #28124c;
+
+  color: white;
+}
+
+.cards-opening-glow {
+  position: absolute;
+
+  width: 120px;
+  height: 120px;
+
+  border-radius: 50%;
+
+  background: white;
+
+  filter: blur(50px);
+
+  animation:
+    cardsOpeningGlow
+    .8s infinite alternate;
+}
+
+.cards-opening strong {
+  position: relative;
+
+  z-index: 2;
+
+  letter-spacing: .2em;
+}
+
+@keyframes cardsOpeningGlow {
+  from {
+    transform: scale(.7);
+
+    opacity: .4;
+  }
+
+  to {
+    transform: scale(2.3);
+
+    opacity: 1;
+  }
+}
+
+/* ==========================================================
+   ACTION
+========================================================== */
+
+.cards-draw-actions {
+  max-width: 360px;
+}
+
+.cards-draw-button {
+  min-height: 58px;
+
+  padding: 0 28px;
+
+  border-radius: 12px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #6723c4,
+      #8d3bf0
+    );
+
+  font-size: .85rem;
+
+  font-weight: 1000;
+
+  letter-spacing: .07em;
+}
+
+.cards-draw-actions p {
+  margin-top: 12px;
+
+  color: #92879a;
+
+  font-size: .72rem;
+}
+
+.cards-already-drawn {
+  padding: 15px 20px;
+
+  border-radius: 10px;
+
+  background: #eae4f1;
+
+  color: #5f5369;
+
+  font-size: .75rem;
+
+  font-weight: 900;
+}
+
+.cards-new-card-message,
+.cards-duplicate-message {
+  margin-top: 15px;
+
+  padding: 13px 16px;
+
+  font-size: .72rem;
+
+  font-weight: 1000;
+
+  text-align: center;
+}
+
+.cards-new-card-message {
+  background: #efe5ff;
+
+  color: #6420bd;
+}
+
+.cards-duplicate-message {
+  background: #f2f0f4;
+
+  color: #706778;
+}
+
+/* ==========================================================
+   RARETES
+========================================================== */
+
+.cards-rarity-guide {
+  display: grid;
+
+  grid-template-columns:
+    repeat(5, 1fr);
+
+  gap: 8px;
+
+  margin-top: 30px;
+}
+
+.cards-rarity-guide-item {
+  padding: 12px;
+
+  border-radius: 8px;
+
+  text-align: center;
+}
+
+.cards-rarity-guide-item strong,
+.cards-rarity-guide-item span {
+  display: block;
+}
+
+.cards-rarity-guide-item strong {
+  font-size: .62rem;
+
+  font-weight: 1000;
+}
+
+.cards-rarity-guide-item span {
+  margin-top: 4px;
+
+  font-size: .55rem;
+
+  opacity: .7;
+}
+
+/* ==========================================================
+   COLLECTION
+========================================================== */
+
+.cards-collection-section {
+  margin-top: 80px;
+}
+
+.cards-collection-heading {
+  display: flex;
+
+  align-items: flex-end;
+  justify-content: space-between;
+
+  gap: 20px;
+}
+
+.cards-collection-heading > strong {
+  color: #6d28d9;
+
+  font-size: 1rem;
+}
+
+.cards-filters {
+  display: flex;
+
+  gap: 7px;
+
+  margin-bottom: 25px;
+
+  overflow-x: auto;
+
+  padding-bottom: 4px;
+}
+
+.cards-filters button {
+  min-height: 35px;
+
+  padding: 7px 11px;
+
+  background: white;
+
+  border:
+    1px solid #ddd5e5;
+
+  color: #6b6072;
+
+  box-shadow: none;
+
+  font-size: .62rem;
+
+  white-space: nowrap;
+}
+
+.cards-filters .cards-filter-active {
+  background: #6523c2;
+
+  color: white;
+
+  border-color: #6523c2;
+}
+
+.cards-collection-grid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(
+      auto-fill,
+      minmax(210px, 1fr)
+    );
+
+  gap: 20px;
+}
+
+.cards-empty,
+.cards-login-box {
+  padding: 40px;
+
+  background: white;
+
+  border:
+    1px dashed #d9d0e2;
+
+  color: #83798a;
+}
+
+/* ==========================================================
+   CARTE MTT
+========================================================== */
+
+.mtt-card {
+  position: relative;
+
+  width: 100%;
+
+  max-width: 285px;
+
+  aspect-ratio: 0.69;
+
+  justify-self: center;
+
+  padding: 5px;
+
+  overflow: hidden;
+
+  border-radius: 20px;
+
+  transition:
+    transform .25s ease,
+    box-shadow .25s ease;
+}
+
+.mtt-card:hover {
+  transform:
+    translateY(-7px)
+    rotate(1deg);
+}
+
+.mtt-card-inner {
+  position: relative;
+
+  z-index: 2;
+
+  height: 100%;
+
+  display: flex;
+
+  flex-direction: column;
+
+  overflow: hidden;
+
+  padding: 12px;
+
+  border-radius: 16px;
+}
+
+/* ==========================================================
+   TOP
+========================================================== */
+
+.mtt-card-top {
+  display: flex;
+
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 10px;
+}
+
+.mtt-card-top span {
+  font-size: .48rem;
+
+  font-weight: 1000;
+
+  letter-spacing: .14em;
+}
+
+.mtt-card-top strong {
+  font-size: .5rem;
+
+  letter-spacing: .08em;
+}
+
+/* ==========================================================
+   PHOTO
+========================================================== */
+
+.mtt-card-photo {
+  position: relative;
+
+  overflow: hidden;
+
+  aspect-ratio: 1;
+
+  margin-top: 9px;
+
+  border-radius: 12px;
+}
+
+.mtt-card-photo > img {
+  width: 100%;
+  height: 100%;
+
+  object-fit: cover;
+}
+
+.mtt-card-placeholder {
+  width: 100%;
+  height: 100%;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  background:
+    linear-gradient(
+      135deg,
+      #ddd6fe,
+      #ede9fe
+    );
+
+  color: #5b21b6;
+
+  font-size: 4rem;
+
+  font-weight: 1000;
+}
+
+.mtt-card-index {
+  position: absolute;
+
+  right: 7px;
+  bottom: 7px;
+
+  min-width: 55px;
+
+  padding: 7px;
+
+  border-radius: 8px;
+
+  background:
+    rgba(26,12,47,.88);
+
+  color: white;
+
+  text-align: center;
+
+  backdrop-filter: blur(8px);
+}
+
+.mtt-card-index small,
+.mtt-card-index strong {
+  display: block;
+}
+
+.mtt-card-index small {
+  font-size: .42rem;
+
+  letter-spacing: .1em;
+}
+
+.mtt-card-index strong {
+  font-size: 1.1rem;
+}
+
+/* ==========================================================
+   IDENTITE
+========================================================== */
+
+.mtt-card-identity h3 {
+  margin: 10px 0 2px;
+
+  font-size: 1.1rem;
+
+  line-height: 1;
+}
+
+.mtt-card-identity span {
+  font-size: .58rem;
+}
+
+/* ==========================================================
+   SPECIALITE
+========================================================== */
+
+.mtt-card-speciality {
+  margin-top: 8px;
+
+  padding: 6px 8px;
+
+  border-radius: 6px;
+}
+
+.mtt-card-speciality span,
+.mtt-card-speciality strong {
+  display: block;
+}
+
+.mtt-card-speciality span {
+  font-size: .4rem;
+
+  font-weight: 1000;
+
+  letter-spacing: .1em;
+}
+
+.mtt-card-speciality strong {
+  margin-top: 2px;
+
+  font-size: .65rem;
+}
+
+/* ==========================================================
+   INDEX
+========================================================== */
+
+.mtt-card-indexes {
+  display: grid;
+
+  grid-template-columns:
+    repeat(4, 1fr);
+
+  gap: 4px;
+
+  margin-top: 8px;
+}
+
+.mtt-card-indexes div {
+  padding: 5px 2px;
+
+  border-radius: 5px;
+
+  text-align: center;
+}
+
+.mtt-card-indexes span,
+.mtt-card-indexes strong {
+  display: block;
+}
+
+.mtt-card-indexes span {
+  font-size: .38rem;
+}
+
+.mtt-card-indexes strong {
+  margin-top: 2px;
+
+  font-size: .63rem;
+}
+
+/* ==========================================================
+   FOOTER
+========================================================== */
+
+.mtt-card-footer {
+  display: flex;
+
+  align-items: center;
+  justify-content: space-between;
+
+  margin-top: auto;
+
+  padding-top: 8px;
+
+  font-size: .42rem;
+
+  font-weight: 1000;
+
+  letter-spacing: .08em;
+}
+
+.mtt-card-footer strong {
+  font-size: .65rem;
+}
+
+/* ==========================================================
+   COMMUN
+========================================================== */
+
+.rarity-common.mtt-card {
+  background:
+    linear-gradient(
+      135deg,
+      #b7b4bd,
+      #6f6878
+    );
+
+  box-shadow:
+    0 12px 25px
+    rgba(35,30,40,.14);
+}
+
+.rarity-common
+.mtt-card-inner {
+  background:
+    linear-gradient(
+      160deg,
+      #f8f7f9,
+      #e9e6ec
+    );
+
+  color: #453e49;
+}
+
+.rarity-common
+.mtt-card-speciality,
+.rarity-common
+.mtt-card-indexes div {
+  background: #ddd9e1;
+}
+
+/* ==========================================================
+   RARE
+========================================================== */
+
+.rarity-rare.mtt-card {
+  background:
+    linear-gradient(
+      135deg,
+      #3178ff,
+      #4c1d95
+    );
+
+  box-shadow:
+    0 14px 32px
+    rgba(49,120,255,.22);
+}
+
+.rarity-rare
+.mtt-card-inner {
+  background:
+    linear-gradient(
+      160deg,
+      #f6f9ff,
+      #e8efff
+    );
+
+  color: #20295a;
+}
+
+.rarity-rare
+.mtt-card-speciality,
+.rarity-rare
+.mtt-card-indexes div {
+  background: #d9e5ff;
+}
+
+/* ==========================================================
+   PREMIUM
+========================================================== */
+
+.rarity-premium.mtt-card {
+  background:
+    linear-gradient(
+      135deg,
+      #5721b4,
+      #9a4dff,
+      #5721b4
+    );
+
+  box-shadow:
+    0 16px 40px
+    rgba(111,38,200,.3);
+}
+
+.rarity-premium
+.mtt-card-inner {
+  background:
+    linear-gradient(
+      160deg,
+      #fbf7ff,
+      #eee1ff
+    );
+
+  color: #3d176c;
+}
+
+.rarity-premium
+.mtt-card-speciality,
+.rarity-premium
+.mtt-card-indexes div {
+  background: #e5d2fb;
+}
+
+/* ==========================================================
+   EPIQUE
+========================================================== */
+
+.rarity-epic.mtt-card {
+  background:
+    linear-gradient(
+      120deg,
+      #6512a8,
+      #db2777,
+      #7c3aed,
+      #6512a8
+    );
+
+  background-size:
+    250% 250%;
+
+  animation:
+    epicCardGlow
+    5s ease infinite;
+
+  box-shadow:
+    0 20px 50px
+    rgba(211,39,119,.3);
+}
+
+.rarity-epic
+.mtt-card-inner {
+  background:
+    linear-gradient(
+      160deg,
+      #fff7fc,
+      #f0ddff
+    );
+
+  color: #4c1769;
+}
+
+.rarity-epic
+.mtt-card-speciality,
+.rarity-epic
+.mtt-card-indexes div {
+  background: #ebcdf2;
+}
+
+@keyframes epicCardGlow {
+  0% {
+    background-position:
+      0% 50%;
+  }
+
+  50% {
+    background-position:
+      100% 50%;
+  }
+
+  100% {
+    background-position:
+      0% 50%;
+  }
+}
+
+/* ==========================================================
+   LEGENDAIRE
+========================================================== */
+
+.rarity-legendary.mtt-card {
+  background:
+    conic-gradient(
+      from 0deg,
+      #8b5e00,
+      #ffd95a,
+      #fff0a0,
+      #c98200,
+      #ffd95a,
+      #8b5e00
+    );
+
+  box-shadow:
+    0 20px 55px
+    rgba(214,157,0,.38);
+
+  animation:
+    legendaryFloat
+    3s ease-in-out infinite;
+}
+
+.rarity-legendary
+.mtt-card-inner {
+  background:
+    linear-gradient(
+      155deg,
+      #fffdf5,
+      #fff2be,
+      #f4dd8d
+    );
+
+  color: #5d3c00;
+}
+
+.rarity-legendary
+.mtt-card-speciality,
+.rarity-legendary
+.mtt-card-indexes div {
+  background:
+    rgba(
+      255,
+      221,
+      111,
+      .5
+    );
+}
+
+@keyframes legendaryFloat {
+  0%,
+  100% {
+    transform:
+      translateY(0);
+  }
+
+  50% {
+    transform:
+      translateY(-5px);
+  }
+}
+
+/* ==========================================================
+   GUIDE COULEURS
+========================================================== */
+
+.cards-rarity-guide-item.rarity-common {
+  background: #eceaec;
+  color: #615a65;
+}
+
+.cards-rarity-guide-item.rarity-rare {
+  background: #e5edff;
+  color: #2854b5;
+}
+
+.cards-rarity-guide-item.rarity-premium {
+  background: #eee0ff;
+  color: #6821bb;
+}
+
+.cards-rarity-guide-item.rarity-epic {
+  background: #f7dcec;
+  color: #a52268;
+}
+
+.cards-rarity-guide-item.rarity-legendary {
+  background: #fff0b8;
+  color: #8b5c00;
+}
+
+/* ==========================================================
+   CARTE PRINCIPALE
+========================================================== */
+
+.mtt-card-featured {
+  width: 255px;
+}
+
+/* ==========================================================
+   MOBILE
+========================================================== */
+
+@media (max-width: 700px) {
+
+  .cards-page {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+
+  .cards-game-header h1 {
+    font-size: 3rem;
+  }
+
+  .cards-stats {
+    grid-template-columns:
+      repeat(2, 1fr);
+  }
+
+  .cards-stats > div {
+    padding: 14px;
+  }
+
+  .cards-stats > div:nth-child(2) {
+    border-right: 0;
+  }
+
+  .cards-stats strong {
+    font-size: 1.5rem;
+  }
+
+  .cards-draw-section {
+    margin-top: 45px;
+  }
+
+  .cards-draw-zone {
+    min-height: 0;
+
+    padding: 22px 12px;
+
+    flex-direction: column;
+
+    gap: 22px;
+  }
+
+  .cards-pack,
+  .cards-opening,
+  .mtt-card-featured {
+    width: 230px;
+  }
+
+  .cards-rarity-guide {
+    grid-template-columns:
+      repeat(5, minmax(0, 1fr));
+
+    gap: 3px;
+  }
+
+  .cards-rarity-guide-item {
+    padding: 7px 2px;
+  }
+
+  .cards-rarity-guide-item strong {
+    font-size: .42rem;
+  }
+
+  .cards-rarity-guide-item span {
+    font-size: .4rem;
+  }
+
+  .cards-collection-section {
+    margin-top: 55px;
+  }
+
+  .cards-collection-grid {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+
+    gap: 8px;
+  }
+
+  .mtt-card {
+    max-width: none;
+
+    padding: 3px;
+
+    border-radius: 12px;
+  }
+
+  .mtt-card-inner {
+    padding: 7px;
+
+    border-radius: 10px;
+  }
+
+  .mtt-card-top span,
+  .mtt-card-top strong {
+    font-size: .34rem;
+  }
+
+  .mtt-card-photo {
+    margin-top: 5px;
+
+    border-radius: 8px;
+  }
+
+  .mtt-card-index {
+    right: 4px;
+    bottom: 4px;
+
+    min-width: 40px;
+
+    padding: 4px;
+  }
+
+  .mtt-card-index strong {
+    font-size: .8rem;
+  }
+
+  .mtt-card-identity h3 {
+    margin-top: 6px;
+
+    font-size: .72rem;
+  }
+
+  .mtt-card-identity span {
+    font-size: .4rem;
+  }
+
+  .mtt-card-speciality {
+    margin-top: 5px;
+
+    padding: 4px;
+  }
+
+  .mtt-card-speciality span {
+    font-size: .28rem;
+  }
+
+  .mtt-card-speciality strong {
+    font-size: .45rem;
+  }
+
+  .mtt-card-indexes {
+    margin-top: 5px;
+
+    gap: 2px;
+  }
+
+  .mtt-card-indexes div {
+    padding: 3px 1px;
+  }
+
+  .mtt-card-indexes span {
+    font-size: .26rem;
+  }
+
+  .mtt-card-indexes strong {
+    font-size: .45rem;
+  }
+
+  .mtt-card-footer {
+    font-size: .28rem;
+  }
+}

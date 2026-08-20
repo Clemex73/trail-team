@@ -33,7 +33,9 @@ export default function Navbar() {
 
   return (
     <header className="site-navbar">
-      {/* Photo Aiguilles */}
+      {/* ==================================================
+          PHOTO AIGUILLES
+      ================================================== */}
       <div className="navbar-mountain-image">
         <Image
           src="/aiguilles-arves2.png"
@@ -51,7 +53,9 @@ export default function Navbar() {
       <div className="navbar-light" />
 
       <div className="navbar-inner">
-        {/* Identité */}
+        {/* ==================================================
+            IDENTITE
+        ================================================== */}
         <Link href="/" className="navbar-brand">
           <div className="navbar-logo">
             <Image
@@ -74,7 +78,9 @@ export default function Navbar() {
           </div>
         </Link>
 
-        {/* Navigation */}
+        {/* ==================================================
+            NAVIGATION
+        ================================================== */}
         <nav className="navbar-nav">
           <NavLink
             href="/"
@@ -92,6 +98,15 @@ export default function Navbar() {
             href="/courses"
             icon="/nav-courses.png"
             label="Courses"
+          />
+
+          {/* ==================================================
+              MTT CARDS
+          ================================================== */}
+          <NavLink
+            href="/cartes"
+            icon="/nav-cards.png"
+            label="Cartes"
           />
 
           {isConnected ? (
@@ -152,6 +167,10 @@ export default function Navbar() {
     </header>
   );
 }
+
+/* ==========================================================
+   LIEN NAVIGATION
+========================================================== */
 
 function NavLink({
   href,
