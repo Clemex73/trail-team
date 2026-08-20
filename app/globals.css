@@ -7849,3 +7849,243 @@ label {
   }
 }
 
+/* ==========================================================
+   TEAM - PROCHAINE COURSE MEMBRE
+========================================================== */
+
+.team-next-race {
+  width: 100%;
+
+  display: grid;
+
+  grid-template-columns:
+    54px
+    minmax(0, 1fr)
+    auto;
+
+  align-items: center;
+
+  gap: 12px;
+
+  margin-top: 14px;
+
+  padding: 10px 12px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #faf7ff,
+      #f3edfc
+    );
+
+  border:
+    1px solid
+    #e1d6ed;
+
+  border-radius: 10px;
+}
+
+/* ==========================================================
+   LOGO
+========================================================== */
+
+.team-next-race-logo {
+  width: 54px;
+  height: 54px;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  overflow: hidden;
+
+  flex-shrink: 0;
+
+  background: white;
+
+  border:
+    1px solid
+    #e3dce9;
+
+  border-radius: 9px;
+}
+
+.team-next-race-logo img {
+  width: 100%;
+  height: 100%;
+
+  padding: 4px;
+
+  object-fit: contain;
+}
+
+.team-next-race-logo span {
+  font-size: 1.5rem;
+}
+
+/* ==========================================================
+   INFOS
+========================================================== */
+
+.team-next-race-content {
+  min-width: 0;
+}
+
+.team-next-race-label {
+  display: block;
+
+  margin-bottom: 3px;
+
+  color: #7c3aed;
+
+  font-size: 0.5rem;
+
+  font-weight: 1000;
+
+  letter-spacing: 0.14em;
+}
+
+.team-next-race-name {
+  display: block;
+
+  overflow: hidden;
+
+  color: #28134d;
+
+  font-size: 0.82rem;
+
+  font-weight: 900;
+
+  line-height: 1.15;
+
+  white-space: nowrap;
+
+  text-overflow: ellipsis;
+}
+
+.team-next-race-details {
+  display: flex;
+
+  flex-wrap: wrap;
+
+  gap: 3px 9px;
+
+  margin-top: 5px;
+}
+
+.team-next-race-details span {
+  color: #776d7d;
+
+  font-size: 0.62rem;
+
+  font-weight: 700;
+
+  white-space: nowrap;
+}
+
+/* ==========================================================
+   J-X
+========================================================== */
+
+.team-next-race-countdown {
+  min-width: 58px;
+
+  padding-left: 10px;
+
+  border-left:
+    1px solid
+    #ddd1e8;
+
+  text-align: center;
+}
+
+.team-next-race-countdown small {
+  display: block;
+
+  margin-bottom: 2px;
+
+  color: #94879e;
+
+  font-size: 0.45rem;
+
+  font-weight: 900;
+
+  letter-spacing: 0.1em;
+}
+
+.team-next-race-countdown strong {
+  display: block;
+
+  color: #6622c8;
+
+  font-size: 1.45rem;
+
+  font-weight: 1000;
+
+  line-height: 1;
+}
+
+/* ==========================================================
+   MOBILE
+========================================================== */
+
+@media (max-width: 600px) {
+  .team-next-race {
+    grid-template-columns:
+      36px
+      minmax(0, 1fr)
+      auto;
+
+    gap: 6px;
+
+    margin-top: 8px;
+
+    padding: 7px;
+  }
+
+  .team-next-race-logo {
+    width: 36px;
+    height: 36px;
+
+    border-radius: 6px;
+  }
+
+  .team-next-race-logo img {
+    padding: 2px;
+  }
+
+  .team-next-race-label {
+    font-size: 0.38rem;
+
+    letter-spacing: 0.08em;
+  }
+
+  .team-next-race-name {
+    font-size: 0.62rem;
+  }
+
+  .team-next-race-details {
+    gap: 2px 5px;
+
+    margin-top: 3px;
+  }
+
+  .team-next-race-details span {
+    font-size: 0.47rem;
+  }
+
+  .team-next-race-countdown {
+    min-width: 39px;
+
+    padding-left: 5px;
+  }
+
+  .team-next-race-countdown small {
+    display: none;
+  }
+
+  .team-next-race-countdown strong {
+    font-size: 0.93rem;
+  }
+}
