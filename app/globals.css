@@ -8187,3 +8187,336 @@ label {
     font-size: 0.38rem;
   }
 }
+
+
+/* ==========================================================
+   LISTE DES COURSES - MOBILE ULTRA COMPACTE
+   Desktop inchangé.
+========================================================== */
+
+@media (max-width: 600px) {
+  /* On réduit fortement les marges de la section */
+  .race-list-section {
+    padding-top: 18px;
+    padding-bottom: 28px;
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+
+  .race-list-section .courses-section-title {
+    margin-bottom: 12px;
+  }
+
+  .race-list-section .courses-section-title h2 {
+    margin-top: 4px;
+    font-size: 1.45rem;
+    line-height: 1;
+  }
+
+  .race-list {
+    gap: 8px;
+  }
+
+  /* Carte complète : date + contenu */
+  .race-event-card {
+    grid-template-columns: 54px minmax(0, 1fr);
+
+    min-height: 0;
+
+    border-radius: 10px;
+
+    box-shadow:
+      0 4px 14px
+      rgba(40, 20, 70, 0.05);
+  }
+
+  /* Colonne date beaucoup plus fine */
+  .race-event-date {
+    min-width: 54px;
+
+    padding: 8px 3px;
+  }
+
+  .race-event-date strong {
+    font-size: 1.25rem;
+  }
+
+  .race-event-date span {
+    margin-top: 3px;
+
+    font-size: 0.48rem;
+
+    letter-spacing: 0.04em;
+  }
+
+  /* Contenu général */
+  .race-event-content {
+    min-width: 0;
+
+    padding: 9px 10px;
+  }
+
+  /* Header horizontal : logo + nom */
+  .race-event-header {
+    flex-direction: row;
+
+    align-items: center;
+
+    gap: 8px;
+  }
+
+  .race-event-logo {
+    width: 42px;
+    height: 42px;
+
+    flex: 0 0 42px;
+
+    border-radius: 8px;
+  }
+
+  .race-event-logo img {
+    padding: 3px;
+  }
+
+  .race-card-label {
+    margin-bottom: 2px;
+
+    font-size: 0.44rem;
+
+    letter-spacing: 0.1em;
+  }
+
+  .race-event-header h3 {
+    margin: 1px 0 2px;
+
+    font-size: 1rem;
+
+    line-height: 1.05;
+
+    overflow: hidden;
+
+    white-space: nowrap;
+
+    text-overflow: ellipsis;
+  }
+
+  .race-event-location {
+    margin: 0;
+
+    font-size: 0.58rem;
+
+    line-height: 1.15;
+
+    overflow: hidden;
+
+    white-space: nowrap;
+
+    text-overflow: ellipsis;
+  }
+
+  /* Formats : petites lignes horizontales */
+  .race-formats-list {
+    margin-top: 7px;
+
+    border-top: 1px solid #ece6f1;
+  }
+
+  .race-format-row {
+    grid-template-columns:
+      minmax(0, 1fr)
+      auto
+      auto;
+
+    gap: 7px;
+
+    padding: 6px 0;
+
+    align-items: center;
+  }
+
+  /* Le bloc "participants" détaillé n'est pas utile ici sur mobile.
+     Le total reste affiché dans le résumé juste dessous. */
+  .race-format-row > div:nth-child(3) {
+    display: none;
+  }
+
+  .race-format-name {
+    min-width: 0;
+  }
+
+  .race-format-name > span {
+    margin: 0 0 1px;
+
+    font-size: 0.48rem;
+
+    white-space: nowrap;
+
+    overflow: hidden;
+
+    text-overflow: ellipsis;
+  }
+
+  .race-format-name strong {
+    display: inline;
+
+    font-size: 0.72rem;
+  }
+
+  .race-format-row > div:nth-child(2) span {
+    display: none;
+  }
+
+  .race-format-row > div:nth-child(2) strong {
+    font-size: 0.68rem;
+
+    white-space: nowrap;
+  }
+
+  /* Bouton participer petit et horizontal */
+  .race-format-join {
+    width: auto;
+
+    min-width: 0;
+    min-height: 30px;
+
+    padding: 5px 8px;
+
+    border-radius: 6px;
+
+    font-size: 0.58rem;
+
+    white-space: nowrap;
+  }
+
+  /* Résumé en une seule ligne */
+  .race-event-summary {
+    display: flex;
+
+    flex-direction: row;
+
+    align-items: center;
+
+    gap: 10px;
+
+    margin-top: 6px;
+
+    padding: 6px 8px;
+
+    border-radius: 7px;
+
+    overflow: hidden;
+  }
+
+  .race-event-summary > div {
+    display: flex;
+
+    align-items: center;
+
+    gap: 3px;
+  }
+
+  .race-event-summary span {
+    display: none;
+  }
+
+  .race-event-summary strong {
+    font-size: 0.66rem;
+
+    white-space: nowrap;
+  }
+
+  .race-event-summary .event-comment-count {
+    margin: 0;
+
+    font-size: 0.62rem;
+
+    white-space: nowrap;
+  }
+
+  /* Actions principales compactes sur la même ligne */
+  .race-event-actions {
+    gap: 5px;
+
+    margin-top: 6px;
+  }
+
+  .race-event-actions .race-choice {
+    min-height: 30px;
+
+    padding: 5px 9px;
+
+    font-size: 0.58rem;
+  }
+
+  .race-event-actions .race-remove {
+    width: 30px;
+    height: 30px;
+
+    padding: 0;
+
+    flex: 0 0 30px;
+  }
+
+  /* Les boutons d'admin sont présents mais discrets */
+  .race-owner-actions {
+    margin-top: 6px;
+
+    gap: 5px;
+
+    flex-direction: row;
+  }
+
+  .race-owner-actions button {
+    min-height: 28px;
+
+    padding: 4px 8px;
+
+    font-size: 0.55rem;
+  }
+
+  /* Quand une course est sélectionnée */
+  .race-format-selected {
+    border-radius: 6px;
+  }
+}
+
+/* Très petits écrans : encore un peu plus compact */
+@media (max-width: 430px) {
+  .race-event-card {
+    grid-template-columns: 48px minmax(0, 1fr);
+  }
+
+  .race-event-date {
+    min-width: 48px;
+  }
+
+  .race-event-date strong {
+    font-size: 1.1rem;
+  }
+
+  .race-event-content {
+    padding: 8px;
+  }
+
+  .race-event-logo {
+    width: 38px;
+    height: 38px;
+
+    flex-basis: 38px;
+  }
+
+  .race-event-header h3 {
+    font-size: 0.92rem;
+  }
+
+  .race-format-row {
+    gap: 5px;
+  }
+
+  .race-format-join {
+    padding-left: 6px;
+    padding-right: 6px;
+
+    font-size: 0.53rem;
+  }
+}
