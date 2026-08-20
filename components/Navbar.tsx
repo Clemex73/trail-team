@@ -76,24 +76,72 @@ export default function Navbar() {
 
         {/* Navigation */}
         <nav className="navbar-nav">
-          <NavLink href="/">Accueil</NavLink>
-          <NavLink href="/equipe">Équipe</NavLink>
-          <NavLink href="/courses">Courses</NavLink>
+          <NavLink
+            href="/"
+            icon="/nav-home.png"
+            label="Accueil"
+          />
+
+          <NavLink
+            href="/equipe"
+            icon="/nav-team.png"
+            label="Équipe"
+          />
+
+          <NavLink
+            href="/courses"
+            icon="/nav-courses.png"
+            label="Courses"
+          />
 
           {isConnected ? (
             <>
-              <NavLink href="/profil">Profil</NavLink>
+              <NavLink
+                href="/profil"
+                icon="/nav-profile.png"
+                label="Profil"
+              />
 
-              <Link href="/logout" className="navbar-action">
-                Déconnexion
+              <Link
+                href="/logout"
+                className="navbar-action navbar-link-with-icon"
+              >
+                <Image
+                  src="/nav-logout.png"
+                  alt=""
+                  width={22}
+                  height={22}
+                  className="navbar-menu-icon"
+                />
+
+                <span>
+                  Déconnexion
+                </span>
               </Link>
             </>
           ) : (
             <>
-              <NavLink href="/login">Connexion</NavLink>
+              <NavLink
+                href="/login"
+                icon="/nav-login.png"
+                label="Connexion"
+              />
 
-              <Link href="/register" className="navbar-register">
-                Inscription
+              <Link
+                href="/register"
+                className="navbar-register navbar-link-with-icon"
+              >
+                <Image
+                  src="/nav-register.png"
+                  alt=""
+                  width={22}
+                  height={22}
+                  className="navbar-menu-icon"
+                />
+
+                <span>
+                  Inscription
+                </span>
               </Link>
             </>
           )}
@@ -107,14 +155,29 @@ export default function Navbar() {
 
 function NavLink({
   href,
-  children,
+  icon,
+  label,
 }: {
   href: string;
-  children: React.ReactNode;
+  icon: string;
+  label: string;
 }) {
   return (
-    <Link href={href} className="navbar-link">
-      {children}
+    <Link
+      href={href}
+      className="navbar-link navbar-link-with-icon"
+    >
+      <Image
+        src={icon}
+        alt=""
+        width={22}
+        height={22}
+        className="navbar-menu-icon"
+      />
+
+      <span>
+        {label}
+      </span>
     </Link>
   );
 }

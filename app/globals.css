@@ -7493,3 +7493,239 @@ label {
     width: 100%;
   }
 }
+
+/* ==========================================================
+   ICONES NAVBAR
+========================================================== */
+
+.navbar-link-with-icon {
+  display: inline-flex;
+  align-items: center;
+
+  gap: 7px;
+}
+
+.navbar-menu-icon {
+  width: 22px;
+  height: 22px;
+
+  flex-shrink: 0;
+
+  object-fit: contain;
+}
+
+.navbar-link .navbar-menu-icon,
+.navbar-action .navbar-menu-icon {
+  filter:
+    brightness(0)
+    invert(1);
+
+  opacity: 0.95;
+}
+
+.navbar-register .navbar-menu-icon {
+  filter: none;
+}
+
+@media (max-width: 768px) {
+  .navbar-link-with-icon {
+    gap: 5px;
+  }
+
+  .navbar-menu-icon {
+    width: 19px;
+    height: 19px;
+  }
+}
+
+/* ==========================================================
+   NAVBAR - VERSION AGRANDIE
+   Ce bloc est volontairement placé en fin de fichier
+   pour écraser les anciennes tailles de la navbar.
+========================================================== */
+
+.navbar-nav {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.navbar-link,
+.navbar-action,
+.navbar-register {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 10px;
+
+  min-height: 54px;
+  padding: 14px 18px;
+
+  font-size: 1.05rem;
+  font-weight: 850;
+
+  border-radius: 12px;
+}
+
+.navbar-link {
+  color: rgba(255, 255, 255, 0.96);
+}
+
+.navbar-link:hover {
+  color: white;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.navbar-action {
+  margin-left: 6px;
+
+  color: white;
+
+  border: 1px solid rgba(255, 255, 255, 0.4);
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.12),
+      rgba(255, 255, 255, 0.06)
+    );
+
+  backdrop-filter: blur(10px);
+}
+
+.navbar-action:hover {
+  color: white;
+  background: rgba(255, 255, 255, 0.18);
+}
+
+.navbar-register {
+  margin-left: 6px;
+
+  color: #4c1d95;
+  background: rgba(255, 255, 255, 0.96);
+
+  font-weight: 900;
+}
+
+.navbar-register:hover {
+  color: #24104f;
+  transform: translateY(-1px);
+}
+
+/* ==========================================================
+   ICONES NAVBAR - PLUS GRANDES
+========================================================== */
+
+.navbar-link-with-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 10px;
+}
+
+.navbar-menu-icon {
+  width: 32px !important;
+  height: 32px !important;
+
+  flex: 0 0 32px;
+
+  object-fit: contain;
+}
+
+.navbar-link .navbar-menu-icon,
+.navbar-action .navbar-menu-icon {
+  filter:
+    brightness(0)
+    invert(1);
+
+  opacity: 1;
+}
+
+.navbar-register .navbar-menu-icon {
+  filter: none;
+}
+
+/* ==========================================================
+   TABLETTE
+========================================================== */
+
+@media (max-width: 1100px) {
+  .navbar-nav {
+    gap: 7px;
+  }
+
+  .navbar-link,
+  .navbar-action,
+  .navbar-register {
+    min-height: 50px;
+
+    padding: 12px 14px;
+
+    font-size: 0.96rem;
+
+    gap: 8px;
+  }
+
+  .navbar-menu-icon {
+    width: 28px !important;
+    height: 28px !important;
+
+    flex-basis: 28px;
+  }
+}
+
+/* ==========================================================
+   MOBILE
+========================================================== */
+
+@media (max-width: 768px) {
+  .navbar-nav {
+    gap: 5px;
+  }
+
+  .navbar-link,
+  .navbar-action,
+  .navbar-register {
+    min-height: 46px;
+
+    padding: 10px 11px;
+
+    font-size: 0.9rem;
+
+    gap: 7px;
+  }
+
+  .navbar-menu-icon {
+    width: 24px !important;
+    height: 24px !important;
+
+    flex-basis: 24px;
+  }
+}
+
+/* ==========================================================
+   PETITS TELEPHONES
+========================================================== */
+
+@media (max-width: 430px) {
+  .navbar-link,
+  .navbar-action,
+  .navbar-register {
+    padding: 9px 8px;
+
+    font-size: 0.8rem;
+
+    gap: 5px;
+  }
+
+  .navbar-menu-icon {
+    width: 21px !important;
+    height: 21px !important;
+
+    flex-basis: 21px;
+  }
+}
+
