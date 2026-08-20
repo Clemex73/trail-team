@@ -88,6 +88,9 @@ export default function CoursesPage() {
   const [userId, setUserId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
+  const [showRaceCreate, setShowRaceCreate] = useState(false);
+  const [showTrainingCreate, setShowTrainingCreate] = useState(false);
+
   /* ======================================================
      CREATION COURSE
   ====================================================== */
@@ -513,6 +516,8 @@ export default function CoursesPage() {
       setRaceImage(null);
       setRaceImagePreview(null);
 
+      setShowRaceCreate(false);
+
       await loadEverything();
     } catch (error: any) {
       console.error(error);
@@ -903,6 +908,8 @@ export default function CoursesPage() {
     setTrainingComment("");
     setTrainingLevel("<300");
 
+    setShowTrainingCreate(false);
+
     await loadEverything();
   }
 
@@ -1181,26 +1188,102 @@ export default function CoursesPage() {
       </section>
 
       {/* ==================================================
+          AJOUTER UNE COURSE / UN ENTRAINEMENT
+      ================================================== */}
+
+      {userId && (
+        <section className="page-container">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <button
+              type="button"
+              onClick={() => {
+                setShowRaceCreate((current) => !current);
+                setShowTrainingCreate(false);
+              }}
+              className="group flex min-h-[118px] w-full items-center gap-4 rounded-2xl !border !border-violet-200 !bg-white p-4 text-left !text-[#28134d] shadow-md transition hover:-translate-y-0.5 hover:!border-violet-400 hover:!bg-violet-50 hover:shadow-lg"
+            >
+              <img
+                src="/add-race.png"
+                alt=""
+                className="h-20 w-20 shrink-0 object-contain md:h-24 md:w-24"
+              />
+
+              <div className="min-w-0 flex-1">
+                <span className="block text-[0.62rem] font-black tracking-[0.18em] !text-violet-700">
+                  COURSE
+                </span>
+
+                <strong className="mt-1 block text-lg font-black !text-[#28134d] md:text-xl">
+                  Ajouter une course
+                </strong>
+
+                <span className="mt-1 block text-sm font-semibold !text-[#5f5667]">
+                  Créer un nouvel événement et ses formats
+                </span>
+              </div>
+
+              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full !bg-violet-100 text-3xl font-light !text-violet-700">
+                {showRaceCreate ? "−" : "+"}
+              </span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => {
+                setShowTrainingCreate((current) => !current);
+                setShowRaceCreate(false);
+              }}
+              className="group flex min-h-[118px] w-full items-center gap-4 rounded-2xl !border !border-violet-200 !bg-white p-4 text-left !text-[#28134d] shadow-md transition hover:-translate-y-0.5 hover:!border-violet-400 hover:!bg-violet-50 hover:shadow-lg"
+            >
+              <img
+                src="/add-training.png"
+                alt=""
+                className="h-20 w-20 shrink-0 object-contain md:h-24 md:w-24"
+              />
+
+              <div className="min-w-0 flex-1">
+                <span className="block text-[0.62rem] font-black tracking-[0.18em] !text-violet-700">
+                  ENTRAÎNEMENT
+                </span>
+
+                <strong className="mt-1 block text-lg font-black !text-[#28134d] md:text-xl">
+                  Ajouter un entraînement
+                </strong>
+
+                <span className="mt-1 block text-sm font-semibold !text-[#5f5667]">
+                  Planifier une sortie ou un entraînement du team
+                </span>
+              </div>
+
+              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full !bg-violet-100 text-3xl font-light !text-violet-700">
+                {showTrainingCreate ? "−" : "+"}
+              </span>
+            </button>
+          </div>
+        </section>
+      )}
+
+      {/* ==================================================
           CREATION EVENEMENT
       ================================================== */}
 
-      <section className="page-container">
-        <div className="race-create">
-          <div className="race-create-heading">
-            <span>
-              AJOUTER UN ÉVÉNEMENT
-            </span>
+      {userId && showRaceCreate && (
+        <section className="page-container pt-0">
+          <div className="race-create">
+            <div className="race-create-heading">
+              <span>
+                AJOUTER UN ÉVÉNEMENT
+              </span>
 
-            <h2>
-              Un nouveau défi ?
-            </h2>
+              <h2>
+                Un nouveau défi ?
+              </h2>
 
-            <p>
-              Crée un événement puis ajoute autant de formats que nécessaire.
-            </p>
-          </div>
+              <p>
+                Crée un événement puis ajoute autant de formats que nécessaire.
+              </p>
+            </div>
 
-          {userId && (
             <form
               className="race-event-form"
               onSubmit={addRace}
@@ -1383,37 +1466,47 @@ export default function CoursesPage() {
                 )}
               </div>
 
-              <button
-                type="submit"
-                className="race-submit"
-                disabled={saving}
-              >
-                {saving
-                  ? "Création..."
-                  : "Créer l'événement"}
-              </button>
+              <div className="flex flex-col gap-3 md:flex-row">
+                <button
+                  type="submit"
+                  className="race-submit flex-1"
+                  disabled={saving}
+                >
+                  {saving
+                    ? "Création..."
+                    : "Créer l'événement"}
+                </button>
+
+                <button
+                  type="button"
+                  className="race-edit-cancel"
+                  onClick={() => setShowRaceCreate(false)}
+                >
+                  Fermer
+                </button>
+              </div>
             </form>
-          )}
-        </div>
-      </section>
+          </div>
+        </section>
+      )}
 
       {/* ==================================================
           CREATION ENTRAINEMENT
       ================================================== */}
 
-      <section className="page-container">
-        <div className="training-create">
-          <div className="training-create-heading">
-            <span>
-              AJOUTER UNE SORTIE
-            </span>
+      {userId && showTrainingCreate && (
+        <section className="page-container pt-0">
+          <div className="training-create">
+            <div className="training-create-heading">
+              <span>
+                AJOUTER UNE SORTIE
+              </span>
 
-            <h2>
-              Une sortie prévue ?
-            </h2>
-          </div>
+              <h2>
+                Une sortie prévue ?
+              </h2>
+            </div>
 
-          {userId && (
             <form
               className="training-form"
               onSubmit={addTraining}
@@ -1514,16 +1607,26 @@ export default function CoursesPage() {
                 />
               </div>
 
-              <button
-                className="training-submit"
-                disabled={savingTraining}
-              >
-                Ajouter la sortie
-              </button>
+              <div className="flex flex-col gap-3 md:flex-row">
+                <button
+                  className="training-submit flex-1"
+                  disabled={savingTraining}
+                >
+                  Ajouter la sortie
+                </button>
+
+                <button
+                  type="button"
+                  className="race-edit-cancel"
+                  onClick={() => setShowTrainingCreate(false)}
+                >
+                  Fermer
+                </button>
+              </div>
             </form>
-          )}
-        </div>
-      </section>
+          </div>
+        </section>
+      )}
 
       {/* ==================================================
           CALENDRIER
